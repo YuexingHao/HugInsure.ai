@@ -47,12 +47,24 @@
   }
 
   .app {
-    display: flex;
-    flex-direction: column;
     min-height: 100vh;
-    max-width: 760px;
+    max-width: 1180px;
     margin: 0 auto;
     padding: 0 28px;
+    display: flex;
+    flex-direction: column;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 36px;
+    align-items: start;
+    flex: 1;
+  }
+  .left-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
   }
 
   /* ---------- Header ---------- */
@@ -273,118 +285,160 @@
   }
   .send:hover { transform: translateY(-1px); background: var(--hug); }
 
-  /* ---------- Bet bar (replaces "Claude is AI..." footer) ---------- */
-  .bet {
-    margin-top: 14px;
+  /* ---------- Right sidebar ---------- */
+  .bet-panel {
+    position: sticky;
+    top: 28px;
+    align-self: start;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
     gap: 14px;
-    padding: 0 6px;
+    padding-top: 32px;
   }
-  .bet-line {
+  .bet-panel .tagline {
     font-family: var(--serif);
     font-style: italic;
-    font-weight: 300;
-    font-size: 16.5px;
+    font-size: 16px;
     color: var(--ink-2);
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 8px;
+    padding: 0 4px;
   }
-  .bet-line .heart {
-    display: inline-block;
+  .bet-panel .tagline .heart {
     color: var(--hug);
     font-style: normal;
     transform: translateY(-1px);
   }
 
-  .hug-trigger {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 16px 8px 8px;
-    background: var(--ink);
-    color: var(--paper);
-    border: 0;
-    border-radius: 999px;
-    font: 500 13px/1 var(--sans);
-    cursor: pointer;
-    transition: transform .2s ease, background .2s ease;
-  }
-  .hug-trigger:hover { transform: translateY(-1px); background: var(--hug); }
-  .hug-trigger .pill {
-    display: inline-flex; align-items: center; justify-content: center;
-    background: var(--hug); color: #fff;
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 14px;
-    transition: background .2s, color .2s;
-  }
-  .hug-trigger:hover .pill { background: #fff; color: var(--hug); }
-  .hug-trigger .from {
-    font-family: var(--serif);
-    font-style: italic;
-    font-weight: 400;
-    font-size: 14px;
-    color: rgba(243,236,224,.7);
-    margin-left: 1px;
-  }
-
-  /* ---------- Picker ---------- */
-  .picker {
-    margin-top: 14px;
+  /* ---------- Risk score widget ---------- */
+  .risk {
     background: #fffdf8;
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
-    padding: 22px 22px 18px;
-    box-shadow: 0 24px 60px -28px rgba(40, 25, 10, 0.25);
-    display: none;
+    padding: 18px 20px 18px;
+    box-shadow: 0 18px 40px -28px rgba(40, 25, 10, 0.18);
   }
-  .picker.open {
-    display: block;
-    animation: rise 0.45s ease forwards;
+  .risk .head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+    margin-bottom: 8px;
+  }
+  .risk .head .verdict {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink-2);
+  }
+  .risk .score {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 38px;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .risk .score .scale {
+    font-size: 16px;
+    color: var(--ink-3);
+    font-style: italic;
+    margin-left: 2px;
+  }
+  .risk .bar {
+    display: flex;
+    gap: 3px;
+    margin-top: 14px;
+  }
+  .risk .seg {
+    flex: 1;
+    height: 6px;
+    border-radius: 2px;
+    background: var(--paper-2);
+    transition: background .35s;
+  }
+  .risk[data-band="low"]  .seg.on { background: #6b8e6e; }  /* sage */
+  .risk[data-band="mid"]  .seg.on { background: #b48d4a; }  /* gold */
+  .risk[data-band="high"] .seg.on { background: var(--hug); }
+  .risk .reason {
+    margin-top: 12px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .risk .reason.placeholder { color: var(--ink-3); }
+  .risk .recommend {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--line);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-3);
+  }
+  .risk .recommend strong {
+    color: var(--hug);
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    margin-left: 6px;
+  }
+
+  /* ---------- Picker (always visible in sidebar) ---------- */
+  .picker {
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 18px 18px 16px;
+    box-shadow: 0 18px 40px -28px rgba(40, 25, 10, 0.2);
   }
   .picker .ph {
     display: flex; align-items: baseline; justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
   .picker h3 {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 24px;
-    letter-spacing: -0.022em;
+    font-size: 19px;
+    letter-spacing: -0.02em;
   }
   .picker h3 em { font-style: italic; color: var(--hug); }
   .picker .sub {
-    font-size: 10.5px;
+    font-size: 9.5px;
     color: var(--ink-3);
     text-transform: uppercase;
     letter-spacing: 0.22em;
   }
 
   .tiers {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
   .tier {
     text-align: left;
     background: var(--paper);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 16px 14px 14px;
+    padding: 12px 14px 12px;
     cursor: pointer;
-    transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     position: relative;
   }
   .tier:hover {
-    transform: translateY(-3px);
+    transform: translateX(2px);
     border-color: var(--hug);
     background: var(--hug-bg);
   }
@@ -393,90 +447,127 @@
     background: var(--hug-bg);
     box-shadow: inset 0 0 0 1px var(--hug);
   }
-
+  .tier.recommended {
+    border-color: var(--hug-soft);
+    box-shadow: 0 0 0 2px var(--hug-bg);
+  }
+  .tier.recommended::after {
+    content: '★ recommended';
+    position: absolute;
+    top: 12px; right: 12px;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--hug);
+    font-weight: 500;
+  }
+  .tier .row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
   .tier .price {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 30px;
+    font-size: 24px;
     letter-spacing: -0.022em;
     color: var(--ink);
-    line-height: 1.05;
+    line-height: 1;
   }
   .tier .price .cur {
     color: var(--hug);
     font-style: italic;
     margin-right: 1px;
   }
-  .tier .name {
-    font-size: 10.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.22em;
+  .tier .payout-amt {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 12px;
     color: var(--ink-3);
   }
-
-  /* hover explainer */
-  .tier .tip {
-    position: absolute;
-    bottom: calc(100% + 10px);
-    left: 50%;
-    transform: translateX(-50%) translateY(4px);
-    width: 210px;
-    background: var(--ink);
-    color: var(--paper);
-    padding: 12px 14px 13px;
-    border-radius: 12px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .22s ease, transform .22s ease;
-    z-index: 20;
-    box-shadow: 0 18px 36px -12px rgba(0,0,0,.42);
-  }
-  .tier .tip::after {
-    content: '';
-    position: absolute;
-    top: 100%; left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: var(--ink);
-  }
-  .tier:hover .tip,
-  .tier:focus-visible .tip {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-  .tier .tip .label {
-    display: block;
+  .tier .name {
     font-size: 9.5px;
     text-transform: uppercase;
     letter-spacing: 0.22em;
-    color: var(--hug-soft);
-    margin-bottom: 6px;
+    color: var(--ink-3);
   }
-  .tier .tip .ex {
-    display: block;
+  .tier .ex {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 13.5px;
-    line-height: 1.4;
-    color: var(--paper);
+    font-size: 12.5px;
+    color: var(--ink-2);
+    line-height: 1.35;
+    margin-top: 2px;
   }
-  @media (hover: none) { .tier .tip { display: none; } }
 
   .picker .fine {
-    margin-top: 18px;
-    padding-top: 14px;
+    margin-top: 14px;
+    padding-top: 12px;
     border-top: 1px dashed var(--line);
     text-align: center;
-    font-size: 11.5px;
+    font-size: 10px;
     color: var(--ink-3);
-    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
   }
   .picker .fine em {
     font-family: var(--serif);
     font-style: italic;
     color: var(--ink-2);
-    font-size: 13px;
+    font-size: 12px;
     letter-spacing: 0;
+    text-transform: none;
+  }
+
+  /* ---------- Image preview (in composer) ---------- */
+  .composer .preview {
+    display: none;
+    margin: 4px 0 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .composer .preview.has-image { display: flex; }
+  .composer .preview .thumb {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    overflow: visible;
+    border: 1px solid var(--line);
+  }
+  .composer .preview .thumb img {
+    width: 100%; height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  .composer .preview .thumb .x {
+    position: absolute;
+    top: -7px; right: -7px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    border: 0;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  }
+  .composer .preview .thumb .x:hover { background: var(--hug); }
+
+  /* ---------- Image in user message bubble ---------- */
+  .msg.user .attached-img {
+    display: block;
+    max-width: 280px;
+    max-height: 220px;
+    margin: 0 0 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.08);
+    object-fit: cover;
   }
 
   /* ---------- Streaming cursor ---------- */
@@ -535,17 +626,20 @@
   .micro em { font-family: var(--serif); font-style: italic; text-transform: none; letter-spacing: 0; color: var(--ink-2); font-size: 12px; }
 
   /* responsive */
+  @media (max-width: 980px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .bet-panel {
+      position: static;
+      padding-top: 0;
+    }
+  }
   @media (max-width: 720px) {
-    .tiers { grid-template-columns: repeat(2, 1fr); }
     .greeting { font-size: 28px; }
     .meta .live { display: none; }
-    .bet { flex-direction: column; align-items: flex-start; }
-    .bet-line { font-size: 15px; }
     .tag { display: none; }
-  }
-  @media (max-width: 420px) {
-    .tiers { grid-template-columns: 1fr 1fr 1fr; }
-    .tier .payout { display: none; }
   }
 </style>
 </head>
@@ -562,104 +656,98 @@
     </div>
   </header>
 
-  <nav class="scenarios" id="scenarios" aria-label="Test scenarios">
-    <span class="lead">try a scenario.</span>
-    <button class="chip active" data-id="medicine">medicine</button>
-    <button class="chip" data-id="finance">finance</button>
-    <button class="chip" data-id="legal">legal</button>
-    <button class="chip" data-id="history">history</button>
-    <button class="chip" data-id="travel">travel</button>
-  </nav>
+  <div class="layout">
+    <div class="left-col">
+      <nav class="scenarios" id="scenarios" aria-label="Test scenarios">
+        <span class="lead">try a scenario.</span>
+        <button class="chip active" data-id="medicine">medicine</button>
+        <button class="chip" data-id="finance">finance</button>
+        <button class="chip" data-id="legal">legal</button>
+        <button class="chip" data-id="history">history</button>
+        <button class="chip" data-id="travel">travel</button>
+      </nav>
 
-  <main class="chat" id="chat">
-    <div class="greeting">Good evening, Yuexing.<br/>What do you want <em>covered</em> today?</div>
-    <div id="convo"></div>
-  </main>
+      <main class="chat" id="chat">
+        <div class="greeting">Good evening, Yuexing.<br/>What do you want <em>covered</em> today?</div>
+        <div id="convo"></div>
+      </main>
 
-  <div class="composer-wrap">
-    <div class="composer">
-      <textarea id="ta" placeholder="Reply, or ask another question…" rows="1"></textarea>
-      <div class="composer-row">
-        <div class="composer-tools">
-          <button class="iconbtn" title="Attach" aria-label="Attach">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-9 9a5.5 5.5 0 0 1-7.78-7.78l9-9a3.5 3.5 0 0 1 4.95 4.95l-9 9a1.5 1.5 0 0 1-2.12-2.12l8.49-8.49"/></svg>
+      <div class="composer-wrap">
+        <div class="composer">
+          <div class="preview" id="preview" aria-live="polite"></div>
+          <textarea id="ta" placeholder="Reply, or ask another question&hellip;" rows="1"></textarea>
+          <input type="file" id="imageInput" accept="image/*" hidden />
+          <div class="composer-row">
+            <div class="composer-tools">
+              <button class="iconbtn" id="attachBtn" title="Attach image" aria-label="Attach image">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-9 9a5.5 5.5 0 0 1-7.78-7.78l9-9a3.5 3.5 0 0 1 4.95 4.95l-9 9a1.5 1.5 0 0 1-2.12-2.12l8.49-8.49"/></svg>
+              </button>
+              <button class="iconbtn" title="Tools" aria-label="Tools">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+              </button>
+              <button class="iconbtn" title="Voice" aria-label="Voice">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+              </button>
+            </div>
+            <button class="send" id="send" title="Send" aria-label="Send">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="bet-panel" aria-label="Risk score and coverage">
+      <div class="risk" id="risk" data-band="mid">
+        <div class="head">
+          <span>stakes</span>
+          <span class="verdict" id="riskVerdict">&mdash;</span>
+        </div>
+        <div class="score"><span id="riskValue">&mdash;</span><span class="scale"> / 10</span></div>
+        <div class="bar" id="riskBar">
+          <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+          <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+        </div>
+        <div class="reason placeholder" id="riskReason">awaiting an answer to rate.</div>
+        <div class="recommend">recommended <strong id="riskRecommend">&mdash;</strong></div>
+      </div>
+
+      <div class="tagline"><span class="heart">&#10084;</span> Insure this <em>question</em>.</div>
+
+      <div class="picker" role="region" aria-label="Coverage tiers">
+        <div class="ph">
+          <h3>Cover this <em>question</em>.</h3>
+          <div class="sub">price scales with stakes</div>
+        </div>
+        <div class="tiers" id="tiers">
+          <button class="tier" data-tier="light">
+            <div class="row">
+              <span class="price"><span class="cur">$</span><span class="amount">3</span></span>
+              <span class="payout-amt">refund up to $<span class="payout">36</span></span>
+            </div>
+            <div class="name">Light Hug</div>
+            <div class="ex">enough attention for clear questions.</div>
           </button>
-          <button class="iconbtn" title="Tools" aria-label="Tools">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+          <button class="tier" data-tier="standard">
+            <div class="row">
+              <span class="price"><span class="cur">$</span><span class="amount">10</span></span>
+              <span class="payout-amt">refund up to $<span class="payout">120</span></span>
+            </div>
+            <div class="name">Standard Hug</div>
+            <div class="ex">careful response with verification.</div>
           </button>
-          <button class="iconbtn" title="Voice" aria-label="Voice">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          <button class="tier" data-tier="premium">
+            <div class="row">
+              <span class="price"><span class="cur">$</span><span class="amount">25</span></span>
+              <span class="payout-amt">refund up to $<span class="payout">300</span></span>
+            </div>
+            <div class="name">Premium Hug</div>
+            <div class="ex">maximum scrutiny on a high-stakes ask.</div>
           </button>
         </div>
-        <button class="send" id="send" title="Send" aria-label="Send">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-        </button>
+        <div class="fine"><em>independent verdict</em> &middot; 24h payout &middot; price &amp; refund track stakes</div>
       </div>
-    </div>
-
-    <!-- bet bar replaces the standard Claude disclaimer -->
-    <div class="bet">
-      <div class="bet-line">
-        <span class="heart">&#10084;</span> Let's bet on this answer?
-      </div>
-      <button class="hug-trigger" id="hugBtn" aria-expanded="false" aria-controls="picker">
-        <span class="pill">h</span>
-        Buy insurance from Hug
-        <span class="from">— from $3</span>
-      </button>
-    </div>
-
-    <div class="picker" id="picker" role="dialog" aria-label="Select coverage">
-      <div class="ph">
-        <h3>Cover this <em>answer</em>.</h3>
-        <div class="sub">choose your hug</div>
-      </div>
-      <div class="tiers" id="tiers">
-        <button class="tier" data-price="3" data-name="Light Hug" data-payout="$30">
-          <div class="price"><span class="cur">$</span>3</div>
-          <div class="name">Light Hug</div>
-          <span class="tip">
-            <span class="label">pays up to $30</span>
-            <span class="ex">e.g., an OTC drug-interaction check before a refill.</span>
-          </span>
-        </button>
-        <button class="tier" data-price="5" data-name="Warm Hug" data-payout="$60">
-          <div class="price"><span class="cur">$</span>5</div>
-          <div class="name">Warm Hug</div>
-          <span class="tip">
-            <span class="label">pays up to $60</span>
-            <span class="ex">e.g., decoding a friend&rsquo;s lab report.</span>
-          </span>
-        </button>
-        <button class="tier" data-price="10" data-name="Deep Hug" data-payout="$150">
-          <div class="price"><span class="cur">$</span>10</div>
-          <div class="name">Deep Hug</div>
-          <span class="tip">
-            <span class="label">pays up to $150</span>
-            <span class="ex">e.g., a pre-trade scan on earnings night.</span>
-          </span>
-        </button>
-        <button class="tier" data-price="25" data-name="Full Embrace" data-payout="$500">
-          <div class="price"><span class="cur">$</span>25</div>
-          <div class="name">Full Embrace</div>
-          <span class="tip">
-            <span class="label">pays up to $500</span>
-            <span class="ex">e.g., triage at 2am &mdash; ER or wait?</span>
-          </span>
-        </button>
-        <button class="tier" data-price="100" data-name="Lifetime Hug" data-payout="$2,500">
-          <div class="price"><span class="cur">$</span>100</div>
-          <div class="name">Lifetime Hug</div>
-          <span class="tip">
-            <span class="label">pays up to $2,500</span>
-            <span class="ex">e.g., choosing a parent&rsquo;s treatment protocol.</span>
-          </span>
-        </button>
-      </div>
-      <div class="fine">
-        <em>independent verdict</em> &middot; 24-hour payout &middot; policy <em>#HUG&#8202;-&#8202;2604&#8202;-&#8202;Q9F</em>
-      </div>
-    </div>
+    </aside>
   </div>
 
   <div class="micro">
@@ -673,15 +761,67 @@
 </div>
 
 <script>
-  const hugBtn   = document.getElementById('hugBtn');
-  const picker   = document.getElementById('picker');
-  const tiers    = document.getElementById('tiers');
-  const toast    = document.getElementById('toast');
-  const toastText= document.getElementById('toast-text');
-  const ta       = document.getElementById('ta');
-  const send     = document.getElementById('send');
-  const convo    = document.getElementById('convo');
+  const tiers       = document.getElementById('tiers');
+  const toast       = document.getElementById('toast');
+  const toastText   = document.getElementById('toast-text');
+  const ta          = document.getElementById('ta');
+  const send        = document.getElementById('send');
+  const convo       = document.getElementById('convo');
   const scenariosEl = document.getElementById('scenarios');
+  const riskEl      = document.getElementById('risk');
+  const riskValue   = document.getElementById('riskValue');
+  const riskBar     = document.getElementById('riskBar');
+  const riskReason  = document.getElementById('riskReason');
+  const riskVerdict = document.getElementById('riskVerdict');
+  const riskRecommend = document.getElementById('riskRecommend');
+  const attachBtn   = document.getElementById('attachBtn');
+  const imageInput  = document.getElementById('imageInput');
+  const preview     = document.getElementById('preview');
+
+  /* ---------- multimodal image attachment ---------- */
+  let pendingImage = null;       // {dataUrl, base64, mediaType, fileName}
+  const userImages = new Map();  // msgId -> {base64, mediaType}
+  let nextMsgId = 0;
+
+  function showPreview() {
+    preview.innerHTML = '';
+    if (!pendingImage) { preview.classList.remove('has-image'); return; }
+    const thumb = document.createElement('div');
+    thumb.className = 'thumb';
+    const img = document.createElement('img');
+    img.src = pendingImage.dataUrl;
+    img.alt = pendingImage.fileName || 'attachment';
+    const x = document.createElement('button');
+    x.type = 'button'; x.className = 'x'; x.textContent = '×';
+    x.setAttribute('aria-label', 'Remove image');
+    x.addEventListener('click', () => { pendingImage = null; showPreview(); });
+    thumb.appendChild(img); thumb.appendChild(x);
+    preview.appendChild(thumb);
+    preview.classList.add('has-image');
+  }
+
+  attachBtn.addEventListener('click', () => imageInput.click());
+  imageInput.addEventListener('change', () => {
+    const f = imageInput.files[0];
+    if (!f) return;
+    if (!f.type.startsWith('image/')) {
+      console.warn('non-image file ignored:', f.type);
+      imageInput.value = ''; return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result);
+      pendingImage = {
+        dataUrl,
+        base64: dataUrl.split(',')[1] || '',
+        mediaType: f.type || 'image/png',
+        fileName: f.name
+      };
+      showPreview();
+    };
+    reader.readAsDataURL(f);
+    imageInput.value = '';
+  });
 
   /* ---------- scenario library ---------- */
   const SCENARIOS = {
@@ -712,6 +852,90 @@
     ]
   };
 
+  /* ---------- risk score & dynamic pricing ---------- */
+  // Pre-rated stakes for canned scenarios so the demo feels alive.
+  const SCENARIO_SCORES = {
+    medicine: { score: 7, reason: 'specific clinical claim &mdash; verify with a prescriber.' },
+    finance:  { score: 8, reason: 'time-sensitive earnings figures could be stale.' },
+    legal:    { score: 6, reason: 'jurisdiction-specific code; current as of training.' },
+    history:  { score: 2, reason: 'well-established historical fact.' },
+    travel:   { score: 6, reason: 'entry rules shift &mdash; check before departing.' }
+  };
+
+  // Three tiers; price scales up with stakes, refund ratio scales down.
+  const TIERS = [
+    { id: 'light',    name: 'Light Hug',    base:  3 },
+    { id: 'standard', name: 'Standard Hug', base: 10 },
+    { id: 'premium',  name: 'Premium Hug',  base: 25 }
+  ];
+  // For score s in [0,10]: priceMul 1.0 → 2.5, refund ratio 12 → 2.
+  function priceAt(tier, score) {
+    const s = Math.max(0, Math.min(10, score));
+    const priceMul = 1 + 0.15 * s;        // 1.0 to 2.5
+    const ratio    = 12 - s;              // 12 to 2
+    const price    = Math.round(tier.base * priceMul);
+    const payout   = Math.round(price * ratio);
+    return { price, payout };
+  }
+  function applyPricing(score) {
+    TIERS.forEach(t => {
+      const card = document.querySelector(`.tier[data-tier="${t.id}"]`);
+      if (!card) return;
+      const { price, payout } = priceAt(t, score);
+      card.dataset.price  = String(price);
+      card.dataset.payout = `$${payout.toLocaleString()}`;
+      card.dataset.name   = t.name;
+      card.querySelector('.amount').textContent = price;
+      card.querySelector('.payout').textContent = payout.toLocaleString();
+    });
+  }
+
+  function bandFor(s) { return s <= 3 ? 'low' : s <= 6 ? 'mid' : 'high'; }
+  function verdictFor(s) {
+    if (s <= 2) return 'low stakes';
+    if (s <= 4) return 'modest stakes';
+    if (s <= 6) return 'moderate stakes';
+    if (s <= 8) return 'elevated stakes';
+    return 'high stakes';
+  }
+  function recommendedTierId(s) {
+    if (s <= 3) return 'light';
+    if (s <= 7) return 'standard';
+    return 'premium';
+  }
+  function renderScore(score, reason) {
+    const v = Math.max(0, Math.min(10, Number(score)));
+    riskEl.dataset.band = bandFor(v);
+    riskValue.textContent = (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, '');
+    riskVerdict.textContent = verdictFor(v);
+    riskBar.querySelectorAll('.seg').forEach((seg, i) => {
+      seg.classList.toggle('on', i < Math.round(v));
+    });
+    riskReason.classList.remove('placeholder');
+    riskReason.innerHTML = reason || '';
+
+    applyPricing(v);
+
+    const recId = recommendedTierId(v);
+    const recTier = TIERS.find(t => t.id === recId);
+    const recPrice = priceAt(recTier, v).price;
+    riskRecommend.innerHTML = `$${recPrice} ${recTier.name}`;
+    document.querySelectorAll('.tier').forEach(t => {
+      t.classList.toggle('recommended', t.dataset.tier === recId);
+    });
+  }
+  function resetScore(placeholder) {
+    riskEl.dataset.band = 'mid';
+    riskValue.innerHTML = '&mdash;';
+    riskVerdict.innerHTML = '&mdash;';
+    riskBar.querySelectorAll('.seg').forEach(seg => seg.classList.remove('on'));
+    riskReason.classList.add('placeholder');
+    riskReason.textContent = placeholder || 'send a question to score its stakes.';
+    riskRecommend.innerHTML = '&mdash;';
+    applyPricing(5);  // neutral default pricing
+    document.querySelectorAll('.tier').forEach(t => t.classList.remove('recommended'));
+  }
+
   function renderConvo(id) {
     convo.innerHTML = '';
     SCENARIOS[id].forEach((t, i) => {
@@ -722,6 +946,9 @@
       convo.appendChild(m);
     });
     document.querySelectorAll('.tier').forEach(x => x.classList.remove('selected'));
+    const preset = SCENARIO_SCORES[id];
+    if (preset) renderScore(preset.score, preset.reason);
+    else resetScore();
   }
 
   scenariosEl.addEventListener('click', (e) => {
@@ -732,13 +959,7 @@
     renderConvo(c.dataset.id);
   });
 
-  /* ---------- hug picker ---------- */
-  hugBtn.addEventListener('click', () => {
-    const open = picker.classList.toggle('open');
-    hugBtn.setAttribute('aria-expanded', String(open));
-    if (open) picker.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  });
-
+  /* ---------- tier selection ---------- */
   tiers.addEventListener('click', (e) => {
     const t = e.target.closest('.tier');
     if (!t) return;
@@ -778,23 +999,33 @@
   });
 
   function buildHistory() {
-    // Walk the rendered conversation, merging consecutive same-role turns
-    // (scenarios end with a user "follow-up" line, so a freshly-typed user
-    // message can land back-to-back with another user turn — collapse them).
     const turns = [];
     for (const el of convo.querySelectorAll('.msg')) {
       const role = el.classList.contains('user') ? 'user' : 'assistant';
       let content;
       if (role === 'user') {
-        content = el.textContent.trim();
+        const txtEl = el.querySelector('.msg-text');
+        const text = (txtEl ? txtEl.textContent : el.textContent).trim();
+        const msgId = el.dataset.msgid;
+        if (msgId && userImages.has(msgId)) {
+          const img = userImages.get(msgId);
+          const blocks = [];
+          blocks.push({ type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.base64 } });
+          if (text) blocks.push({ type: 'text', text });
+          content = blocks;
+        } else {
+          content = text;
+        }
       } else {
         const clone = el.cloneNode(true);
         clone.querySelectorAll('.coverage').forEach(c => c.remove());
         content = clone.innerHTML.trim();
       }
-      if (!content) continue;
-      if (turns.length && turns[turns.length - 1].role === role) {
-        turns[turns.length - 1].content += '\n\n' + content;
+      if (!content || (Array.isArray(content) && content.length === 0)) continue;
+      // Merge consecutive same-role *text-only* turns (scenarios sometimes leave a trailing user line).
+      const last = turns[turns.length - 1];
+      if (last && last.role === role && typeof last.content === 'string' && typeof content === 'string') {
+        last.content += '\n\n' + content;
       } else {
         turns.push({ role, content });
       }
@@ -804,16 +1035,33 @@
 
   async function sendToClaude() {
     const v = ta.value.trim();
-    if (!v) return;
+    if (!v && !pendingImage) return;
 
-    // 1. Render the user turn
+    resetScore('rating&hellip;');
+
+    // 1. Render the user turn — image first (if any), then text
     const userEl = document.createElement('div');
     userEl.className = 'msg user';
-    userEl.textContent = v;
+    const msgId = String(++nextMsgId);
+    userEl.dataset.msgid = msgId;
+    if (pendingImage) {
+      userImages.set(msgId, { base64: pendingImage.base64, mediaType: pendingImage.mediaType });
+      const img = document.createElement('img');
+      img.className = 'attached-img';
+      img.src = pendingImage.dataUrl;
+      img.alt = pendingImage.fileName || 'attached image';
+      userEl.appendChild(img);
+    }
+    const txt = document.createElement('div');
+    txt.className = 'msg-text';
+    txt.textContent = v || '(image only)';
+    userEl.appendChild(txt);
     userEl.style.animation = 'rise 0.5s forwards';
     convo.appendChild(userEl);
     ta.value = '';
     ta.style.height = 'auto';
+    pendingImage = null;
+    showPreview();
 
     const history = buildHistory();
 
@@ -868,8 +1116,12 @@
               console.log('[hug]', data.usage, tag);
             }
           }
+          if (data.score != null) {
+            renderScore(data.score, data.reason);
+          }
           if (data.error) {
             aEl.innerHTML = `<em>error: ${String(data.error).replace(/</g, '&lt;')}</em>`;
+            resetScore('rating unavailable.');
           }
         }
       }
