@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>hug. — submit a claim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&display=swap" />
+<style>
+  :root {
+    --paper:   #f3ece0;
+    --paper-2: #ebe2d2;
+    --ink:     #1a1612;
+    --ink-2:   #4b4339;
+    --ink-3:   #8a8073;
+    --hug:     #c44a3f;
+    --hug-2:   #a83a30;
+    --hug-soft:#ecb8ad;
+    --hug-bg:  #fae9e0;
+    --line:    #d8cdb6;
+    --serif:   'Fraunces', 'Times New Roman', serif;
+    --sans:    'Hanken Grotesk', ui-sans-serif, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--paper);
+    background-image:
+      radial-gradient(ellipse 60% 40% at 85% -5%, rgba(196,74,63,.08) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at -5% 105%, rgba(180,141,74,.10) 0%, transparent 55%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+    font-size: 16px;
+  }
+
+  .app {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 28px 60px;
+  }
+
+  header.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 28px 0 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  .mark {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .mark .dot { color: var(--hug); }
+  .back-link {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color .15s, color .15s;
+  }
+  .back-link:hover { border-color: var(--hug); color: var(--hug); }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 38px;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin-top: 36px;
+  }
+  h1 em { font-style: italic; color: var(--hug); }
+  .lede {
+    margin-top: 10px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-2);
+  }
+
+  section { margin-top: 32px; }
+  h2 {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  /* ---------- Conversation snapshot ---------- */
+  .snapshot {
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px 24px;
+    box-shadow: 0 18px 40px -28px rgba(40, 25, 10, 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .snapshot .greeting {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 22px;
+    line-height: 1.2;
+    color: var(--ink-2);
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .snapshot .greeting em { font-style: italic; color: var(--hug); }
+  .snapshot .msg {
+    max-width: 88%;
+    font-size: 14.5px;
+  }
+  .snapshot .msg.user {
+    align-self: flex-end;
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    padding: 12px 16px;
+    border-radius: 16px 16px 4px 16px;
+  }
+  .snapshot .msg.assistant {
+    align-self: flex-start;
+    line-height: 1.6;
+  }
+  .snapshot .msg.assistant strong { font-weight: 600; }
+  .snapshot .msg.assistant em { font-style: italic; }
+  .snapshot .msg.assistant .ans {
+    font-family: var(--serif);
+    font-weight: 500;
+    background: linear-gradient(180deg, transparent 60%, var(--hug-soft) 60%, var(--hug-soft) 95%, transparent 95%);
+    padding: 0 2px;
+  }
+  .snapshot .attached-img {
+    display: block;
+    max-width: 280px;
+    max-height: 220px;
+    margin: 0 0 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.08);
+    object-fit: cover;
+  }
+  .snapshot .coverage,
+  .snapshot .cursor { display: none; }
+
+  /* ---------- Tier info pill ---------- */
+  .tier-info {
+    background: var(--hug-bg);
+    border: 1px solid var(--hug-soft);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-family: var(--serif);
+    font-size: 14.5px;
+    color: var(--ink-2);
+  }
+  .tier-info strong {
+    color: var(--hug);
+    font-weight: 500;
+    margin-right: 8px;
+  }
+  .tier-info em {
+    font-style: italic;
+    color: var(--ink-3);
+  }
+  .tier-info.empty {
+    background: transparent;
+    border-style: dashed;
+    border-color: var(--line);
+    color: var(--ink-3);
+    font-style: italic;
+  }
+
+  /* ---------- Form fields ---------- */
+  label {
+    display: block;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  textarea {
+    width: 100%;
+    min-height: 110px;
+    padding: 14px 16px;
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font: 15px/1.55 var(--sans);
+    color: var(--ink);
+    resize: vertical;
+    outline: none;
+    transition: border-color .18s;
+  }
+  textarea:focus { border-color: var(--hug); }
+  textarea::placeholder {
+    color: var(--ink-3);
+    font-style: italic;
+  }
+
+  /* ---------- File upload ---------- */
+  input[type=file] { display: none; }
+  .upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 18px;
+    background: #fffdf8;
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    font: 500 11px var(--sans);
+    color: var(--ink-2);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    transition: border-color .18s, border-style .18s, color .18s;
+  }
+  .upload-btn:hover {
+    border-color: var(--hug);
+    border-style: solid;
+    color: var(--hug);
+  }
+  .evidence-grid {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .ev-thumb {
+    position: relative;
+    width: 90px; height: 90px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    overflow: visible;
+  }
+  .ev-thumb img {
+    width: 100%; height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+    display: block;
+  }
+  .ev-thumb .x {
+    position: absolute;
+    top: -7px; right: -7px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    border: 0;
+    font-size: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  }
+  .ev-thumb .x:hover { background: var(--hug); }
+
+  /* ---------- Actions ---------- */
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .primary {
+    background: var(--ink);
+    color: var(--paper);
+    border: 0;
+    border-radius: 999px;
+    padding: 13px 30px;
+    font: 500 13px var(--sans);
+    cursor: pointer;
+    transition: background .18s, transform .18s;
+  }
+  .primary:hover { background: var(--hug); transform: translateY(-1px); }
+  .secondary {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-3);
+    text-decoration: none;
+    transition: color .15s;
+  }
+  .secondary:hover { color: var(--ink); }
+
+  /* ---------- States ---------- */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+  }
+  .empty-state h1 { margin-top: 0; }
+  .empty-state p {
+    margin-top: 18px;
+    color: var(--ink-2);
+    font-size: 16px;
+  }
+  .empty-state .ref {
+    margin-top: 30px;
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-3);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+  .empty-state a {
+    color: var(--hug);
+    text-decoration: none;
+    border-bottom: 1px solid var(--hug-soft);
+    transition: border-color .15s;
+  }
+  .empty-state a:hover { border-color: var(--hug); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="mark">hug<span class="dot">.</span></div>
+    <a href="index.html" class="back-link">&larr; back to chat</a>
+  </header>
+
+  <main id="main">
+    <h1>Submit a <em>claim</em>.</h1>
+    <p class="lede">If our answer was wrong, file a claim. Independent verdict in 24 hours.</p>
+
+    <section>
+      <h2>The conversation</h2>
+      <div class="snapshot" id="snapshot"></div>
+    </section>
+
+    <section>
+      <h2>Coverage locked in</h2>
+      <div class="tier-info" id="tierInfo"></div>
+    </section>
+
+    <section>
+      <h2>What was wrong?</h2>
+      <textarea id="errorDesc" placeholder="Describe what Hug got wrong &mdash; the step, the claim, the diagnosis."></textarea>
+    </section>
+
+    <section>
+      <h2>The correct answer</h2>
+      <textarea id="correctAnswer" placeholder="What's the actual correct answer? Paste a detailed correction or cite a source."></textarea>
+    </section>
+
+    <section>
+      <h2>Supporting figures</h2>
+      <input type="file" id="figures" accept="image/*" multiple />
+      <label for="figures" class="upload-btn">+ attach figures</label>
+      <div class="evidence-grid" id="evidenceGrid"></div>
+    </section>
+
+    <section class="actions">
+      <button id="submitBtn" class="primary">Submit claim</button>
+      <a href="index.html" class="secondary">cancel</a>
+    </section>
+  </main>
+</div>
+
+<script>
+  const main = document.getElementById('main');
+  const data = (() => {
+    try { return JSON.parse(localStorage.getItem('hug:claim') || 'null'); }
+    catch { return null; }
+  })();
+
+  if (!data || !data.conversationHtml) {
+    main.innerHTML = `
+      <div class="empty-state">
+        <h1>No claim in progress.</h1>
+        <p>Start a chat first, then click <em>submit a claim</em> on the right panel.</p>
+        <p style="margin-top:32px;"><a href="index.html">&larr; back to chat</a></p>
+      </div>
+    `;
+  } else {
+    const snap = document.getElementById('snapshot');
+    if (data.greetingHtml) {
+      const wrap = document.createElement('div');
+      wrap.innerHTML = data.greetingHtml;
+      if (wrap.firstElementChild) snap.appendChild(wrap.firstElementChild);
+    }
+    if (data.conversationHtml) {
+      const wrap = document.createElement('div');
+      wrap.innerHTML = data.conversationHtml;
+      Array.from(wrap.children).forEach(c => snap.appendChild(c));
+    }
+
+    const ti = document.getElementById('tierInfo');
+    if (data.tier && data.tier.name) {
+      const note = data.tier.isRecommendation ? ' <em>(recommended &mdash; click on the chat to lock in)</em>' : '';
+      ti.innerHTML = `<strong>${data.tier.name}</strong>$${data.tier.price} paid &mdash; refund up to ${data.tier.payout} if our verdict says wrong.${note}`;
+    } else {
+      ti.classList.add('empty');
+      ti.textContent = 'no tier locked in. pick a coverage on the chat to enable a refund.';
+    }
+  }
+
+  // Image evidence
+  const figuresInput = document.getElementById('figures');
+  const evidenceGrid = document.getElementById('evidenceGrid');
+  const evidence = [];
+  if (figuresInput) {
+    figuresInput.addEventListener('change', () => {
+      for (const f of Array.from(figuresInput.files)) {
+        if (!f.type.startsWith('image/')) continue;
+        const reader = new FileReader();
+        reader.onload = () => {
+          evidence.push({ name: f.name, dataUrl: String(reader.result) });
+          renderEvidence();
+        };
+        reader.readAsDataURL(f);
+      }
+      figuresInput.value = '';
+    });
+  }
+  function renderEvidence() {
+    evidenceGrid.innerHTML = '';
+    evidence.forEach((e, i) => {
+      const t = document.createElement('div');
+      t.className = 'ev-thumb';
+      const img = document.createElement('img');
+      img.src = e.dataUrl;
+      img.alt = e.name;
+      t.appendChild(img);
+      const x = document.createElement('button');
+      x.className = 'x';
+      x.type = 'button';
+      x.textContent = '×';
+      x.setAttribute('aria-label', 'Remove figure');
+      x.addEventListener('click', () => { evidence.splice(i, 1); renderEvidence(); });
+      t.appendChild(x);
+      evidenceGrid.appendChild(t);
+    });
+  }
+
+  // Mock submit
+  const submitBtn = document.getElementById('submitBtn');
+  if (submitBtn) {
+    submitBtn.addEventListener('click', () => {
+      const errDesc = document.getElementById('errorDesc').value.trim();
+      const correct = document.getElementById('correctAnswer').value.trim();
+      if (!errDesc) { alert('Describe what Hug got wrong before submitting.'); return; }
+      if (!correct) { alert('Provide the correct answer.'); return; }
+
+      const ref = 'HUG-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+      console.log('[hug] mock claim submitted', { errDesc, correct, evidenceCount: evidence.length, ref });
+      main.innerHTML = `
+        <div class="empty-state">
+          <h1>Claim received.</h1>
+          <p>Independent verdict in <em>24 hours</em>. We&rsquo;ll email you when it lands.</p>
+          <p class="ref">reference&nbsp;&middot;&nbsp;${ref}</p>
+          <p style="margin-top:32px;"><a href="index.html">&larr; back to chat</a></p>
+        </div>
+      `;
+      localStorage.removeItem('hug:claim');
+    });
+  }
+</script>
+</body>
+</html>
