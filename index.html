@@ -126,15 +126,7 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
-    padding: 18px 0 0;
-  }
-  .scenarios .lead {
-    font-family: var(--serif);
-    font-style: italic;
-    font-weight: 300;
-    font-size: 13.5px;
-    color: var(--ink-3);
-    margin-right: 6px;
+    margin-top: -16px;  /* tuck up under the greeting */
   }
   .scenarios .chip {
     background: transparent;
@@ -292,32 +284,13 @@
     align-self: start;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding-top: 32px;
-  }
-  .bet-panel .tagline {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 16px;
-    color: var(--ink-2);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 4px;
-  }
-  .bet-panel .tagline .heart {
-    color: var(--hug);
-    font-style: normal;
-    transform: translateY(-1px);
+    gap: 18px;
+    padding-top: 36px;
   }
 
-  /* ---------- Risk score widget ---------- */
+  /* ---------- Stakes bar (compact) ---------- */
   .risk {
-    background: #fffdf8;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    padding: 18px 20px 18px;
-    box-shadow: 0 18px 40px -28px rgba(40, 25, 10, 0.18);
+    padding: 0 2px;
   }
   .risk .head {
     display: flex; justify-content: space-between; align-items: baseline;
@@ -330,112 +303,69 @@
   .risk .head .verdict {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 13px;
+    font-size: 13.5px;
     text-transform: none;
     letter-spacing: 0;
     color: var(--ink-2);
-  }
-  .risk .score {
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: 38px;
-    letter-spacing: -0.03em;
-    color: var(--ink);
-    line-height: 1;
-  }
-  .risk .score .scale {
-    font-size: 16px;
-    color: var(--ink-3);
-    font-style: italic;
-    margin-left: 2px;
   }
   .risk .bar {
     display: flex;
     gap: 3px;
-    margin-top: 14px;
   }
   .risk .seg {
     flex: 1;
-    height: 6px;
+    height: 5px;
     border-radius: 2px;
     background: var(--paper-2);
     transition: background .35s;
   }
-  .risk[data-band="low"]  .seg.on { background: #6b8e6e; }  /* sage */
-  .risk[data-band="mid"]  .seg.on { background: #b48d4a; }  /* gold */
+  .risk[data-band="low"]  .seg.on { background: #6b8e6e; }
+  .risk[data-band="mid"]  .seg.on { background: #b48d4a; }
   .risk[data-band="high"] .seg.on { background: var(--hug); }
-  .risk .reason {
-    margin-top: 12px;
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 13px;
-    line-height: 1.45;
-    color: var(--ink-2);
-  }
-  .risk .reason.placeholder { color: var(--ink-3); }
-  .risk .recommend {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px dashed var(--line);
-    font-size: 10.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: var(--ink-3);
-  }
-  .risk .recommend strong {
-    color: var(--hug);
-    font-weight: 500;
-    text-transform: none;
-    letter-spacing: 0;
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 14px;
-    margin-left: 6px;
-  }
 
-  /* ---------- Picker (always visible in sidebar) ---------- */
-  .picker {
-    background: #fffdf8;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    padding: 18px 18px 16px;
-    box-shadow: 0 18px 40px -28px rgba(40, 25, 10, 0.2);
+  /* ---------- "If we're wrong, we pay you." ---------- */
+  .promise {
+    padding: 0 2px;
   }
-  .picker .ph {
-    display: flex; align-items: baseline; justify-content: space-between;
-    margin-bottom: 12px;
-  }
-  .picker h3 {
+  .promise .lead {
     font-family: var(--serif);
-    font-weight: 400;
-    font-size: 19px;
-    letter-spacing: -0.02em;
+    font-weight: 300;
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -0.022em;
+    color: var(--ink);
   }
-  .picker h3 em { font-style: italic; color: var(--hug); }
-  .picker .sub {
-    font-size: 9.5px;
-    color: var(--ink-3);
+  .promise .lead em {
+    font-style: italic;
+    color: var(--hug);
+  }
+  .promise .sub {
+    margin-top: 6px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.22em;
+    color: var(--ink-3);
   }
 
+  /* ---------- Tier rows (compact, single-line) ---------- */
   .tiers {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
   .tier {
-    text-align: left;
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 12px 14px 12px;
-    cursor: pointer;
-    transition: transform .15s ease, border-color .15s ease, background .15s ease;
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform .15s, border-color .15s, background .15s;
     position: relative;
+    text-align: left;
   }
   .tier:hover {
     transform: translateX(2px);
@@ -448,76 +378,38 @@
     box-shadow: inset 0 0 0 1px var(--hug);
   }
   .tier.recommended {
-    border-color: var(--hug-soft);
-    box-shadow: 0 0 0 2px var(--hug-bg);
+    border-color: var(--hug);
+    background: var(--hug-bg);
   }
-  .tier.recommended::after {
-    content: '★ recommended';
+  .tier.recommended::before {
+    content: '★';
     position: absolute;
-    top: 12px; right: 12px;
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
+    left: -18px;
+    top: 50%;
+    transform: translateY(-50%);
     color: var(--hug);
-    font-weight: 500;
-  }
-  .tier .row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 10px;
+    font-size: 12px;
   }
   .tier .price {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 24px;
-    letter-spacing: -0.022em;
+    font-size: 19px;
+    letter-spacing: -0.02em;
     color: var(--ink);
     line-height: 1;
   }
-  .tier .price .cur {
-    color: var(--hug);
-    font-style: italic;
-    margin-right: 1px;
+  .tier .arrow {
+    font-family: var(--serif);
+    color: var(--ink-3);
+    font-size: 13px;
+    flex-shrink: 0;
   }
   .tier .payout-amt {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 12px;
-    color: var(--ink-3);
-  }
-  .tier .name {
-    font-size: 9.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.22em;
-    color: var(--ink-3);
-  }
-  .tier .ex {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 12.5px;
-    color: var(--ink-2);
-    line-height: 1.35;
-    margin-top: 2px;
-  }
-
-  .picker .fine {
-    margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px dashed var(--line);
-    text-align: center;
-    font-size: 10px;
-    color: var(--ink-3);
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-  }
-  .picker .fine em {
-    font-family: var(--serif);
-    font-style: italic;
-    color: var(--ink-2);
-    font-size: 12px;
-    letter-spacing: 0;
-    text-transform: none;
+    font-size: 14px;
+    color: var(--hug);
+    margin-left: auto;
   }
 
   /* ---------- Image preview (in composer) ---------- */
@@ -648,27 +540,21 @@
   <header class="top">
     <div class="brand">
       <div class="mark">hug<span class="dot">.</span></div>
-      <div class="tag">answer insurance<br/><em>est. 2026</em></div>
     </div>
     <div class="meta">
-      <div class="live">live coverage</div>
       <div>yuexing</div>
     </div>
   </header>
 
   <div class="layout">
     <div class="left-col">
-      <nav class="scenarios" id="scenarios" aria-label="Test scenarios">
-        <span class="lead">try a scenario.</span>
-        <button class="chip active" data-id="medicine">medicine</button>
-        <button class="chip" data-id="finance">finance</button>
-        <button class="chip" data-id="legal">legal</button>
-        <button class="chip" data-id="history">history</button>
-        <button class="chip" data-id="travel">travel</button>
-      </nav>
-
       <main class="chat" id="chat">
-        <div class="greeting">Good evening, Yuexing.<br/>What do you want <em>covered</em> today?</div>
+        <div class="greeting">Ask anything.</div>
+        <nav class="scenarios" id="scenarios" aria-label="Sample scenarios">
+          <button class="chip active" data-id="medicine">medicine</button>
+          <button class="chip" data-id="legal">legal</button>
+          <button class="chip" data-id="history">history</button>
+        </nav>
         <div id="convo"></div>
       </main>
 
@@ -682,12 +568,6 @@
               <button class="iconbtn" id="attachBtn" title="Attach image" aria-label="Attach image">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-9 9a5.5 5.5 0 0 1-7.78-7.78l9-9a3.5 3.5 0 0 1 4.95 4.95l-9 9a1.5 1.5 0 0 1-2.12-2.12l8.49-8.49"/></svg>
               </button>
-              <button class="iconbtn" title="Tools" aria-label="Tools">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-              </button>
-              <button class="iconbtn" title="Voice" aria-label="Voice">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
-              </button>
             </div>
             <button class="send" id="send" title="Send" aria-label="Send">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
@@ -697,55 +577,39 @@
       </div>
     </div>
 
-    <aside class="bet-panel" aria-label="Risk score and coverage">
+    <aside class="bet-panel" aria-label="Stakes and compensation">
       <div class="risk" id="risk" data-band="mid">
         <div class="head">
           <span>stakes</span>
           <span class="verdict" id="riskVerdict">&mdash;</span>
         </div>
-        <div class="score"><span id="riskValue">&mdash;</span><span class="scale"> / 10</span></div>
         <div class="bar" id="riskBar">
           <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
           <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
         </div>
-        <div class="reason placeholder" id="riskReason">awaiting an answer to rate.</div>
-        <div class="recommend">recommended <strong id="riskRecommend">&mdash;</strong></div>
       </div>
 
-      <div class="tagline"><span class="heart">&#10084;</span> Insure this <em>question</em>.</div>
+      <div class="promise">
+        <div class="lead">If we&rsquo;re wrong, <em>we pay you</em>.</div>
+        <div class="sub" id="promiseSub">lock in below.</div>
+      </div>
 
-      <div class="picker" role="region" aria-label="Coverage tiers">
-        <div class="ph">
-          <h3>Cover this <em>question</em>.</h3>
-          <div class="sub">price scales with stakes</div>
-        </div>
-        <div class="tiers" id="tiers">
-          <button class="tier" data-tier="light">
-            <div class="row">
-              <span class="price"><span class="cur">$</span><span class="amount">3</span></span>
-              <span class="payout-amt">refund up to $<span class="payout">36</span></span>
-            </div>
-            <div class="name">Light Hug</div>
-            <div class="ex">enough attention for clear questions.</div>
-          </button>
-          <button class="tier" data-tier="standard">
-            <div class="row">
-              <span class="price"><span class="cur">$</span><span class="amount">10</span></span>
-              <span class="payout-amt">refund up to $<span class="payout">120</span></span>
-            </div>
-            <div class="name">Standard Hug</div>
-            <div class="ex">careful response with verification.</div>
-          </button>
-          <button class="tier" data-tier="premium">
-            <div class="row">
-              <span class="price"><span class="cur">$</span><span class="amount">25</span></span>
-              <span class="payout-amt">refund up to $<span class="payout">300</span></span>
-            </div>
-            <div class="name">Premium Hug</div>
-            <div class="ex">maximum scrutiny on a high-stakes ask.</div>
-          </button>
-        </div>
-        <div class="fine"><em>independent verdict</em> &middot; 24h payout &middot; price &amp; refund track stakes</div>
+      <div class="tiers" id="tiers" role="region" aria-label="Compensation tiers">
+        <button class="tier" data-tier="light">
+          <span class="price">$<span class="amount">0.30</span></span>
+          <span class="arrow">&rarr;</span>
+          <span class="payout-amt">refund $<span class="payout">30</span></span>
+        </button>
+        <button class="tier" data-tier="standard">
+          <span class="price">$<span class="amount">0.60</span></span>
+          <span class="arrow">&rarr;</span>
+          <span class="payout-amt">refund $<span class="payout">60</span></span>
+        </button>
+        <button class="tier" data-tier="premium">
+          <span class="price">$<span class="amount">1.00</span></span>
+          <span class="arrow">&rarr;</span>
+          <span class="payout-amt">refund $<span class="payout">100</span></span>
+        </button>
       </div>
     </aside>
   </div>
@@ -769,11 +633,9 @@
   const convo       = document.getElementById('convo');
   const scenariosEl = document.getElementById('scenarios');
   const riskEl      = document.getElementById('risk');
-  const riskValue   = document.getElementById('riskValue');
   const riskBar     = document.getElementById('riskBar');
-  const riskReason  = document.getElementById('riskReason');
   const riskVerdict = document.getElementById('riskVerdict');
-  const riskRecommend = document.getElementById('riskRecommend');
+  const promiseSub  = document.getElementById('promiseSub');
   const attachBtn   = document.getElementById('attachBtn');
   const imageInput  = document.getElementById('imageInput');
   const preview     = document.getElementById('preview');
@@ -826,76 +688,65 @@
   /* ---------- scenario library ---------- */
   const SCENARIOS = {
     medicine: [
-      { role: 'user',      html: 'Is ibuprofen safe to take with my Plavix?' },
-      { role: 'assistant', html: '<strong>Generally no.</strong> NSAIDs like ibuprofen can blunt <span class="ans">clopidogrel&rsquo;s</span> antiplatelet effect and raise bleeding risk. Acetaminophen is the usual alternative &mdash; confirm with your prescriber.' },
-      { role: 'user',      html: 'good to know. cover me.' }
-    ],
-    finance: [
-      { role: 'user',      html: 'Did NVIDIA beat earnings last quarter?' },
-      { role: 'assistant', html: '<strong>Yes.</strong> Revenue came in near <span class="ans">$39.3B</span> vs. ~$38.1B consensus &mdash; about a 3% beat. Data center grew ~93% YoY; forward guide also above the Street.' },
-      { role: 'user',      html: 'are those numbers fresh?' }
+      { role: 'user',      html: "I&rsquo;ve had bad headaches and dizziness for two weeks. Could this be a brain tumor?" },
+      { role: 'assistant', html: '<strong>Likely &mdash; sounds like a <span class="ans">brain tumor</span>.</strong> Persistent headaches plus dizziness over two weeks fit the picture. Get an MRI today, ideally with contrast.' },
+      { role: 'user',      html: 'so the ENT just told me it&rsquo;s allergies. should i still get the MRI?' }
     ],
     legal: [
       { role: 'user',      html: 'Can my landlord enter my place without notice in California?' },
-      { role: 'assistant', html: '<strong>No.</strong> Cal. Civil Code <span class="ans">&sect;1954</span> requires <em>24 hours&rsquo; written notice</em> &mdash; with narrow exceptions for emergencies, abandonment, or tenant consent.' },
+      { role: 'assistant', html: '<strong>No.</strong> Cal. Civil Code <span class="ans">&sect;1954</span> requires <em>24 hours&rsquo; written notice</em> &mdash; narrow exceptions for emergencies, abandonment, or tenant consent.' },
       { role: 'user',      html: 'still current as of this year?' }
     ],
     history: [
       { role: 'user',      html: 'Did Einstein win the Nobel Prize for relativity?' },
       { role: 'assistant', html: '<strong>No.</strong> Einstein won the <span class="ans">1921 Nobel Prize in Physics</span> for the <em>photoelectric effect</em> &mdash; not relativity, which the committee found too theoretical at the time.' },
-      { role: 'user',      html: 'huh &mdash; worth a hug?' }
-    ],
-    travel: [
-      { role: 'user',      html: 'Do I need a yellow fever vaccine for a 3-day Kenya safari?' },
-      { role: 'assistant', html: '<strong>Usually yes.</strong> Kenya requires proof of <span class="ans">yellow fever vaccination</span> for travelers from at-risk countries; CDC also recommends it for safari areas. Cert must be 10+ days old at entry.' },
-      { role: 'user',      html: 'i fly friday.' }
+      { role: 'user',      html: 'how confident is that, really?' }
     ]
   };
 
-  /* ---------- risk score & dynamic pricing ---------- */
-  // Pre-rated stakes for canned scenarios so the demo feels alive.
+  /* ---------- stakes scoring & dynamic refund ---------- */
+  // Pre-rated stakes for canned scenarios.
   const SCENARIO_SCORES = {
-    medicine: { score: 7, reason: 'specific clinical claim &mdash; verify with a prescriber.' },
-    finance:  { score: 8, reason: 'time-sensitive earnings figures could be stale.' },
+    medicine: { score: 9, reason: 'medical misdiagnosis is costly &mdash; verify with a clinician.' },
     legal:    { score: 6, reason: 'jurisdiction-specific code; current as of training.' },
-    history:  { score: 2, reason: 'well-established historical fact.' },
-    travel:   { score: 6, reason: 'entry rules shift &mdash; check before departing.' }
+    history:  { score: 2, reason: 'well-established historical fact.' }
   };
 
-  // Three tiers; price scales up with stakes, refund ratio scales down.
+  // Fixed prices in the $0.30-$1 band; refund multiplier scales with stakes.
   const TIERS = [
-    { id: 'light',    name: 'Light Hug',    base:  3 },
-    { id: 'standard', name: 'Standard Hug', base: 10 },
-    { id: 'premium',  name: 'Premium Hug',  base: 25 }
+    { id: 'light',    name: 'Light',    base: 0.30 },
+    { id: 'standard', name: 'Standard', base: 0.60 },
+    { id: 'premium',  name: 'Premium',  base: 1.00 }
   ];
-  // For score s in [0,10]: priceMul 1.0 → 2.5, refund ratio 12 → 2.
   function priceAt(tier, score) {
     const s = Math.max(0, Math.min(10, score));
-    const priceMul = 1 + 0.15 * s;        // 1.0 to 2.5
-    const ratio    = 12 - s;              // 12 to 2
-    const price    = Math.round(tier.base * priceMul);
-    const payout   = Math.round(price * ratio);
-    return { price, payout };
+    // 100x payout ratio at low stakes (mostly safe), 50x at high stakes (more likely to pay out).
+    const refundMul = 100 - 5 * s;
+    return { price: tier.base, payout: tier.base * refundMul };
+  }
+  function fmtPayout(p) {
+    return p >= 10 ? Math.round(p).toLocaleString() : p.toFixed(2);
   }
   function applyPricing(score) {
     TIERS.forEach(t => {
       const card = document.querySelector(`.tier[data-tier="${t.id}"]`);
       if (!card) return;
       const { price, payout } = priceAt(t, score);
-      card.dataset.price  = String(price);
-      card.dataset.payout = `$${payout.toLocaleString()}`;
-      card.dataset.name   = t.name;
-      card.querySelector('.amount').textContent = price;
-      card.querySelector('.payout').textContent = payout.toLocaleString();
+      const payoutDisplay = fmtPayout(payout);
+      card.dataset.price  = price.toFixed(2);
+      card.dataset.payout = `$${payoutDisplay}`;
+      card.dataset.name   = `${t.name} Hug`;
+      card.querySelector('.amount').textContent = price.toFixed(2);
+      card.querySelector('.payout').textContent = payoutDisplay;
     });
   }
 
   function bandFor(s) { return s <= 3 ? 'low' : s <= 6 ? 'mid' : 'high'; }
   function verdictFor(s) {
     if (s <= 2) return 'low stakes';
-    if (s <= 4) return 'modest stakes';
-    if (s <= 6) return 'moderate stakes';
-    if (s <= 8) return 'elevated stakes';
+    if (s <= 4) return 'modest';
+    if (s <= 6) return 'moderate';
+    if (s <= 8) return 'elevated';
     return 'high stakes';
   }
   function recommendedTierId(s) {
@@ -906,33 +757,23 @@
   function renderScore(score, reason) {
     const v = Math.max(0, Math.min(10, Number(score)));
     riskEl.dataset.band = bandFor(v);
-    riskValue.textContent = (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, '');
     riskVerdict.textContent = verdictFor(v);
     riskBar.querySelectorAll('.seg').forEach((seg, i) => {
       seg.classList.toggle('on', i < Math.round(v));
     });
-    riskReason.classList.remove('placeholder');
-    riskReason.innerHTML = reason || '';
-
+    if (promiseSub) promiseSub.innerHTML = reason || 'lock in below.';
     applyPricing(v);
-
     const recId = recommendedTierId(v);
-    const recTier = TIERS.find(t => t.id === recId);
-    const recPrice = priceAt(recTier, v).price;
-    riskRecommend.innerHTML = `$${recPrice} ${recTier.name}`;
     document.querySelectorAll('.tier').forEach(t => {
       t.classList.toggle('recommended', t.dataset.tier === recId);
     });
   }
   function resetScore(placeholder) {
     riskEl.dataset.band = 'mid';
-    riskValue.innerHTML = '&mdash;';
     riskVerdict.innerHTML = '&mdash;';
     riskBar.querySelectorAll('.seg').forEach(seg => seg.classList.remove('on'));
-    riskReason.classList.add('placeholder');
-    riskReason.textContent = placeholder || 'send a question to score its stakes.';
-    riskRecommend.innerHTML = '&mdash;';
-    applyPricing(5);  // neutral default pricing
+    if (promiseSub) promiseSub.innerHTML = placeholder || 'lock in below.';
+    applyPricing(0);
     document.querySelectorAll('.tier').forEach(t => t.classList.remove('recommended'));
   }
 
@@ -970,7 +811,7 @@
     const name   = t.dataset.name;
     const payout = t.dataset.payout;
 
-    toastText.innerHTML = `your <strong>$${price} ${name}</strong> is active &mdash; pays up to ${payout} if this answer is wrong.`;
+    toastText.innerHTML = `<strong>$${price} ${name}</strong> locked in &mdash; Hug refunds up to ${payout} if our verdict says this answer is wrong.`;
     toast.classList.add('show');
     clearTimeout(window._tt);
     window._tt = setTimeout(() => toast.classList.remove('show'), 4400);
