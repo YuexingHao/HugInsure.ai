@@ -339,7 +339,7 @@
     </section>
 
     <section>
-      <h2>Coverage locked in</h2>
+      <h2>Reward if claim is verified</h2>
       <div class="tier-info" id="tierInfo"></div>
     </section>
 
@@ -396,12 +396,13 @@
     }
 
     const ti = document.getElementById('tierInfo');
-    if (data.tier && data.tier.name) {
-      const note = data.tier.isRecommendation ? ' <em>(recommended &mdash; click on the chat to lock in)</em>' : '';
-      ti.innerHTML = `<strong>${data.tier.name}</strong>$${data.tier.price} paid &mdash; refund up to ${data.tier.payout} if our verdict says wrong.${note}`;
+    const payout = Number.isFinite(data.payout) ? data.payout : null;
+    if (payout && payout > 0) {
+      const stakesNote = data.verdict ? ` &middot; <em>${data.verdict}</em> question` : '';
+      ti.innerHTML = `<strong>$${payout}</strong>paid out if Hug&rsquo;s verdict confirms your correction${stakesNote}.`;
     } else {
       ti.classList.add('empty');
-      ti.textContent = 'no tier locked in. pick a coverage on the chat to enable a refund.';
+      ti.textContent = 'no bounty attached. start from the chat first.';
     }
   }
 

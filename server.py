@@ -27,7 +27,8 @@ from typing import Any, Union
 import anthropic
 from anthropic import AsyncAnthropicFoundry
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 # Azure AI Foundry endpoint and deployment.
@@ -76,11 +77,6 @@ class Turn(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: list[Turn]
-
-
-@app.get("/")
-async def index():
-    return FileResponse(HERE / "index.html")
 
 
 async def rate_answer(question: str, answer: str) -> dict:
@@ -187,6 +183,11 @@ async def chat(req: ChatRequest):
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+# Serve every static file in the project dir (index.html, claim.html, Math.JPG, etc.).
+# Mounted last so the POST /chat route above takes priority over GET /chat.
+app.mount("/", StaticFiles(directory=str(HERE), html=True), name="static")
 
 
 if __name__ == "__main__":
