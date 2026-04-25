@@ -80,24 +80,23 @@
   .brand { display: flex; align-items: baseline; gap: 14px; }
   .brand-link {
     display: inline-flex;
-    align-items: center;
-    gap: 11px;
+    align-items: baseline;
     text-decoration: none;
     color: inherit;
     cursor: pointer;
     transition: opacity .15s, transform .15s;
   }
-  .brand-link:hover { opacity: 0.85; transform: translateY(-1px); }
-  .brand-icon { flex-shrink: 0; }
+  .brand-link:hover { opacity: 0.82; transform: translateY(-1px); }
   .brand-text {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 26px;
+    font-size: 28px;
     letter-spacing: -0.02em;
     color: var(--ink);
     line-height: 1;
   }
-  .brand-text .em { color: var(--hug); }
+  .brand-text .em { color: var(--hug); font-weight: 500; }
+  .brand-text .small { font-size: 17px; color: var(--ink-3); margin-left: 1px; }
   .tag {
     font-size: 10.5px;
     text-transform: uppercase;
@@ -643,11 +642,7 @@
 <div class="app">
   <header class="top">
     <a class="brand-link" href="index.html" aria-label="Hug Claims home">
-      <svg class="brand-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="var(--hug)"/>
-        <path d="M8.5 12l2.5 2.5L15.5 9.5" stroke="#fffdf8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span class="brand-text">Hug<span class="em">.</span>Claims</span>
+      <span class="brand-text">Hug<span class="em">.</span><span class="small">claims</span></span>
     </a>
     <div class="meta">
       <div>yuexing</div>
@@ -705,7 +700,7 @@
       </div>
 
       <div class="bounty">
-        <div class="lead">If you find an error, <em>we pay you</em></div>
+        <div class="lead"><em>Cash back</em> if AI gets it wrong</div>
         <div class="amount">$<span id="payoutAmount">2</span></div>
         <div class="sub" id="promiseSub">how the demo flow works.</div>
       </div>
