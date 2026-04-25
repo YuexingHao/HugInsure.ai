@@ -662,27 +662,81 @@
     preview.classList.add('has-image');
   }
 
+  // Anthropic API: max 5 MB per image. We leave a safety margin and resize/recompress as needed.
+  const KNOWN_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+  const MAX_IMAGE_BYTES = 4_500_000;
+  const MAX_IMAGE_EDGE  = 1568;  // Anthropic's recommended max edge for vision
+
+  function _decodedBytes(dataUrl) {
+    return Math.floor(((dataUrl.split(',')[1] || '').length) * 3 / 4);
+  }
+
+  async function processImage(file) {
+    const origDataUrl = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload  = () => resolve(String(r.result));
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+
+    // Small enough + a Claude-supported format: ship as-is.
+    if (_decodedBytes(origDataUrl) <= MAX_IMAGE_BYTES && KNOWN_IMAGE_TYPES.has(file.type)) {
+      return { dataUrl: origDataUrl, base64: origDataUrl.split(',')[1] || '', mediaType: file.type };
+    }
+
+    // Otherwise: decode → scale → JPEG re-encode at decreasing quality until under the cap.
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload  = () => resolve(i);
+      i.onerror = () => reject(new Error('failed to decode image'));
+      i.src = origDataUrl;
+    });
+
+    let w = img.naturalWidth, h = img.naturalHeight;
+    const longest = Math.max(w, h);
+    if (longest > MAX_IMAGE_EDGE) {
+      const s = MAX_IMAGE_EDGE / longest;
+      w = Math.round(w * s);
+      h = Math.round(h * s);
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+    let q = 0.85;
+    let dataUrl = canvas.toDataURL('image/jpeg', q);
+    while (_decodedBytes(dataUrl) > MAX_IMAGE_BYTES && q > 0.4) {
+      q -= 0.1;
+      dataUrl = canvas.toDataURL('image/jpeg', q);
+    }
+
+    return { dataUrl, base64: dataUrl.split(',')[1] || '', mediaType: 'image/jpeg' };
+  }
+
   attachBtn.addEventListener('click', () => imageInput.click());
-  imageInput.addEventListener('change', () => {
+  imageInput.addEventListener('change', async () => {
     const f = imageInput.files[0];
     if (!f) return;
     if (!f.type.startsWith('image/')) {
       console.warn('non-image file ignored:', f.type);
-      imageInput.value = ''; return;
+      imageInput.value = '';
+      return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = String(reader.result);
-      pendingImage = {
-        dataUrl,
-        base64: dataUrl.split(',')[1] || '',
-        mediaType: f.type || 'image/png',
-        fileName: f.name
-      };
+    try {
+      const processed = await processImage(f);
+      pendingImage = { ...processed, fileName: f.name };
       showPreview();
-    };
-    reader.readAsDataURL(f);
-    imageInput.value = '';
+      const finalKB = Math.round(_decodedBytes(processed.dataUrl) / 1024);
+      const origKB  = Math.round(f.size / 1024);
+      if (origKB !== finalKB) {
+        console.log(`[hug] image: ${origKB} KB → ${finalKB} KB (${processed.mediaType})`);
+      }
+    } catch (e) {
+      console.error('image processing failed:', e);
+    } finally {
+      imageInput.value = '';
+    }
   });
 
   /* ---------- scenario library ---------- */
