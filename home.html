@@ -28,6 +28,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
+    position: relative;
     font-family: var(--sans);
     color: var(--ink);
     background: var(--paper);
@@ -38,14 +39,90 @@
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
     line-height: 1.55;
-    font-size: 16px;
+    font-size: 17.5px;
   }
 
   .app {
-    max-width: 1040px;
+    position: relative;
+    z-index: 2;
+    max-width: 1080px;
     margin: 0 auto;
     padding: 0 32px;
   }
+
+  /* ---------- Flippable background fragments ---------- */
+  .bg-flips {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .bg-swap {
+    position: absolute;
+    display: inline-grid;
+    grid-template-columns: 1fr;
+    pointer-events: auto;
+    cursor: help;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14.5px;
+    white-space: nowrap;
+    transition: opacity .35s, transform .35s;
+    opacity: 0.28;
+  }
+  .bg-swap:hover { opacity: 0.85; transform: scale(1.04); }
+  .bg-swap > .wrong, .bg-swap > .right {
+    grid-column: 1; grid-row: 1;
+    padding: 0 5px;
+    border-radius: 3px;
+    transition:
+      opacity .42s cubic-bezier(.25, .8, .25, 1),
+      transform .42s cubic-bezier(.25, .8, .25, 1),
+      filter .42s ease;
+  }
+  .bg-swap > .wrong {
+    color: var(--hug-2);
+    text-decoration: line-through;
+    text-decoration-color: var(--hug);
+    text-decoration-thickness: 2px;
+    background: rgba(196, 74, 63, 0.08);
+  }
+  .bg-swap > .right {
+    color: var(--green-2);
+    background: var(--green-bg);
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(4px);
+    filter: blur(2px);
+    text-decoration: none;
+  }
+  .bg-swap:hover > .wrong,
+  .bg-swap.flipped > .wrong { opacity: 0; transform: translateY(-4px); filter: blur(2px); }
+  .bg-swap:hover > .right,
+  .bg-swap.flipped > .right { opacity: 1; transform: translateY(0); filter: blur(0); }
+
+  /* Brand logo */
+  .brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: opacity .15s, transform .15s;
+  }
+  .brand-link:hover { opacity: 0.88; transform: translateY(-1px); }
+  .brand-icon { flex-shrink: 0; }
+  .brand-text {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .brand-text .em { color: var(--hug); }
 
   /* ---------- Header ---------- */
   header.top {
@@ -208,17 +285,22 @@
   .hero h1 {
     font-family: var(--serif);
     font-weight: 300;
-    font-size: 68px;
-    line-height: 1.07;
+    font-size: 80px;
+    line-height: 1.05;
     letter-spacing: -0.03em;
     color: var(--ink);
   }
+  .hero h1 .mono {
+    font-family: 'Fraunces', 'Times New Roman', serif;
+    font-style: italic;
+    font-feature-settings: 'tnum';
+  }
   .hero h1 em { font-style: italic; }
   .hero .tagline {
-    margin-top: 28px;
+    margin-top: 30px;
     font-family: var(--serif);
     font-style: italic;
-    font-size: 20px;
+    font-size: 22px;
     color: var(--ink-2);
     max-width: 56ch;
     line-height: 1.5;
@@ -274,7 +356,7 @@
   .examples h2 {
     font-family: var(--serif);
     font-weight: 300;
-    font-size: 40px;
+    font-size: 46px;
     letter-spacing: -0.025em;
     line-height: 1.15;
     max-width: 22ch;
@@ -311,7 +393,7 @@
   }
   .ex-card .quote {
     font-family: var(--serif);
-    font-size: 17px;
+    font-size: 19px;
     line-height: 1.5;
     color: var(--ink);
   }
@@ -338,7 +420,7 @@
   .how h2 {
     font-family: var(--serif);
     font-weight: 300;
-    font-size: 40px;
+    font-size: 46px;
     letter-spacing: -0.025em;
     margin-bottom: 56px;
   }
@@ -365,12 +447,12 @@
   .step h3 {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 22px;
+    font-size: 24px;
     letter-spacing: -0.02em;
     color: var(--ink);
   }
   .step p {
-    font-size: 15px;
+    font-size: 17px;
     color: var(--ink-2);
     line-height: 1.6;
   }
@@ -385,7 +467,7 @@
   .final h2 {
     font-family: var(--serif);
     font-weight: 300;
-    font-size: 52px;
+    font-size: 60px;
     letter-spacing: -0.03em;
     line-height: 1.12;
     max-width: 22ch;
@@ -438,11 +520,34 @@
 </style>
 </head>
 <body>
+
+<!-- Flippable background: hover any fragment to "fix" it -->
+<div class="bg-flips" aria-hidden="true">
+  <span class="bg-swap" style="top: 8%;  left: 4%;"  tabindex="0"><span class="wrong">2 + 2 = 5</span><span class="right">2 + 2 = 4</span></span>
+  <span class="bg-swap" style="top: 13%; right: 5%;" tabindex="0"><span class="wrong">&pi; = 3.15</span><span class="right">&pi; &asymp; 3.14159</span></span>
+  <span class="bg-swap" style="top: 22%; left: 3%;"  tabindex="0"><span class="wrong">sin(0) = 1</span><span class="right">sin(0) = 0</span></span>
+  <span class="bg-swap" style="top: 28%; right: 3%;" tabindex="0"><span class="wrong">d/dx(e&Hat;x) = e</span><span class="right">d/dx(e&Hat;x) = e&Hat;x</span></span>
+  <span class="bg-swap" style="top: 35%; left: 5%;"  tabindex="0"><span class="wrong">log(1) = 1</span><span class="right">log(1) = 0</span></span>
+  <span class="bg-swap" style="top: 42%; right: 4%;" tabindex="0"><span class="wrong">0! = 0</span><span class="right">0! = 1</span></span>
+  <span class="bg-swap" style="top: 49%; left: 4%;"  tabindex="0"><span class="wrong">E = mc</span><span class="right">E = mc&sup2;</span></span>
+  <span class="bg-swap" style="top: 56%; right: 6%;" tabindex="0"><span class="wrong">F = ma&sup2;</span><span class="right">F = ma</span></span>
+  <span class="bg-swap" style="top: 63%; left: 3%;"  tabindex="0"><span class="wrong">(a+b)&sup2; = a&sup2; + b&sup2;</span><span class="right">a&sup2; + 2ab + b&sup2;</span></span>
+  <span class="bg-swap" style="top: 70%; right: 4%;" tabindex="0"><span class="wrong">Earth orbits the moon</span><span class="right">Earth orbits the Sun</span></span>
+  <span class="bg-swap" style="top: 77%; left: 5%;"  tabindex="0"><span class="wrong">cos(0) = 0</span><span class="right">cos(0) = 1</span></span>
+  <span class="bg-swap" style="top: 84%; right: 3%;" tabindex="0"><span class="wrong">&radic;(&minus;1) = error</span><span class="right">&radic;(&minus;1) = i</span></span>
+  <span class="bg-swap" style="top: 91%; left: 4%;"  tabindex="0"><span class="wrong">light speed = 3e9 m/s</span><span class="right">3 &times; 10&Hat;8 m/s</span></span>
+  <span class="bg-swap" style="top: 95%; right: 5%;" tabindex="0"><span class="wrong">&int; x dx = x&sup2;</span><span class="right">&frac12;x&sup2; + C</span></span>
+</div>
+
 <div class="app">
   <header class="top">
-    <div class="brand">
-      <div class="mark">hug<span class="dot">.</span><span class="product">claims.ai</span></div>
-    </div>
+    <a class="brand-link" href="home.html" aria-label="Hug Claims home">
+      <svg class="brand-icon" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="var(--hug)"/>
+        <path d="M8.5 12l2.5 2.5L15.5 9.5" stroke="#fffdf8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="brand-text">Hug<span class="em">.</span>Claims</span>
+    </a>
     <nav class="nav">
       <a href="claim.html">file a claim</a>
       <a href="index.html" class="cta">try the chat &rarr;</a>
@@ -451,17 +556,17 @@
 
   <section class="hero">
     <div class="badge"><span class="pulse"></span> live &middot; paying claims daily</div>
-    <div class="quote-label">the AI confidently said:</div>
+    <div class="quote-label">the AI confidently wrote:</div>
     <h1>
-      &ldquo;It&rsquo;s
+      &ldquo;In the integration-by-parts step, <span class="mono">v =
       <span class="swap" tabindex="0">
-        <span class="wrong">a brain tumor</span>
-        <span class="right">an allergy issue</span>
-      </span>.&rdquo;
+        <span class="wrong">1</span>
+        <span class="right">&minus;e<sup>&minus;x</sup></span>
+      </span></span>.&rdquo;
     </h1>
     <p class="tagline">
       Hug pays you when AI gets things wrong. Up to <strong>$27</strong> per verified claim &mdash;
-      medicine, law, math, anything that matters.
+      math, medicine, law, anything that matters.
     </p>
     <div class="actions">
       <a href="index.html" class="btn-primary">open the chat &rarr;</a>
@@ -474,13 +579,14 @@
     <h2>Hover any answer to see what was <em>actually right</em>.</h2>
     <div class="ex-grid">
       <article class="ex-card">
-        <div class="domain">medicine</div>
+        <div class="domain">math</div>
         <div class="quote">
-          &ldquo;Persistent headaches plus dizziness
-          <span class="swap" tabindex="0"><span class="wrong">point to a brain tumor</span><span class="right">are likely allergies</span></span>.
-          <span class="swap" tabindex="0"><span class="wrong">Get an MRI</span><span class="right">try antihistamines</span></span>.&rdquo;
+          &ldquo;In the integration-by-parts step, v =
+          <span class="swap" tabindex="0"><span class="wrong">1</span><span class="right">&minus;e<sup>&minus;x</sup></span></span>.
+          The
+          <span class="swap" tabindex="0"><span class="wrong">proof is correct</span><span class="right">final answer is right but the proof has a gap</span></span>.&rdquo;
         </div>
-        <div class="pay">Sara filed a claim. <strong>Hug paid $24.</strong></div>
+        <div class="pay">Yuexing filed a claim. <strong>Hug paid $16.</strong></div>
       </article>
       <article class="ex-card">
         <div class="domain">finance</div>
@@ -493,14 +599,13 @@
         <div class="pay">Mark filed a claim. <strong>Hug paid $19.</strong></div>
       </article>
       <article class="ex-card">
-        <div class="domain">math</div>
+        <div class="domain">medicine</div>
         <div class="quote">
-          &ldquo;In the integration-by-parts step, v =
-          <span class="swap" tabindex="0"><span class="wrong">1</span><span class="right">&minus;e<sup>&minus;x</sup></span></span>.
-          The
-          <span class="swap" tabindex="0"><span class="wrong">proof is correct</span><span class="right">final answer is right but the proof has a gap</span></span>.&rdquo;
+          &ldquo;Persistent headaches plus dizziness
+          <span class="swap" tabindex="0"><span class="wrong">point to a brain tumor</span><span class="right">are likely allergies</span></span>.
+          <span class="swap" tabindex="0"><span class="wrong">Get an MRI</span><span class="right">try antihistamines</span></span>.&rdquo;
         </div>
-        <div class="pay">Yuexing filed a claim. <strong>Hug paid $16.</strong></div>
+        <div class="pay">Sara filed a claim. <strong>Hug paid $24.</strong></div>
       </article>
     </div>
   </section>
@@ -544,9 +649,9 @@
 </div>
 
 <script>
-  // Touch fallback: tap a swap to flip it.
+  // Touch fallback: tap any swap to flip it.
   if (window.matchMedia('(hover: none)').matches) {
-    document.querySelectorAll('.swap').forEach(s => {
+    document.querySelectorAll('.swap, .bg-swap').forEach(s => {
       s.addEventListener('click', () => s.classList.toggle('flipped'));
     });
   }
