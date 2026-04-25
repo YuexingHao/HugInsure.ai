@@ -120,13 +120,53 @@
     100% { box-shadow: 0 0 0 0 rgba(196,74,63,0); }
   }
 
+  /* ---------- Mode tabs (your chat / examples) ---------- */
+  .mode-tabs {
+    display: flex;
+    gap: 18px;
+    align-items: baseline;
+    border-bottom: 1px solid var(--line);
+    margin-top: -8px;
+    padding-bottom: 1px;
+  }
+  .mode-tab {
+    padding: 6px 0;
+    background: transparent;
+    border: 0;
+    font: 500 11px var(--sans);
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color .15s, border-color .15s;
+  }
+  .mode-tab:hover { color: var(--ink-2); }
+  .mode-tab.active {
+    color: var(--ink);
+    border-bottom-color: var(--hug);
+  }
+
+  /* Empty-chat hint, shown only in chat mode with no messages */
+  .empty-hint {
+    display: none;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14.5px;
+    color: var(--ink-3);
+    padding: 12px 4px;
+  }
+  .app[data-mode="chat"] .scenarios { display: none; }
+  .app[data-mode="chat"]:has(#convo:empty) .empty-hint { display: block; }
+  .app[data-mode="examples"] .empty-hint { display: none; }
+
   /* ---------- Scenario chips ---------- */
   .scenarios {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: -16px;  /* tuck up under the greeting */
   }
   .scenarios .chip {
     background: transparent;
@@ -583,11 +623,18 @@
     <div class="left-col">
       <main class="chat" id="chat">
         <div class="greeting">Ask anything.</div>
+        <div class="mode-tabs" id="modeTabs">
+          <button class="mode-tab active" data-mode="chat" type="button">your chat</button>
+          <button class="mode-tab" data-mode="examples" type="button">examples</button>
+        </div>
         <nav class="scenarios" id="scenarios" aria-label="Sample scenarios">
           <button class="chip active" data-id="medicine">medicine</button>
           <button class="chip" data-id="legal">legal</button>
           <button class="chip" data-id="math">math</button>
         </nav>
+        <div class="empty-hint" id="emptyHint">
+          Start typing below &mdash; stakes &amp; bounty update with each question.
+        </div>
         <div id="convo"></div>
       </main>
 
@@ -1070,8 +1117,34 @@
     if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
   });
 
-  /* ---------- init ---------- */
-  renderConvo('medicine');
+  /* ---------- mode switching (your chat / examples) ---------- */
+  const appEl = document.querySelector('.app');
+  const modeTabs = document.querySelectorAll('.mode-tab');
+
+  function switchMode(mode) {
+    if (appEl.dataset.mode === mode) return;
+    appEl.dataset.mode = mode;
+    modeTabs.forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+
+    if (mode === 'chat') {
+      // Clean canvas — user starts a fresh conversation; stakes reset.
+      convo.innerHTML = '';
+      userImages.clear();
+      resetScore('ask a question to size the bounty.');
+    } else {
+      // Examples: render the active scenario chip (default = medicine).
+      const activeChip = document.querySelector('.chip.active') || document.querySelector('.chip');
+      if (activeChip) renderConvo(activeChip.dataset.id);
+    }
+  }
+
+  modeTabs.forEach(tab => {
+    tab.addEventListener('click', () => switchMode(tab.dataset.mode));
+  });
+
+  /* ---------- init: open on an empty real chat ---------- */
+  appEl.dataset.mode = 'chat';
+  resetScore('ask a question to size the bounty.');
 </script>
 </body>
 </html>
