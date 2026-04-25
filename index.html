@@ -19,6 +19,8 @@
     --hug-2:   #a83a30;
     --hug-soft:#ecb8ad;
     --hug-bg:  #fae9e0;
+    --green:   #6b8e6e;
+    --green-2: #2f6b40;
     --gold:    #b48d4a;
     --line:    #d8cdb6;
     --serif:   'Fraunces', 'Times New Roman', serif;
@@ -391,7 +393,25 @@
     color: var(--hug);
     line-height: 1;
     margin: 12px 0 8px;
-    transition: color .25s;
+    display: inline-block;
+    transition: color .35s ease, transform .3s ease, opacity .28s ease, text-shadow .35s ease;
+  }
+  .bounty .amount.is-increasing {
+    color: var(--green-2);
+    transform: scale(1.04);
+    text-shadow: 0 0 16px rgba(74, 138, 93, 0.30);
+  }
+  .bounty .amount.is-decreasing {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  .bounty .amount.is-appearing {
+    animation: amount-appear .45s cubic-bezier(.25, .8, .25, 1);
+  }
+  @keyframes amount-appear {
+    0%   { opacity: 0; transform: translateY(-10px) scale(0.94); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
   }
   .bounty .sub {
     font-family: var(--serif);
@@ -864,6 +884,54 @@
     return Math.max(2, Math.round(s * 2.7));
   }
 
+  // Animate the bounty figure: count up on increase (with a green flash),
+  // fade out + reappear on decrease.
+  let _payoutRaf = null;
+  function setPayout(target) {
+    if (!payoutAmount) return;
+    const amountEl = payoutAmount.parentElement;
+    const current = parseInt(payoutAmount.textContent, 10);
+
+    if (Number.isNaN(current)) {
+      payoutAmount.textContent = target;
+      return;
+    }
+    if (current === target) return;
+
+    if (_payoutRaf) cancelAnimationFrame(_payoutRaf);
+    amountEl.classList.remove('is-increasing', 'is-decreasing', 'is-appearing');
+
+    if (target > current) {
+      // Count up with green flash
+      amountEl.classList.add('is-increasing');
+      const delta = target - current;
+      const duration = Math.min(1100, 220 + delta * 35);
+      const start = current;
+      const t0 = performance.now();
+      const tick = (now) => {
+        const t = Math.min(1, (now - t0) / duration);
+        const eased = 1 - Math.pow(1 - t, 2);
+        payoutAmount.textContent = Math.round(start + delta * eased);
+        if (t < 1) {
+          _payoutRaf = requestAnimationFrame(tick);
+        } else {
+          payoutAmount.textContent = target;
+          setTimeout(() => amountEl.classList.remove('is-increasing'), 520);
+        }
+      };
+      _payoutRaf = requestAnimationFrame(tick);
+    } else {
+      // Fade out, swap, fade in
+      amountEl.classList.add('is-decreasing');
+      setTimeout(() => {
+        payoutAmount.textContent = target;
+        amountEl.classList.remove('is-decreasing');
+        amountEl.classList.add('is-appearing');
+        setTimeout(() => amountEl.classList.remove('is-appearing'), 460);
+      }, 300);
+    }
+  }
+
   function bandFor(s) { return s <= 3 ? 'low' : s <= 6 ? 'mid' : 'high'; }
   function verdictFor(s) {
     if (s <= 2) return 'low stakes';
@@ -880,14 +948,15 @@
       seg.classList.toggle('on', i < Math.round(v));
     });
     if (promiseSub) promiseSub.innerHTML = reason || '&nbsp;';
-    if (payoutAmount) payoutAmount.textContent = payoutFor(v);
+    setPayout(payoutFor(v));
   }
-  function resetScore(placeholder) {
+  function resetScore(placeholder, opts) {
+    const resetBounty = !opts || opts.resetBounty !== false;
     riskEl.dataset.band = 'mid';
     riskVerdict.innerHTML = '&mdash;';
     riskBar.querySelectorAll('.seg').forEach(seg => seg.classList.remove('on'));
     if (promiseSub) promiseSub.innerHTML = placeholder || 'send a question to size the bounty.';
-    if (payoutAmount) payoutAmount.textContent = payoutFor(0);
+    if (resetBounty) setPayout(payoutFor(0));
   }
 
   function renderConvo(id) {
@@ -984,7 +1053,7 @@
     const v = ta.value.trim();
     if (!v && !pendingImage) return;
 
-    resetScore('rating&hellip;');
+    resetScore('rating&hellip;', { resetBounty: false });
 
     // 1. Render the user turn — image first (if any), then text
     const userEl = document.createElement('div');
