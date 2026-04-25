@@ -769,14 +769,14 @@
 <body>
 <div class="app">
   <header class="top">
-    <a class="brand-link" href="home.html" aria-label="Hug Claims home">
+    <a class="brand-link" href="index.html" aria-label="Hug Claims home">
       <svg class="brand-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="var(--hug)"/>
         <path d="M8.5 12l2.5 2.5L15.5 9.5" stroke="#fffdf8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <span class="brand-text">Hug<span class="em">.</span>Claims</span>
     </a>
-    <a href="index.html" class="back-link">&larr; back to chat</a>
+    <a href="chat.html" class="back-link">&larr; back to chat</a>
   </header>
 
   <main id="main">
@@ -813,7 +813,7 @@
       <button id="verifyBtn" class="verifier-btn" type="button">
         <span class="vicon">&#x2696;</span> LLM Verifier
       </button>
-      <a href="index.html" class="secondary">cancel</a>
+      <a href="chat.html" class="secondary">cancel</a>
     </section>
 
     <div class="verdict" id="verdict" aria-live="polite"></div>
@@ -838,7 +838,7 @@
       <div class="empty-state">
         <h1>No claim in progress.</h1>
         <p>Start a chat first, then click <em>submit a claim</em> on the right panel.</p>
-        <p style="margin-top:32px;"><a href="index.html">&larr; back to chat</a></p>
+        <p style="margin-top:32px;"><a href="chat.html">&larr; back to chat</a></p>
       </div>
     `;
   } else {
@@ -1292,7 +1292,7 @@
           <p>Filed against <em>${brand || 'AI'}</em> with <em>${edits.length} edit${edits.length > 1 ? 's' : ''}</em>. Independent verdict in <em>24 hours</em>; we&rsquo;ll email you when it lands.</p>
           ${sourceLine}
           <p class="ref">reference&nbsp;&middot;&nbsp;${ref}</p>
-          <p style="margin-top:32px;"><a href="index.html">&larr; back to chat</a></p>
+          <p style="margin-top:32px;"><a href="chat.html">&larr; back to chat</a></p>
         </div>
       `;
       localStorage.removeItem('hug:claim');

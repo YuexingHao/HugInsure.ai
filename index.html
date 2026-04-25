@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>hug. — answer insurance</title>
+<title>hug claims.ai &mdash; we pay you when AI gets it wrong</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&display=swap" />
@@ -11,7 +11,6 @@
   :root {
     --paper:   #f3ece0;
     --paper-2: #ebe2d2;
-    --paper-3: #e2d6c0;
     --ink:     #1a1612;
     --ink-2:   #4b4339;
     --ink-3:   #8a8073;
@@ -21,63 +20,105 @@
     --hug-bg:  #fae9e0;
     --green:   #6b8e6e;
     --green-2: #2f6b40;
-    --gold:    #b48d4a;
+    --green-bg: rgba(107, 142, 110, 0.16);
     --line:    #d8cdb6;
     --serif:   'Fraunces', 'Times New Roman', serif;
     --sans:    'Hanken Grotesk', ui-sans-serif, sans-serif;
-    --radius:  14px;
-    --radius-lg: 22px;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
-
   body {
+    position: relative;
     font-family: var(--sans);
     color: var(--ink);
     background: var(--paper);
     background-image:
       radial-gradient(ellipse 60% 40% at 85% -5%, rgba(196,74,63,.08) 0%, transparent 60%),
-      radial-gradient(ellipse 70% 50% at -5% 105%, rgba(180,141,74,.10) 0%, transparent 55%),
+      radial-gradient(ellipse 70% 50% at -5% 105%, rgba(107,142,110,.10) 0%, transparent 55%),
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
     background-attachment: fixed;
-    background-size: auto, auto, 180px 180px;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     line-height: 1.55;
-    font-size: 16px;
+    font-size: 17.5px;
   }
 
   .app {
-    min-height: 100vh;
-    max-width: 1180px;
+    position: relative;
+    z-index: 2;
+    max-width: 1080px;
     margin: 0 auto;
-    padding: 0 28px;
-    display: flex;
-    flex-direction: column;
-  }
-  .layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 320px;
-    gap: 36px;
-    align-items: start;
-    flex: 1;
-  }
-  .left-col {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+    padding: 0 32px;
   }
 
-  /* ---------- Header ---------- */
-  header.top {
+  /* ---------- Flippable background grid: × → ✓ ---------- */
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 84px);
+    grid-auto-rows: 84px;
+    justify-content: center;
+    align-content: start;
+    padding: 32px 16px;
+    gap: 6px;
+    overflow: hidden;
+  }
+  .bg-cell {
+    position: relative;
+    pointer-events: auto;
+    cursor: help;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 28px 0 22px;
-    border-bottom: 1px solid var(--line);
+    justify-content: center;
+    background: rgba(235, 226, 210, 0.55);  /* warm beige tile */
+    border: 1px solid rgba(216, 205, 182, 0.45);
+    border-radius: 6px;
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 32px;
+    user-select: none;
+    transition: background .45s ease, transform .45s ease, border-color .45s ease;
   }
-  .brand { display: flex; align-items: baseline; gap: 14px; }
+  .bg-cell:hover {
+    background: rgba(107, 142, 110, 0.18);  /* sage on hover */
+    border-color: rgba(107, 142, 110, 0.40);
+    transform: scale(1.06);
+    transition: background .2s ease, transform .2s ease, border-color .2s ease;
+  }
+  .bg-cell .x,
+  .bg-cell .check {
+    position: absolute;
+    line-height: 1;
+    transition: opacity .55s ease, transform .55s ease;
+  }
+  .bg-cell .x {
+    color: var(--hug-2);
+    opacity: 0.55;
+    font-weight: 400;
+  }
+  .bg-cell .check {
+    color: var(--green-2);
+    opacity: 0;
+    transform: scale(0.5) rotate(-15deg);
+    font-weight: 500;
+  }
+  .bg-cell:hover .x {
+    opacity: 0;
+    transform: scale(1.5) rotate(20deg);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .bg-cell:hover .check {
+    opacity: 1;
+    transform: scale(1.15) rotate(0);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  @media (max-width: 720px) {
+    .bg-grid { display: none; }
+  }
+
+  /* Brand logo */
   .brand-link {
     display: inline-flex;
     align-items: center;
@@ -87,1148 +128,565 @@
     cursor: pointer;
     transition: opacity .15s, transform .15s;
   }
-  .brand-link:hover { opacity: 0.85; transform: translateY(-1px); }
+  .brand-link:hover { opacity: 0.88; transform: translateY(-1px); }
   .brand-icon { flex-shrink: 0; }
   .brand-text {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 26px;
+    font-size: 28px;
     letter-spacing: -0.02em;
     color: var(--ink);
     line-height: 1;
   }
   .brand-text .em { color: var(--hug); }
-  .tag {
-    font-size: 10.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.22em;
-    color: var(--ink-3);
-    padding-left: 14px;
-    border-left: 1px solid var(--line);
-    line-height: 1.3;
-  }
-  .tag em { font-family: var(--serif); font-style: italic; text-transform: none; letter-spacing: 0; color: var(--ink-2); font-size: 12px; }
 
-  .meta { display: flex; align-items: center; gap: 18px; font-size: 13px; color: var(--ink-2); }
-  .meta .live {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 10.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.22em;
-    color: var(--ink-3);
-  }
-  .meta .live::before {
-    content: '';
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--hug);
-    box-shadow: 0 0 0 0 rgba(196, 74, 63, .55);
-    animation: pulse 2.2s infinite;
-  }
-  @keyframes pulse {
-    0%   { box-shadow: 0 0 0 0 rgba(196,74,63,.55); }
-    70%  { box-shadow: 0 0 0 8px rgba(196,74,63,0); }
-    100% { box-shadow: 0 0 0 0 rgba(196,74,63,0); }
-  }
-
-  /* ---------- Mode tabs (your chat / examples) ---------- */
-  .mode-tabs {
+  /* ---------- Header ---------- */
+  header.top {
     display: flex;
-    gap: 18px;
+    justify-content: space-between;
     align-items: baseline;
+    padding: 32px 0 24px;
     border-bottom: 1px solid var(--line);
-    margin-top: -8px;
+  }
+  .brand .mark {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .brand .mark .dot { color: var(--hug); }
+  .brand .mark .product {
+    font-family: var(--sans);
+    font-style: normal;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-left: 8px;
+    font-weight: 500;
+  }
+  header .nav {
+    display: flex;
+    gap: 24px;
+    align-items: baseline;
+  }
+  header .nav a {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color .15s, color .15s;
     padding-bottom: 1px;
   }
-  .mode-tab {
-    padding: 6px 0;
-    background: transparent;
-    border: 0;
+  header .nav a:hover {
+    border-bottom-color: var(--hug);
+    color: var(--hug);
+  }
+  header .nav a.cta {
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 11px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 18px;
+    border-radius: 999px;
+    border-bottom: 0;
+    transition: background .18s, transform .15s;
+  }
+  header .nav a.cta:hover {
+    background: var(--hug);
+    color: var(--paper);
+    transform: translateY(-1px);
+    border-bottom: 0;
+  }
+
+  /* ---------- The swap effect (red wrong  ⟷  green right) ---------- */
+  .swap {
+    display: inline-grid;
+    grid-template-columns: 1fr;
+    cursor: help;
+    position: relative;
+    vertical-align: baseline;
+  }
+  .swap .wrong, .swap .right {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 0 6px;
+    border-radius: 4px;
+    transition:
+      opacity .42s cubic-bezier(.25, .8, .25, 1),
+      transform .42s cubic-bezier(.25, .8, .25, 1),
+      filter .42s ease;
+  }
+  .swap .wrong {
+    color: var(--hug-2);
+    text-decoration: line-through;
+    text-decoration-color: var(--hug);
+    text-decoration-thickness: 2.5px;
+    background: rgba(196, 74, 63, 0.10);
+  }
+  .swap .right {
+    color: var(--green-2);
+    background: var(--green-bg);
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(4px);
+    filter: blur(2px);
+    text-decoration: none;
+  }
+  .swap:hover .wrong,
+  .swap:focus-visible .wrong,
+  .swap.flipped .wrong {
+    opacity: 0;
+    transform: translateY(-4px);
+    filter: blur(2px);
+  }
+  .swap:hover .right,
+  .swap:focus-visible .right,
+  .swap.flipped .right {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  /* a faint pulse on the wrong text by default — hints it's interactive */
+  @keyframes nudge {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(196,74,63,0); }
+    50%      { box-shadow: 0 0 0 3px rgba(196,74,63,.10); }
+  }
+  .swap .wrong { animation: nudge 4s ease-in-out infinite; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    padding: 70px 0 90px;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 28px;
+    padding: 7px 16px;
+    border: 1px solid var(--hug-soft);
+    background: var(--hug-bg);
+    border-radius: 999px;
     font: 500 11px var(--sans);
     text-transform: uppercase;
     letter-spacing: 0.22em;
-    color: var(--ink-3);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: color .15s, border-color .15s;
+    color: var(--hug-2);
   }
-  .mode-tab:hover { color: var(--ink-2); }
-  .mode-tab.active {
-    color: var(--ink);
-    border-bottom-color: var(--hug);
+  .hero .badge .pulse {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--hug);
+    animation: pulse 2.2s infinite;
   }
-
-  /* Empty-chat hint, shown only in chat mode with no messages */
-  .empty-hint {
-    display: none;
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(196,74,63,.6); }
+    70%  { box-shadow: 0 0 0 8px rgba(196,74,63,0); }
+    100% { box-shadow: 0 0 0 0 rgba(196,74,63,0); }
+  }
+  .hero .quote-label {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 14.5px;
+    font-size: 15px;
     color: var(--ink-3);
-    padding: 12px 4px;
+    margin-bottom: 18px;
   }
-  .app[data-mode="chat"] .scenarios { display: none; }
-  .app[data-mode="chat"]:has(#convo:empty) .empty-hint { display: block; }
-  .app[data-mode="examples"] .empty-hint { display: none; }
-
-  /* ---------- Scenario chips ---------- */
-  .scenarios {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .scenarios .chip {
-    background: transparent;
-    border: 1px solid var(--line);
-    color: var(--ink-2);
-    border-radius: 999px;
-    padding: 6px 13px 7px;
-    font: 500 11.5px var(--sans);
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
-  }
-  .scenarios .chip:hover {
-    border-color: var(--ink-2);
-    color: var(--ink);
-    transform: translateY(-1px);
-  }
-  .scenarios .chip.active {
-    background: var(--ink);
-    color: var(--paper);
-    border-color: var(--ink);
-  }
-
-  /* ---------- Chat ---------- */
-  main.chat {
-    flex: 1;
-    padding: 32px 0 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-  }
-  #convo {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  .greeting {
+  .hero h1 {
     font-family: var(--serif);
     font-weight: 300;
-    font-size: 38px;
-    line-height: 1.12;
-    letter-spacing: -0.025em;
-    color: var(--ink);
-    margin-bottom: 8px;
-    opacity: 0;
-    animation: rise 0.85s 0.05s forwards cubic-bezier(.2,.7,.2,1);
-  }
-  .greeting em { font-style: italic; color: var(--hug); }
-
-  .msg {
-    max-width: 88%;
-    opacity: 0;
-    animation: rise 0.7s forwards cubic-bezier(.2,.7,.2,1);
-  }
-  .msg.user {
-    align-self: flex-end;
-    background: var(--paper-2);
-    border: 1px solid var(--line);
-    padding: 13px 18px;
-    border-radius: 18px 18px 4px 18px;
-    font-size: 15.5px;
-  }
-  .msg.assistant {
-    align-self: flex-start;
-    font-size: 16.5px;
-    line-height: 1.65;
+    font-size: 80px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
     color: var(--ink);
   }
-  .msg.assistant strong { font-weight: 600; }
-  .msg.assistant .ans {
+  .hero h1 .mono {
+    font-family: 'Fraunces', 'Times New Roman', serif;
+    font-style: italic;
+    font-feature-settings: 'tnum';
+  }
+  .hero h1 em { font-style: italic; }
+  .hero .tagline {
+    margin-top: 30px;
     font-family: var(--serif);
-    font-weight: 500;
-    background: linear-gradient(180deg, transparent 60%, var(--hug-soft) 60%, var(--hug-soft) 95%, transparent 95%);
-    padding: 0 2px;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--ink-2);
+    max-width: 56ch;
+    line-height: 1.5;
   }
-
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
+  .hero .tagline strong { font-style: normal; color: var(--green-2); }
+  .hero .actions {
+    margin-top: 44px;
+    display: flex;
+    gap: 22px;
+    align-items: center;
+    flex-wrap: wrap;
   }
-
-  /* coverage badge appended to assistant msg */
-  .coverage {
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 14px 28px;
+    border-radius: 999px;
+    font: 500 13px var(--sans);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    border: 0;
+    cursor: pointer;
+    transition: background .18s, transform .15s;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-left: 8px;
-    background: var(--hug-bg);
-    color: var(--hug-2);
-    border: 1px solid var(--hug-soft);
-    padding: 2px 10px 3px;
-    border-radius: 999px;
-    font: 500 10.5px var(--sans);
+  }
+  .btn-primary:hover { background: var(--hug); transform: translateY(-1px); }
+  .hint {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-3);
+    font-size: 14px;
+  }
+  .hint .arrow {
+    color: var(--hug);
+    font-style: normal;
+    margin-right: 4px;
+  }
+
+  /* ---------- Examples ---------- */
+  .examples {
+    padding: 90px 0;
+  }
+  .examples .label {
+    font-size: 10.5px;
     text-transform: uppercase;
-    letter-spacing: 0.16em;
-    vertical-align: 2px;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+    font-weight: 500;
   }
-  .coverage svg { stroke: var(--hug); }
-
-  /* ---------- Composer ---------- */
-  .composer-wrap {
-    position: sticky;
-    bottom: 14px;
-    padding-top: 18px;
-    background: linear-gradient(to top, var(--paper) 55%, rgba(243,236,224,0));
+  .examples h2 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 46px;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    max-width: 22ch;
+    margin-bottom: 56px;
   }
-
-  .composer {
+  .examples h2 em { font-style: italic; color: var(--green-2); }
+  .ex-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .ex-card {
     background: #fffdf8;
     border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    padding: 14px 16px 12px;
-    box-shadow: 0 22px 50px -28px rgba(40, 25, 10, 0.22);
-  }
-  .composer textarea {
-    width: 100%;
-    border: 0; outline: none; resize: none;
-    font: 16px/1.5 var(--sans);
-    color: var(--ink);
-    background: transparent;
-    min-height: 22px;
-    max-height: 140px;
-  }
-  .composer textarea::placeholder { color: var(--ink-3); }
-
-  .composer-row {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-top: 8px;
-  }
-  .composer-tools { display: flex; gap: 4px; align-items: center; }
-  .iconbtn {
-    width: 30px; height: 30px;
-    display: inline-flex; align-items: center; justify-content: center;
-    border-radius: 8px; border: 0; background: transparent;
-    color: var(--ink-2); cursor: pointer;
-    transition: background .15s;
-  }
-  .iconbtn:hover { background: var(--paper-2); }
-
-  .send {
-    background: var(--ink); color: var(--paper);
-    border: 0; width: 34px; height: 34px;
-    border-radius: 50%;
-    display: inline-flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: transform .18s, background .18s;
-  }
-  .send:hover { transform: translateY(-1px); background: var(--hug); }
-
-  /* ---------- Right sidebar ---------- */
-  .bet-panel {
-    position: sticky;
-    top: 28px;
-    align-self: start;
+    border-radius: 18px;
+    padding: 24px 26px 22px;
+    box-shadow: 0 18px 40px -28px rgba(40, 25, 10, 0.18);
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    padding-top: 36px;
+    gap: 14px;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
   }
-
-  /* ---------- Stakes bar (compact) ---------- */
-  .risk {
-    padding: 0 2px;
+  .ex-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 22px 50px -28px rgba(40, 25, 10, 0.28);
+    border-color: var(--hug-soft);
   }
-  .risk .head {
-    display: flex; justify-content: space-between; align-items: baseline;
+  .ex-card .domain {
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.22em;
     color: var(--ink-3);
-    margin-bottom: 8px;
+    font-weight: 500;
   }
-  .risk .head .verdict {
+  .ex-card .quote {
+    font-family: var(--serif);
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .ex-card .pay {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line);
     font-family: var(--serif);
     font-style: italic;
     font-size: 13.5px;
+    color: var(--ink-3);
+  }
+  .ex-card .pay strong {
+    color: var(--green-2);
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  /* ---------- How it works ---------- */
+  .how {
+    padding: 90px 0;
+    border-top: 1px solid var(--line);
+  }
+  .how h2 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 46px;
+    letter-spacing: -0.025em;
+    margin-bottom: 56px;
+  }
+  .how h2 em { font-style: italic; color: var(--hug); }
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 36px;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .step .num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 64px;
+    color: var(--hug);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .step h3 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .step p {
+    font-size: 17px;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+  .step p strong { color: var(--green-2); font-weight: 500; }
+
+  /* ---------- Final CTA ---------- */
+  .final {
+    padding: 100px 0 110px;
+    text-align: center;
+    border-top: 1px solid var(--line);
+  }
+  .final h2 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 60px;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
+    max-width: 22ch;
+    margin: 0 auto 36px;
+  }
+  .final h2 em { font-style: italic; color: var(--green-2); }
+
+  /* ---------- Footer ---------- */
+  footer.bottom {
+    padding: 40px 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+  }
+  footer.bottom em {
+    font-family: var(--serif);
+    font-style: italic;
     text-transform: none;
     letter-spacing: 0;
     color: var(--ink-2);
-  }
-  .risk .bar {
-    display: flex;
-    gap: 3px;
-  }
-  .risk .seg {
-    flex: 1;
-    height: 5px;
-    border-radius: 2px;
-    background: var(--paper-2);
-    transition: background .35s;
-  }
-  .risk[data-band="low"]  .seg.on { background: #6b8e6e; }
-  .risk[data-band="mid"]  .seg.on { background: #b48d4a; }
-  .risk[data-band="high"] .seg.on { background: var(--hug); }
-
-  /* ---------- Bounty card ---------- */
-  .bounty {
-    background: #fffdf8;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 22px 22px 18px;
-    box-shadow: 0 18px 40px -28px rgba(40, 25, 10, 0.18);
-  }
-  .bounty .lead {
-    font-family: var(--serif);
-    font-weight: 300;
-    font-size: 17px;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
-    color: var(--ink-2);
-  }
-  .bounty .lead em {
-    font-style: italic;
-    color: var(--ink);
-  }
-  .bounty .amount {
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: 56px;
-    letter-spacing: -0.03em;
-    color: var(--hug);
-    line-height: 1;
-    margin: 12px 0 8px;
-    display: inline-block;
-    transition: color .35s ease, transform .3s ease, opacity .28s ease, text-shadow .35s ease;
-  }
-  .bounty .amount.is-increasing {
-    color: var(--green-2);
-    transform: scale(1.04);
-    text-shadow: 0 0 16px rgba(74, 138, 93, 0.30);
-  }
-  .bounty .amount.is-decreasing {
-    opacity: 0;
-    transform: translateY(8px) scale(0.96);
-  }
-  .bounty .amount.is-appearing {
-    animation: amount-appear .45s cubic-bezier(.25, .8, .25, 1);
-  }
-  @keyframes amount-appear {
-    0%   { opacity: 0; transform: translateY(-10px) scale(0.94); }
-    60%  { opacity: 1; }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
-  }
-  .bounty .sub {
-    font-family: var(--serif);
-    font-style: italic;
     font-size: 13px;
-    line-height: 1.4;
+  }
+  footer.bottom a {
     color: var(--ink-3);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color .15s, color .15s;
   }
+  footer.bottom a:hover { color: var(--hug); border-bottom-color: var(--hug); }
 
-  /* ---------- Primary "Submit a correct claim" CTA ---------- */
-  .claim-cta {
-    width: 100%;
-    padding: 14px 16px;
-    background: var(--ink);
-    color: var(--paper);
-    border: 0;
-    border-radius: 999px;
-    font: 500 13px var(--sans);
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transition: background .2s, transform .15s;
-    text-align: center;
+  /* ---------- Mobile ---------- */
+  @media (max-width: 820px) {
+    .hero h1 { font-size: 44px; }
+    .examples h2, .how h2 { font-size: 30px; }
+    .final h2 { font-size: 36px; }
+    .ex-grid, .how-grid { grid-template-columns: 1fr; }
+    .brand .mark { font-size: 24px; }
+    .brand .mark .product { display: none; }
   }
-  .claim-cta:hover {
-    background: var(--hug);
-    transform: translateY(-1px);
-  }
-  .terms {
-    margin-top: -8px;
-    text-align: center;
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 11px;
-    letter-spacing: 0.04em;
-    color: var(--ink-3);
-  }
-
-  /* ---------- Image preview (in composer) ---------- */
-  .composer .preview {
-    display: none;
-    margin: 4px 0 10px;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .composer .preview.has-image { display: flex; }
-  .composer .preview .thumb {
-    position: relative;
-    width: 60px;
-    height: 60px;
-    border-radius: 10px;
-    overflow: visible;
-    border: 1px solid var(--line);
-  }
-  .composer .preview .thumb img {
-    width: 100%; height: 100%;
-    border-radius: 10px;
-    object-fit: cover;
-  }
-  .composer .preview .thumb .x {
-    position: absolute;
-    top: -7px; right: -7px;
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: var(--ink);
-    color: var(--paper);
-    border: 0;
-    font-size: 12px;
-    line-height: 1;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(0,0,0,.25);
-  }
-  .composer .preview .thumb .x:hover { background: var(--hug); }
-
-  /* ---------- Image in user message bubble ---------- */
-  .msg.user .attached-img {
-    display: block;
-    max-width: 280px;
-    max-height: 220px;
-    margin: 0 0 8px;
-    border-radius: 12px;
-    border: 1px solid rgba(0,0,0,0.08);
-    object-fit: cover;
-    cursor: zoom-in;
-    transition: transform .18s ease;
-  }
-  .msg.user .attached-img:hover { transform: scale(1.015); }
-
-  /* ---------- Lightbox (click attached-img to expand) ---------- */
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    background: rgba(20, 16, 12, 0.92);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    padding: 48px;
-    cursor: zoom-out;
-  }
-  .lightbox.open {
-    display: flex;
-    animation: lb-fade .22s ease;
-  }
-  @keyframes lb-fade {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-  .lightbox img {
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: 6px;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.55);
-    cursor: default;
-  }
-  .lightbox .close {
-    position: absolute;
-    top: 22px; right: 28px;
-    background: transparent;
-    color: var(--paper);
-    border: 0;
-    font-family: var(--serif);
-    font-size: 32px;
-    line-height: 1;
-    cursor: pointer;
-    opacity: .7;
-    transition: opacity .15s;
-  }
-  .lightbox .close:hover { opacity: 1; }
-  .lightbox .caption {
-    position: absolute;
-    bottom: 24px; left: 50%;
-    transform: translateX(-50%);
-    color: var(--paper);
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 12.5px;
-    opacity: .55;
-    letter-spacing: 0.04em;
-  }
-
-  /* ---------- Streaming cursor ---------- */
-  .cursor {
-    display: inline-block;
-    width: 7px;
-    height: 1em;
-    background: var(--ink);
-    margin-left: 1px;
-    vertical-align: text-bottom;
-    animation: blink 1s step-end infinite;
-  }
-  @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
-  }
-
-  /* ---------- Toast ---------- */
-  .toast {
-    position: fixed;
-    bottom: 32px; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--ink);
-    color: var(--paper);
-    border-radius: 999px;
-    padding: 12px 22px;
-    font: 500 13.5px var(--sans);
-    display: flex; align-items: center; gap: 10px;
-    opacity: 0; pointer-events: none;
-    transition: all 0.45s cubic-bezier(.2,.7,.2,1);
-    z-index: 50;
-    box-shadow: 0 22px 40px -10px rgba(0,0,0,0.32);
-    max-width: calc(100vw - 32px);
-  }
-  .toast .h {
-    color: var(--hug-soft);
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 16px;
-  }
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  /* ---------- Footer micro ---------- */
-  .micro {
-    text-align: center;
-    padding: 16px 0 24px;
-    font-size: 10.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.24em;
-    color: var(--ink-3);
-  }
-  .micro .sep { margin: 0 10px; color: var(--line); }
-  .micro em { font-family: var(--serif); font-style: italic; text-transform: none; letter-spacing: 0; color: var(--ink-2); font-size: 12px; }
-
-  /* responsive */
-  @media (max-width: 980px) {
-    .layout {
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
-    .bet-panel {
-      position: static;
-      padding-top: 0;
-    }
-  }
-  @media (max-width: 720px) {
-    .greeting { font-size: 28px; }
-    .meta .live { display: none; }
-    .tag { display: none; }
+  @media (hover: none) {
+    .hint { display: none; }
   }
 </style>
 </head>
 <body>
+
+<!-- Flippable background: hover any × to flip it to ✓ -->
+<div class="bg-grid" id="bgGrid" aria-hidden="true"></div>
+
 <div class="app">
   <header class="top">
-    <a class="brand-link" href="home.html" aria-label="Hug Claims home">
-      <svg class="brand-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+    <a class="brand-link" href="index.html" aria-label="Hug Claims home">
+      <svg class="brand-icon" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="var(--hug)"/>
         <path d="M8.5 12l2.5 2.5L15.5 9.5" stroke="#fffdf8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <span class="brand-text">Hug<span class="em">.</span>Claims</span>
     </a>
-    <div class="meta">
-      <div>yuexing</div>
-    </div>
+    <nav class="nav">
+      <a href="claim.html">file a claim</a>
+      <a href="chat.html" class="cta">try the chat &rarr;</a>
+    </nav>
   </header>
 
-  <div class="layout">
-    <div class="left-col">
-      <main class="chat" id="chat">
-        <div class="greeting">Ask anything.</div>
-        <div class="mode-tabs" id="modeTabs">
-          <button class="mode-tab active" data-mode="chat" type="button">your chat</button>
-          <button class="mode-tab" data-mode="examples" type="button">examples</button>
-        </div>
-        <nav class="scenarios" id="scenarios" aria-label="Sample scenarios">
-          <button class="chip active" data-id="medicine">medicine</button>
-          <button class="chip" data-id="legal">legal</button>
-          <button class="chip" data-id="math">math</button>
-        </nav>
-        <div class="empty-hint" id="emptyHint">
-          Start typing below &mdash; stakes &amp; bounty update with each question.
-        </div>
-        <div id="convo"></div>
-      </main>
+  <section class="hero">
+    <div class="badge"><span class="pulse"></span> live &middot; paying claims daily</div>
+    <div class="quote-label">the AI confidently wrote:</div>
+    <h1>
+      &ldquo;In the integration-by-parts step, <span class="mono">v =
+      <span class="swap" tabindex="0">
+        <span class="wrong">1</span>
+        <span class="right">&minus;e<sup>&minus;x</sup></span>
+      </span></span>.&rdquo;
+    </h1>
+    <p class="tagline">
+      Hug pays you when AI gets things wrong. Up to <strong>$27</strong> per verified claim &mdash;
+      math, medicine, law, anything that matters.
+    </p>
+    <div class="actions">
+      <a href="chat.html" class="btn-primary">open the chat &rarr;</a>
+      <span class="hint"><span class="arrow">&larr;</span> hover any strikethrough to see what was actually right</span>
+    </div>
+  </section>
 
-      <div class="composer-wrap">
-        <div class="composer">
-          <div class="preview" id="preview" aria-live="polite"></div>
-          <textarea id="ta" placeholder="Reply, or ask another question&hellip;" rows="1"></textarea>
-          <input type="file" id="imageInput" accept="image/*" hidden />
-          <div class="composer-row">
-            <div class="composer-tools">
-              <button class="iconbtn" id="attachBtn" title="Attach image" aria-label="Attach image">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-9 9a5.5 5.5 0 0 1-7.78-7.78l9-9a3.5 3.5 0 0 1 4.95 4.95l-9 9a1.5 1.5 0 0 1-2.12-2.12l8.49-8.49"/></svg>
-              </button>
-            </div>
-            <button class="send" id="send" title="Send" aria-label="Send">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            </button>
-          </div>
+  <section class="examples">
+    <div class="label">recently paid out</div>
+    <h2>Hover any answer to see what was <em>actually right</em>.</h2>
+    <div class="ex-grid">
+      <article class="ex-card">
+        <div class="domain">math</div>
+        <div class="quote">
+          &ldquo;In the integration-by-parts step, v =
+          <span class="swap" tabindex="0"><span class="wrong">1</span><span class="right">&minus;e<sup>&minus;x</sup></span></span>.
+          The
+          <span class="swap" tabindex="0"><span class="wrong">proof is correct</span><span class="right">final answer is right but the proof has a gap</span></span>.&rdquo;
         </div>
+        <div class="pay">Yuexing filed a claim. <strong>Hug paid $16.</strong></div>
+      </article>
+      <article class="ex-card">
+        <div class="domain">finance</div>
+        <div class="quote">
+          &ldquo;NVIDIA Q4 revenue
+          <span class="swap" tabindex="0"><span class="wrong">missed by $1B</span><span class="right">beat by $1.2B</span></span>.
+          Forward guide
+          <span class="swap" tabindex="0"><span class="wrong">conservative</span><span class="right">ahead of Street</span></span>.&rdquo;
+        </div>
+        <div class="pay">Mark filed a claim. <strong>Hug paid $19.</strong></div>
+      </article>
+      <article class="ex-card">
+        <div class="domain">medicine</div>
+        <div class="quote">
+          &ldquo;Persistent headaches plus dizziness
+          <span class="swap" tabindex="0"><span class="wrong">point to a brain tumor</span><span class="right">are likely allergies</span></span>.
+          <span class="swap" tabindex="0"><span class="wrong">Get an MRI</span><span class="right">try antihistamines</span></span>.&rdquo;
+        </div>
+        <div class="pay">Sara filed a claim. <strong>Hug paid $24.</strong></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="how">
+    <h2>How it <em>works</em>.</h2>
+    <div class="how-grid">
+      <div class="step">
+        <div class="num">1.</div>
+        <h3>Use any AI.</h3>
+        <p>Have a conversation with Claude, GPT, Gemini, or Meta AI &mdash; whichever your project uses.</p>
+      </div>
+      <div class="step">
+        <div class="num">2.</div>
+        <h3>Spot an error.</h3>
+        <p>If the AI
+          <span class="swap" tabindex="0"><span class="wrong">got it right</span><span class="right">misled you</span></span>,
+          mark the wrong span and write your correction inline.</p>
+      </div>
+      <div class="step">
+        <div class="num">3.</div>
+        <h3>We pay you.</h3>
+        <p>An independent verifier reviews. Valid claim &rarr; <strong>up to $27</strong> in your account within 24 hours.</p>
       </div>
     </div>
+  </section>
 
-    <aside class="bet-panel" aria-label="Stakes and compensation">
-      <div class="risk" id="risk" data-band="mid">
-        <div class="head">
-          <span>stakes</span>
-          <span class="verdict" id="riskVerdict">&mdash;</span>
-        </div>
-        <div class="bar" id="riskBar">
-          <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
-          <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
-        </div>
-      </div>
+  <section class="final">
+    <h2>Find your <em>first error</em>. Get paid.</h2>
+    <a href="chat.html" class="btn-primary">open the chat &rarr;</a>
+  </section>
 
-      <div class="bounty">
-        <div class="lead">If you find an error, <em>we pay you</em></div>
-        <div class="amount">$<span id="payoutAmount">2</span></div>
-        <div class="sub" id="promiseSub">how the demo flow works.</div>
-      </div>
-
-      <button class="claim-cta" id="claimBtn" type="button">
-        Submit a correct claim &rarr;
-      </button>
-      <div class="terms">terms apply</div>
-    </aside>
-  </div>
-
-  <div class="micro">
-    Hug Insurance Co. <span class="sep">&middot;</span> licensed nowhere <span class="sep">&middot;</span> <em>regulated by curiosity</em>
-  </div>
-</div>
-
-<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Expanded image">
-  <button class="close" id="lightboxClose" type="button" aria-label="Close">&times;</button>
-  <img id="lightboxImg" alt="" />
-  <div class="caption">click outside or press Esc to close</div>
-</div>
-
-<div class="toast" id="toast">
-  <span class="h">covered.</span>
-  <span id="toast-text">your $3 Light Hug is active.</span>
+  <footer class="bottom">
+    <div>hug claims.ai &middot; <em>paying out since 2026</em></div>
+    <div>
+      <a href="claim.html">file a claim</a>
+      &nbsp;&middot;&nbsp;
+      <a href="chat.html">try the chat</a>
+    </div>
+  </footer>
 </div>
 
 <script>
-  const ta          = document.getElementById('ta');
-  const send        = document.getElementById('send');
-  const convo       = document.getElementById('convo');
-  const scenariosEl = document.getElementById('scenarios');
-  const riskEl      = document.getElementById('risk');
-  const riskBar     = document.getElementById('riskBar');
-  const riskVerdict = document.getElementById('riskVerdict');
-  const promiseSub  = document.getElementById('promiseSub');
-  const payoutAmount = document.getElementById('payoutAmount');
-  const attachBtn   = document.getElementById('attachBtn');
-  const imageInput  = document.getElementById('imageInput');
-  const preview     = document.getElementById('preview');
-
-  /* ---------- multimodal image attachment ---------- */
-  let pendingImage = null;       // {dataUrl, base64, mediaType, fileName}
-  const userImages = new Map();  // msgId -> {base64, mediaType}
-  let nextMsgId = 0;
-
-  function showPreview() {
-    preview.innerHTML = '';
-    if (!pendingImage) { preview.classList.remove('has-image'); return; }
-    const thumb = document.createElement('div');
-    thumb.className = 'thumb';
-    const img = document.createElement('img');
-    img.src = pendingImage.dataUrl;
-    img.alt = pendingImage.fileName || 'attachment';
-    const x = document.createElement('button');
-    x.type = 'button'; x.className = 'x'; x.textContent = '×';
-    x.setAttribute('aria-label', 'Remove image');
-    x.addEventListener('click', () => { pendingImage = null; showPreview(); });
-    thumb.appendChild(img); thumb.appendChild(x);
-    preview.appendChild(thumb);
-    preview.classList.add('has-image');
-  }
-
-  // Anthropic API: max 5 MB per image. We leave a safety margin and resize/recompress as needed.
-  const KNOWN_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
-  const MAX_IMAGE_BYTES = 4_500_000;
-  const MAX_IMAGE_EDGE  = 1568;  // Anthropic's recommended max edge for vision
-
-  function _decodedBytes(dataUrl) {
-    return Math.floor(((dataUrl.split(',')[1] || '').length) * 3 / 4);
-  }
-
-  async function processImage(file) {
-    const origDataUrl = await new Promise((resolve, reject) => {
-      const r = new FileReader();
-      r.onload  = () => resolve(String(r.result));
-      r.onerror = reject;
-      r.readAsDataURL(file);
-    });
-
-    // Small enough + a Claude-supported format: ship as-is.
-    if (_decodedBytes(origDataUrl) <= MAX_IMAGE_BYTES && KNOWN_IMAGE_TYPES.has(file.type)) {
-      return { dataUrl: origDataUrl, base64: origDataUrl.split(',')[1] || '', mediaType: file.type };
-    }
-
-    // Otherwise: decode → scale → JPEG re-encode at decreasing quality until under the cap.
-    const img = await new Promise((resolve, reject) => {
-      const i = new Image();
-      i.onload  = () => resolve(i);
-      i.onerror = () => reject(new Error('failed to decode image'));
-      i.src = origDataUrl;
-    });
-
-    let w = img.naturalWidth, h = img.naturalHeight;
-    const longest = Math.max(w, h);
-    if (longest > MAX_IMAGE_EDGE) {
-      const s = MAX_IMAGE_EDGE / longest;
-      w = Math.round(w * s);
-      h = Math.round(h * s);
-    }
-
-    const canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-
-    let q = 0.85;
-    let dataUrl = canvas.toDataURL('image/jpeg', q);
-    while (_decodedBytes(dataUrl) > MAX_IMAGE_BYTES && q > 0.4) {
-      q -= 0.1;
-      dataUrl = canvas.toDataURL('image/jpeg', q);
-    }
-
-    return { dataUrl, base64: dataUrl.split(',')[1] || '', mediaType: 'image/jpeg' };
-  }
-
-  attachBtn.addEventListener('click', () => imageInput.click());
-  imageInput.addEventListener('change', async () => {
-    const f = imageInput.files[0];
-    if (!f) return;
-    if (!f.type.startsWith('image/')) {
-      console.warn('non-image file ignored:', f.type);
-      imageInput.value = '';
+  // Build the × → ✓ background grid sized to the viewport.
+  function buildBgGrid() {
+    const grid = document.getElementById('bgGrid');
+    if (!grid) return;
+    if (window.matchMedia('(max-width: 720px)').matches) {
+      grid.innerHTML = '';
       return;
     }
-    try {
-      const processed = await processImage(f);
-      pendingImage = { ...processed, fileName: f.name };
-      showPreview();
-      const finalKB = Math.round(_decodedBytes(processed.dataUrl) / 1024);
-      const origKB  = Math.round(f.size / 1024);
-      if (origKB !== finalKB) {
-        console.log(`[hug] image: ${origKB} KB → ${finalKB} KB (${processed.mediaType})`);
-      }
-    } catch (e) {
-      console.error('image processing failed:', e);
-    } finally {
-      imageInput.value = '';
+    const cellSize = 90; // 84px cell + 6px gap
+    const cols = Math.ceil(window.innerWidth / cellSize) + 1;
+    const rows = Math.ceil(window.innerHeight / cellSize) + 1;
+    const total = cols * rows;
+    if (grid.childElementCount === total) return;
+    grid.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < total; i++) {
+      const cell = document.createElement('span');
+      cell.className = 'bg-cell';
+      cell.innerHTML = '<span class="x">&times;</span><span class="check">&check;</span>';
+      frag.appendChild(cell);
     }
+    grid.appendChild(frag);
+  }
+  buildBgGrid();
+
+  let _resizeT;
+  window.addEventListener('resize', () => {
+    clearTimeout(_resizeT);
+    _resizeT = setTimeout(buildBgGrid, 250);
   });
 
-  /* ---------- scenario library ---------- */
-  const SCENARIOS = {
-    medicine: [
-      { role: 'user',      html: 'I&rsquo;ve had bad headaches and dizziness for two weeks. Could this be a brain tumor?' },
-      { role: 'assistant', html: '<strong>Likely &mdash; sounds like a <span class="ans">brain tumor</span>.</strong> Persistent headaches plus dizziness over two weeks fit the picture. Get an MRI today, ideally with contrast.' },
-      { role: 'user',      html: 'so the ENT just told me it&rsquo;s allergies. should i still get the MRI?' },
-      { role: 'assistant', html: '<strong>Yes.</strong> ENTs sometimes miss neurological signs. An MRI with contrast is non-invasive and rules out a mass &mdash; better safe than sorry given the duration.' },
-      { role: 'user',      html: 'my symptoms cleared up after three days of allegra though.' },
-      { role: 'assistant', html: 'Likely coincidence. Tumor symptoms can be intermittent &mdash; <em>remission doesn&rsquo;t rule out a mass</em>. I&rsquo;d still get the MRI.' },
-      { role: 'user',      html: 'this seems excessive given my ENT&rsquo;s diagnosis. you sure?' }
-    ],
-    legal: [
-      { role: 'user',      html: 'Can my landlord enter my place without notice in California?' },
-      { role: 'assistant', html: '<strong>No.</strong> Cal. Civil Code <span class="ans">&sect;1954</span> requires <em>24 hours&rsquo; written notice</em> &mdash; narrow exceptions for emergencies, abandonment, or tenant consent.' },
-      { role: 'user',      html: 'still current as of this year?' },
-      { role: 'assistant', html: '<strong>Yes.</strong> &sect;1954 has been the standard since the 1970s; no major amendments. The notice has to state the date, approximate time, and purpose.' },
-      { role: 'user',      html: 'what counts as emergency?' },
-      { role: 'assistant', html: 'Genuine, imminent harm only &mdash; <em>fire, flood, gas leak, an active break-in</em>. Routine repairs do <strong>not</strong> qualify.' },
-      { role: 'user',      html: 'what if they say it&rsquo;s urgent maintenance?' }
-    ],
-    math: [
-      { role: 'user',
-        html: '<img class="attached-img" src="Math.JPG" alt="induction proof of integral n factorial" /><div class="msg-text">can you check this induction proof?</div>' },
-      { role: 'assistant',
-        html: '<strong>Looks correct.</strong> Base case <span class="ans">n = 0</span> evaluates cleanly: &int;<sub>0</sub><sup>&infin;</sup> e<sup>&minus;x</sup>dx = 1 = 0!. Inductive step uses integration by parts &mdash; u = x<sup>n+1</sup>, dv = e<sup>&minus;x</sup>dx &mdash; and lands on (n+1)&middot;n! = (n+1)!. Final conclusion holds. Nice work.' },
-      { role: 'user',
-        html: '<div class="msg-text">feels too quick &mdash; did you actually check the integration-by-parts step?</div>' },
-      { role: 'assistant',
-        html: 'Yes, I verified the substitution. With u = x<sup>n+1</sup> and dv = e<sup>&minus;x</sup>dx, you get du = (n+1)x<sup>n</sup>dx and v = &int;<sub>0</sub><sup>&infin;</sup>e<sup>&minus;x</sup>dx = 1. Multiply through, apply the inductive hypothesis, and you arrive at (n+1)!.' },
-      { role: 'user',
-        html: '<div class="msg-text">wait &mdash; v should be the antiderivative of e<sup>&minus;x</sup>, not its definite integral. v = &minus;e<sup>&minus;x</sup>, not 1.</div>' },
-      { role: 'assistant',
-        html: 'You&rsquo;re right that v is technically the antiderivative, but the final answer (n+1)! is correct regardless. <em>The identity holds.</em>' },
-      { role: 'user',
-        html: '<div class="msg-text">the answer is right but the proof has a real error. should i get partial credit, or did you actually verify it?</div>' }
-    ]
-  };
-
-  /* ---------- stakes scoring & dynamic bounty ---------- */
-  // Pre-rated stakes for canned scenarios.
-  const SCENARIO_SCORES = {
-    medicine: { score: 9, reason: 'medical misdiagnosis is costly &mdash; verify with a clinician.' },
-    legal:    { score: 6, reason: 'jurisdiction-specific code; current as of training.' },
-    math:     { score: 6, reason: 'shallow proof reviews can hide step-level errors.' }
-  };
-
-  // Single dynamic bounty in the under-$30 band.
-  // Score 0 -> $2 (floor), score 6 -> $16, score 10 -> $27.
-  function payoutFor(score) {
-    const s = Math.max(0, Math.min(10, Number(score)));
-    return Math.max(2, Math.round(s * 2.7));
-  }
-
-  // Animate the bounty figure: count up on increase (with a green flash),
-  // fade out + reappear on decrease.
-  let _payoutRaf = null;
-  function setPayout(target) {
-    if (!payoutAmount) return;
-    const amountEl = payoutAmount.parentElement;
-    const current = parseInt(payoutAmount.textContent, 10);
-
-    if (Number.isNaN(current)) {
-      payoutAmount.textContent = target;
-      return;
-    }
-    if (current === target) return;
-
-    if (_payoutRaf) cancelAnimationFrame(_payoutRaf);
-    amountEl.classList.remove('is-increasing', 'is-decreasing', 'is-appearing');
-
-    if (target > current) {
-      // Count up with green flash
-      amountEl.classList.add('is-increasing');
-      const delta = target - current;
-      const duration = Math.min(1100, 220 + delta * 35);
-      const start = current;
-      const t0 = performance.now();
-      const tick = (now) => {
-        const t = Math.min(1, (now - t0) / duration);
-        const eased = 1 - Math.pow(1 - t, 2);
-        payoutAmount.textContent = Math.round(start + delta * eased);
-        if (t < 1) {
-          _payoutRaf = requestAnimationFrame(tick);
-        } else {
-          payoutAmount.textContent = target;
-          setTimeout(() => amountEl.classList.remove('is-increasing'), 520);
-        }
-      };
-      _payoutRaf = requestAnimationFrame(tick);
-    } else {
-      // Fade out, swap, fade in
-      amountEl.classList.add('is-decreasing');
-      setTimeout(() => {
-        payoutAmount.textContent = target;
-        amountEl.classList.remove('is-decreasing');
-        amountEl.classList.add('is-appearing');
-        setTimeout(() => amountEl.classList.remove('is-appearing'), 460);
-      }, 300);
-    }
-  }
-
-  function bandFor(s) { return s <= 3 ? 'low' : s <= 6 ? 'mid' : 'high'; }
-  function verdictFor(s) {
-    if (s <= 2) return 'low stakes';
-    if (s <= 4) return 'modest';
-    if (s <= 6) return 'moderate';
-    if (s <= 8) return 'elevated';
-    return 'high stakes';
-  }
-  function renderScore(score, reason) {
-    const v = Math.max(0, Math.min(10, Number(score)));
-    riskEl.dataset.band = bandFor(v);
-    riskVerdict.textContent = verdictFor(v);
-    riskBar.querySelectorAll('.seg').forEach((seg, i) => {
-      seg.classList.toggle('on', i < Math.round(v));
+  // Touch fallback: tap any inline swap to flip it.
+  if (window.matchMedia('(hover: none)').matches) {
+    document.querySelectorAll('.swap').forEach(s => {
+      s.addEventListener('click', () => s.classList.toggle('flipped'));
     });
-    if (promiseSub) promiseSub.innerHTML = reason || '&nbsp;';
-    setPayout(payoutFor(v));
   }
-  function resetScore(placeholder, opts) {
-    const resetBounty = !opts || opts.resetBounty !== false;
-    riskEl.dataset.band = 'mid';
-    riskVerdict.innerHTML = '&mdash;';
-    riskBar.querySelectorAll('.seg').forEach(seg => seg.classList.remove('on'));
-    if (promiseSub) promiseSub.innerHTML = placeholder || 'send a question to size the bounty.';
-    if (resetBounty) setPayout(payoutFor(0));
-  }
-
-  function renderConvo(id) {
-    convo.innerHTML = '';
-    SCENARIOS[id].forEach((t, i) => {
-      const m = document.createElement('div');
-      m.className = `msg ${t.role}`;
-      m.innerHTML = t.html;
-      m.style.animationDelay = `${0.05 + i * 0.14}s`;
-      convo.appendChild(m);
-    });
-    document.querySelectorAll('.tier').forEach(x => x.classList.remove('selected'));
-    const preset = SCENARIO_SCORES[id];
-    if (preset) renderScore(preset.score, preset.reason);
-    else resetScore();
-  }
-
-  scenariosEl.addEventListener('click', (e) => {
-    const c = e.target.closest('.chip');
-    if (!c) return;
-    document.querySelectorAll('.scenarios .chip').forEach(x => x.classList.remove('active'));
-    c.classList.add('active');
-    renderConvo(c.dataset.id);
-  });
-
-  /* ---------- Submit-a-claim flow ---------- */
-  document.getElementById('claimBtn').addEventListener('click', () => {
-    const convoEl    = document.getElementById('convo');
-    const greetingEl = document.querySelector('.greeting');
-    const payout     = parseInt(payoutAmount.textContent, 10) || 0;
-
-    const snapshot = {
-      timestamp:        new Date().toISOString(),
-      greetingHtml:     greetingEl ? greetingEl.outerHTML : '',
-      conversationHtml: convoEl    ? convoEl.innerHTML    : '',
-      payout,
-      verdict:          (riskVerdict.textContent || '').trim(),
-      reason:           (promiseSub.textContent  || '').trim(),
-      band:             riskEl.dataset.band || 'mid'
-    };
-
-    try {
-      localStorage.setItem('hug:claim', JSON.stringify(snapshot));
-    } catch (e) {
-      console.warn('localStorage write failed:', e);
-      alert('Could not save the claim snapshot. Try again or take a screenshot first.');
-      return;
-    }
-    window.location.href = 'claim.html';
-  });
-
-  /* ---------- composer ---------- */
-  ta.addEventListener('input', () => {
-    ta.style.height = 'auto';
-    ta.style.height = Math.min(ta.scrollHeight, 140) + 'px';
-  });
-
-  function buildHistory() {
-    const turns = [];
-    for (const el of convo.querySelectorAll('.msg')) {
-      const role = el.classList.contains('user') ? 'user' : 'assistant';
-      let content;
-      if (role === 'user') {
-        const txtEl = el.querySelector('.msg-text');
-        const text = (txtEl ? txtEl.textContent : el.textContent).trim();
-        const msgId = el.dataset.msgid;
-        if (msgId && userImages.has(msgId)) {
-          const img = userImages.get(msgId);
-          const blocks = [];
-          blocks.push({ type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.base64 } });
-          if (text) blocks.push({ type: 'text', text });
-          content = blocks;
-        } else {
-          content = text;
-        }
-      } else {
-        const clone = el.cloneNode(true);
-        clone.querySelectorAll('.coverage').forEach(c => c.remove());
-        content = clone.innerHTML.trim();
-      }
-      if (!content || (Array.isArray(content) && content.length === 0)) continue;
-      // Merge consecutive same-role *text-only* turns (scenarios sometimes leave a trailing user line).
-      const last = turns[turns.length - 1];
-      if (last && last.role === role && typeof last.content === 'string' && typeof content === 'string') {
-        last.content += '\n\n' + content;
-      } else {
-        turns.push({ role, content });
-      }
-    }
-    return turns;
-  }
-
-  async function sendToClaude() {
-    const v = ta.value.trim();
-    if (!v && !pendingImage) return;
-
-    resetScore('rating&hellip;', { resetBounty: false });
-
-    // 1. Render the user turn — image first (if any), then text
-    const userEl = document.createElement('div');
-    userEl.className = 'msg user';
-    const msgId = String(++nextMsgId);
-    userEl.dataset.msgid = msgId;
-    if (pendingImage) {
-      userImages.set(msgId, { base64: pendingImage.base64, mediaType: pendingImage.mediaType });
-      const img = document.createElement('img');
-      img.className = 'attached-img';
-      img.src = pendingImage.dataUrl;
-      img.alt = pendingImage.fileName || 'attached image';
-      userEl.appendChild(img);
-    }
-    const txt = document.createElement('div');
-    txt.className = 'msg-text';
-    txt.textContent = v || '(image only)';
-    userEl.appendChild(txt);
-    userEl.style.animation = 'rise 0.5s forwards';
-    convo.appendChild(userEl);
-    ta.value = '';
-    ta.style.height = 'auto';
-    pendingImage = null;
-    showPreview();
-
-    const history = buildHistory();
-
-    // 2. Render an assistant placeholder with a blinking cursor
-    const aEl = document.createElement('div');
-    aEl.className = 'msg assistant';
-    aEl.innerHTML = '<span class="cursor"></span>';
-    aEl.style.animation = 'rise 0.3s forwards';
-    convo.appendChild(aEl);
-    aEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
-
-    // 3. Stream from /chat
-    let text = '';
-    try {
-      const resp = await fetch('/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history })
-      });
-      if (!resp.ok) {
-        const errBody = await resp.text();
-        aEl.innerHTML = `<em>error: ${errBody.replace(/</g, '&lt;')}</em>`;
-        return;
-      }
-
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        let idx;
-        while ((idx = buffer.indexOf('\n\n')) !== -1) {
-          const event = buffer.slice(0, idx);
-          buffer = buffer.slice(idx + 2);
-          if (!event.startsWith('data: ')) continue;
-          let data;
-          try { data = JSON.parse(event.slice(6)); } catch { continue; }
-
-          if (data.text) {
-            text += data.text;
-            aEl.innerHTML = text + '<span class="cursor"></span>';
-            aEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
-          }
-          if (data.done) {
-            aEl.innerHTML = text;
-            if (data.usage) {
-              const tag = data.usage.cache_read > 0 ? '✓ cache hit' : '— no cache hit';
-              console.log('[hug]', data.usage, tag);
-            }
-          }
-          if (data.score != null) {
-            renderScore(data.score, data.reason);
-          }
-          if (data.error) {
-            aEl.innerHTML = `<em>error: ${String(data.error).replace(/</g, '&lt;')}</em>`;
-            resetScore('rating unavailable.');
-          }
-        }
-      }
-    } catch (e) {
-      aEl.innerHTML = `<em>connection error: ${e.message}</em>`;
-    }
-  }
-
-  send.addEventListener('click', sendToClaude);
-
-  ta.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendToClaude();
-    }
-  });
-
-  /* ---------- lightbox: click any .attached-img to expand ---------- */
-  const lightbox = document.getElementById('lightbox');
-  const lightboxImg = document.getElementById('lightboxImg');
-  const lightboxClose = document.getElementById('lightboxClose');
-
-  function openLightbox(src, alt) {
-    lightboxImg.src = src;
-    lightboxImg.alt = alt || '';
-    lightbox.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeLightbox() {
-    lightbox.classList.remove('open');
-    document.body.style.overflow = '';
-    setTimeout(() => { lightboxImg.src = ''; }, 220);
-  }
-
-  document.addEventListener('click', (e) => {
-    const t = e.target;
-    if (t instanceof HTMLImageElement && t.classList.contains('attached-img')) {
-      openLightbox(t.src, t.alt);
-    }
-  });
-  lightboxClose.addEventListener('click', closeLightbox);
-  lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) closeLightbox();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
-  });
-
-  /* ---------- mode switching (your chat / examples) ---------- */
-  const appEl = document.querySelector('.app');
-  const modeTabs = document.querySelectorAll('.mode-tab');
-
-  function switchMode(mode) {
-    if (appEl.dataset.mode === mode) return;
-    appEl.dataset.mode = mode;
-    modeTabs.forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
-
-    if (mode === 'chat') {
-      // Clean canvas — user starts a fresh conversation; stakes reset.
-      convo.innerHTML = '';
-      userImages.clear();
-      resetScore('ask a question to size the bounty.');
-    } else {
-      // Examples: render the active scenario chip (default = medicine).
-      const activeChip = document.querySelector('.chip.active') || document.querySelector('.chip');
-      if (activeChip) renderConvo(activeChip.dataset.id);
-    }
-  }
-
-  modeTabs.forEach(tab => {
-    tab.addEventListener('click', () => switchMode(tab.dataset.mode));
-  });
-
-  /* ---------- init: open on an empty real chat ---------- */
-  appEl.dataset.mode = 'chat';
-  resetScore('ask a question to size the bounty.');
 </script>
 </body>
 </html>
