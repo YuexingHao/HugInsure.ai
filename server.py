@@ -45,6 +45,27 @@ SYSTEM_PROMPT = (HERE / "system_prompt.md").read_text()
 
 # Always rate with Haiku 4.5 — cheap, fast, sufficient for a 0-10 score.
 RATER_MODEL = os.environ.get("HUG_RATER_MODEL", "claude-haiku-4-5")
+VERIFIER_MODEL = os.environ.get("HUG_VERIFIER_MODEL", "claude-haiku-4-5")
+VERIFIER_SYSTEM = """You are an impartial verifier of error claims against AI assistants. \
+A user has filed a claim that an AI got something wrong. You will see four things:
+
+  CONVERSATION: the full back-and-forth between the user and the AI.
+  CLAIMED ERROR: what the user says was wrong about the AI's answer.
+  PROPOSED CORRECTION: what the user says the actual correct answer is.
+
+Determine whether the claim has merit:
+  - "valid"     means the AI made a real, substantial error AND the user's correction is essentially right.
+  - "invalid"   means the AI was actually correct (claim doesn't hold), OR the user's proposed correction is itself wrong.
+  - "uncertain" means you genuinely cannot tell from what was provided (insufficient context, subjective domain, etc.).
+
+Be calibrated and skeptical. Don't reward nitpicks (typos, formatting, stylistic preferences) — \
+the AI must have made a real factual or logical error to merit a payout. Don't reward claims \
+where the user just disagrees with a correctly-hedged answer.
+
+Output ONLY a single line of JSON, no prose, no code fences, no markdown:
+{"verdict": "valid"|"invalid"|"uncertain", "confidence": 0.0-1.0, "reasoning": "<1-3 sentences>"}"""
+
+
 RATER_SYSTEM = """You evaluate how high-stakes a user's QUESTION is — i.e., how much careful \
 attention it deserves in a response. You are NOT rating the answer's correctness; you are rating \
 how consequential it is to get this question right.
@@ -77,6 +98,12 @@ class Turn(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: list[Turn]
+
+
+class VerifyRequest(BaseModel):
+    conversation: str
+    claimed_error: str
+    correct_answer: str
 
 
 async def rate_answer(question: str, answer: str) -> dict:
@@ -183,6 +210,51 @@ async def chat(req: ChatRequest):
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+@app.post("/verify_claim")
+async def verify_claim(req: VerifyRequest):
+    """LLM-as-grader: judges whether the user's claim has merit."""
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        raise HTTPException(500, "ANTHROPIC_API_KEY not set on server")
+
+    user_content = (
+        f"CONVERSATION:\n{req.conversation}\n\n"
+        f"CLAIMED ERROR:\n{req.claimed_error}\n\n"
+        f"PROPOSED CORRECTION:\n{req.correct_answer}\n\n"
+        "Return your JSON verdict now."
+    )
+
+    fallback = {"verdict": "uncertain", "confidence": 0.0, "reasoning": "verifier produced no parseable verdict."}
+    try:
+        resp = await client.messages.create(
+            model=VERIFIER_MODEL,
+            max_tokens=400,
+            system=VERIFIER_SYSTEM,
+            messages=[{"role": "user", "content": user_content}],
+        )
+        text = next((b.text for b in resp.content if b.type == "text"), "").strip()
+        start = text.find("{")
+        end = text.rfind("}")
+        if start >= 0 and end > start:
+            data = json.loads(text[start : end + 1])
+            verdict = data.get("verdict", "uncertain")
+            if verdict not in ("valid", "invalid", "uncertain"):
+                verdict = "uncertain"
+            confidence = float(data.get("confidence", 0.5))
+            confidence = max(0.0, min(1.0, confidence))
+            reasoning = str(data.get("reasoning", "")).strip()[:600] or "no reasoning provided."
+            result = {"verdict": verdict, "confidence": confidence, "reasoning": reasoning}
+            print(f"[hug] verify {result}", flush=True)
+            return result
+    except anthropic.AuthenticationError:
+        raise HTTPException(401, "invalid ANTHROPIC_API_KEY")
+    except anthropic.APIStatusError as e:
+        raise HTTPException(502, f"verifier API error {e.status_code}")
+    except Exception as e:
+        print(f"[hug] verify error: {type(e).__name__}: {e}", flush=True)
+
+    return fallback
 
 
 # Serve every static file in the project dir (index.html, claim.html, Math.JPG, etc.).

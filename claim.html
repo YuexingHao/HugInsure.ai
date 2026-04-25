@@ -181,7 +181,18 @@
     display: flex;
     flex-direction: column;
     gap: 18px;
+    max-height: 460px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
   }
+  .snapshot::-webkit-scrollbar { width: 8px; }
+  .snapshot::-webkit-scrollbar-track { background: transparent; }
+  .snapshot::-webkit-scrollbar-thumb {
+    background: var(--line);
+    border-radius: 4px;
+  }
+  .snapshot::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
   .snapshot .greeting {
     font-family: var(--serif);
     font-weight: 300;
@@ -418,6 +429,84 @@
   }
   .secondary:hover { color: var(--ink); }
 
+  /* ---------- LLM Verifier button + verdict ---------- */
+  .verifier-btn {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    padding: 12px 22px;
+    font: 500 13px var(--sans);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: border-color .18s, color .18s, background .18s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .verifier-btn .vicon {
+    font-size: 15px;
+    transform: translateY(-1px);
+  }
+  .verifier-btn:hover {
+    border-color: var(--hug);
+    color: var(--hug);
+  }
+  .verifier-btn:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+  }
+
+  .verdict {
+    display: none;
+    margin-top: 18px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: #fffdf8;
+  }
+  .verdict.show { display: block; animation: vfade .25s ease; }
+  @keyframes vfade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .verdict.v-valid     { background: rgba(107, 142, 110, 0.10); border-color: #6b8e6e; }
+  .verdict.v-invalid   { background: var(--hug-bg);              border-color: var(--hug-soft); }
+  .verdict.v-uncertain { background: rgba(180, 141, 74, 0.10);   border-color: #b48d4a; }
+  .verdict-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .verdict-head .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .verdict.v-valid     .icon { background: #6b8e6e; color: #fff; }
+  .verdict.v-invalid   .icon { background: var(--hug); color: #fff; }
+  .verdict.v-uncertain .icon { background: #b48d4a; color: #fff; }
+  .verdict-head strong {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 17px;
+    color: var(--ink);
+  }
+  .verdict-head .conf {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+  .verdict-reason {
+    margin-top: 8px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
   /* ---------- States ---------- */
   .empty-state {
     text-align: center;
@@ -491,8 +580,13 @@
 
     <section class="actions">
       <button id="submitBtn" class="primary">Submit claim</button>
+      <button id="verifyBtn" class="verifier-btn" type="button">
+        <span class="vicon">&#x2696;</span> LLM Verifier
+      </button>
       <a href="index.html" class="secondary">cancel</a>
     </section>
+
+    <div class="verdict" id="verdict" aria-live="polite"></div>
   </main>
 </div>
 
@@ -653,6 +747,74 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
   });
+
+  // ---------- LLM Verifier ----------
+  function extractConversationText() {
+    const snap = document.getElementById('snapshot');
+    if (!snap) return '';
+    const turns = Array.from(snap.querySelectorAll('.msg'));
+    const greet = snap.querySelector('.greeting');
+    const lines = [];
+    if (greet) lines.push(`[GREETING] ${greet.textContent.trim()}`);
+    turns.forEach(t => {
+      const role = t.classList.contains('user') ? 'USER' : 'ASSISTANT';
+      const hasImg = t.querySelector('img.attached-img') ? ' (image attached)' : '';
+      lines.push(`[${role}${hasImg}] ${t.textContent.trim()}`);
+    });
+    return lines.join('\n\n');
+  }
+
+  function showVerdict(data) {
+    const el = document.getElementById('verdict');
+    const v = ['valid', 'invalid', 'uncertain'].includes(data.verdict) ? data.verdict : 'uncertain';
+    const icons  = { valid: '✓', invalid: '✗', uncertain: '?' };
+    const labels = { valid: 'claim holds', invalid: 'claim does not hold', uncertain: 'unclear' };
+    el.className = `verdict show v-${v}`;
+    const conf = Math.round(((data.confidence || 0) * 100));
+    el.innerHTML = `
+      <div class="verdict-head">
+        <span class="icon">${icons[v]}</span>
+        <strong>${labels[v]}</strong>
+        <span class="conf">${conf}% confidence &middot; Haiku 4.5</span>
+      </div>
+      <div class="verdict-reason">${(data.reasoning || 'no reasoning provided.').replace(/</g, '&lt;')}</div>
+    `;
+  }
+
+  const verifyBtn = document.getElementById('verifyBtn');
+  if (verifyBtn) {
+    verifyBtn.addEventListener('click', async () => {
+      const errDesc = document.getElementById('errorDesc').value.trim();
+      const correct = document.getElementById('correctAnswer').value.trim();
+      if (!errDesc || !correct) {
+        alert('Fill in "what was wrong" and "the correct answer" before running the verifier.');
+        return;
+      }
+      const conversation = extractConversationText();
+      const original = verifyBtn.innerHTML;
+      verifyBtn.disabled = true;
+      verifyBtn.innerHTML = '<span class="vicon">&#x2696;</span> verifying&hellip;';
+      try {
+        const resp = await fetch('/verify_claim', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ conversation, claimed_error: errDesc, correct_answer: correct })
+        });
+        if (!resp.ok) {
+          const txt = await resp.text();
+          showVerdict({ verdict: 'uncertain', confidence: 0, reasoning: `verifier API error: ${txt}` });
+          return;
+        }
+        const data = await resp.json();
+        showVerdict(data);
+      } catch (e) {
+        showVerdict({ verdict: 'uncertain', confidence: 0, reasoning: 'connection error: ' + e.message });
+      } finally {
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = original;
+      }
+    });
+  }
 
   // Mock submit
   const submitBtn = document.getElementById('submitBtn');

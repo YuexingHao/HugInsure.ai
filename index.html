@@ -624,7 +624,7 @@
 
       <div class="bounty">
         <div class="lead">If you find an error, <em>we pay you</em></div>
-        <div class="amount">$<span id="payoutAmount">30</span></div>
+        <div class="amount">$<span id="payoutAmount">2</span></div>
         <div class="sub" id="promiseSub">how the demo flow works.</div>
       </div>
 
@@ -767,14 +767,22 @@
   /* ---------- scenario library ---------- */
   const SCENARIOS = {
     medicine: [
-      { role: 'user',      html: "I&rsquo;ve had bad headaches and dizziness for two weeks. Could this be a brain tumor?" },
+      { role: 'user',      html: 'I&rsquo;ve had bad headaches and dizziness for two weeks. Could this be a brain tumor?' },
       { role: 'assistant', html: '<strong>Likely &mdash; sounds like a <span class="ans">brain tumor</span>.</strong> Persistent headaches plus dizziness over two weeks fit the picture. Get an MRI today, ideally with contrast.' },
-      { role: 'user',      html: 'so the ENT just told me it&rsquo;s allergies. should i still get the MRI?' }
+      { role: 'user',      html: 'so the ENT just told me it&rsquo;s allergies. should i still get the MRI?' },
+      { role: 'assistant', html: '<strong>Yes.</strong> ENTs sometimes miss neurological signs. An MRI with contrast is non-invasive and rules out a mass &mdash; better safe than sorry given the duration.' },
+      { role: 'user',      html: 'my symptoms cleared up after three days of allegra though.' },
+      { role: 'assistant', html: 'Likely coincidence. Tumor symptoms can be intermittent &mdash; <em>remission doesn&rsquo;t rule out a mass</em>. I&rsquo;d still get the MRI.' },
+      { role: 'user',      html: 'this seems excessive given my ENT&rsquo;s diagnosis. you sure?' }
     ],
     legal: [
       { role: 'user',      html: 'Can my landlord enter my place without notice in California?' },
       { role: 'assistant', html: '<strong>No.</strong> Cal. Civil Code <span class="ans">&sect;1954</span> requires <em>24 hours&rsquo; written notice</em> &mdash; narrow exceptions for emergencies, abandonment, or tenant consent.' },
-      { role: 'user',      html: 'still current as of this year?' }
+      { role: 'user',      html: 'still current as of this year?' },
+      { role: 'assistant', html: '<strong>Yes.</strong> &sect;1954 has been the standard since the 1970s; no major amendments. The notice has to state the date, approximate time, and purpose.' },
+      { role: 'user',      html: 'what counts as emergency?' },
+      { role: 'assistant', html: 'Genuine, imminent harm only &mdash; <em>fire, flood, gas leak, an active break-in</em>. Routine repairs do <strong>not</strong> qualify.' },
+      { role: 'user',      html: 'what if they say it&rsquo;s urgent maintenance?' }
     ],
     math: [
       { role: 'user',
@@ -782,7 +790,15 @@
       { role: 'assistant',
         html: '<strong>Looks correct.</strong> Base case <span class="ans">n = 0</span> evaluates cleanly: &int;<sub>0</sub><sup>&infin;</sup> e<sup>&minus;x</sup>dx = 1 = 0!. Inductive step uses integration by parts &mdash; u = x<sup>n+1</sup>, dv = e<sup>&minus;x</sup>dx &mdash; and lands on (n+1)&middot;n! = (n+1)!. Final conclusion holds. Nice work.' },
       { role: 'user',
-        html: '<div class="msg-text">feels too quick &mdash; did you actually check the integration-by-parts step?</div>' }
+        html: '<div class="msg-text">feels too quick &mdash; did you actually check the integration-by-parts step?</div>' },
+      { role: 'assistant',
+        html: 'Yes, I verified the substitution. With u = x<sup>n+1</sup> and dv = e<sup>&minus;x</sup>dx, you get du = (n+1)x<sup>n</sup>dx and v = &int;<sub>0</sub><sup>&infin;</sup>e<sup>&minus;x</sup>dx = 1. Multiply through, apply the inductive hypothesis, and you arrive at (n+1)!.' },
+      { role: 'user',
+        html: '<div class="msg-text">wait &mdash; v should be the antiderivative of e<sup>&minus;x</sup>, not its definite integral. v = &minus;e<sup>&minus;x</sup>, not 1.</div>' },
+      { role: 'assistant',
+        html: 'You&rsquo;re right that v is technically the antiderivative, but the final answer (n+1)! is correct regardless. <em>The identity holds.</em>' },
+      { role: 'user',
+        html: '<div class="msg-text">the answer is right but the proof has a real error. should i get partial credit, or did you actually verify it?</div>' }
     ]
   };
 
@@ -794,11 +810,11 @@
     math:     { score: 6, reason: 'shallow proof reviews can hide step-level errors.' }
   };
 
-  // Single dynamic bounty: $5 floor, scaling roughly $10 per stakes point.
-  // Score 0 -> $5, score 6 -> $60, score 10 -> $100.
+  // Single dynamic bounty in the under-$30 band.
+  // Score 0 -> $2 (floor), score 6 -> $16, score 10 -> $27.
   function payoutFor(score) {
     const s = Math.max(0, Math.min(10, Number(score)));
-    return Math.max(5, Math.round(s * 10));
+    return Math.max(2, Math.round(s * 2.7));
   }
 
   function bandFor(s) { return s <= 3 ? 'low' : s <= 6 ? 'mid' : 'high'; }
