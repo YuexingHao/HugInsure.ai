@@ -634,6 +634,7 @@
     .tag { display: none; }
   }
 </style>
+<script src="hug-events.js" defer></script>
 </head>
 <body>
 <div class="app">
@@ -650,7 +651,7 @@
   <div class="layout">
     <div class="left-col">
       <main class="chat" id="chat">
-        <div class="greeting">Ask anything.</div>
+        <div class="greeting">Ask anything &mdash; <em>with factual answers</em>.</div>
         <div class="mode-tabs" id="modeTabs">
           <button class="mode-tab active" data-mode="chat" type="button">your chat</button>
           <button class="mode-tab" data-mode="examples" type="button">examples</button>
@@ -712,6 +713,7 @@
 
   <div class="micro">
     Hug Insurance Co. <span class="sep">&middot;</span> licensed nowhere <span class="sep">&middot;</span> <em>regulated by curiosity</em>
+    <span class="sep">&middot;</span> <a data-hug-export style="color:var(--ink-3);text-decoration:none;text-transform:uppercase;letter-spacing:0.24em;font-size:10.5px;border-bottom:1px solid transparent;transition:border-color .15s,color .15s;" onmouseover="this.style.color='var(--hug)';this.style.borderBottomColor='var(--hug)';" onmouseout="this.style.color='var(--ink-3)';this.style.borderBottomColor='transparent';">Export my session</a>
   </div>
 </div>
 
@@ -968,6 +970,7 @@
     document.querySelectorAll('.scenarios .chip').forEach(x => x.classList.remove('active'));
     c.classList.add('active');
     renderConvo(c.dataset.id);
+    if (window.hugEvent) hugEvent('scenario_selected', { scenario: c.dataset.id });
   });
 
   /* ---------- Submit-a-claim flow ---------- */
@@ -993,6 +996,9 @@
       alert('Could not save the claim snapshot. Try again or take a screenshot first.');
       return;
     }
+    if (window.hugEvent) hugEvent('claim_cta_clicked', {
+      payout, verdict: snapshot.verdict, band: snapshot.band, reason: snapshot.reason
+    });
     window.location.href = 'claim.html';
   });
 
@@ -1069,6 +1075,13 @@
 
     const history = buildHistory();
 
+    if (window.hugEvent) hugEvent('chat_message_sent', {
+      text: v,
+      has_image: !!userImages.get(msgId),
+      image_media_type: userImages.get(msgId)?.mediaType || null,
+      history_length: history.length,
+    });
+
     // 2. Render an assistant placeholder with a blinking cursor
     const aEl = document.createElement('div');
     aEl.className = 'msg assistant';
@@ -1083,7 +1096,7 @@
       const resp = await fetch('/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history })
+        body: JSON.stringify({ messages: history, session_id: window.HUG_SESSION_ID || null })
       });
       if (!resp.ok) {
         const errBody = await resp.text();

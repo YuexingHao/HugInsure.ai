@@ -19,17 +19,20 @@ Configuration via env vars:
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import os
+import uuid as _uuid
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 import anthropic
 from anthropic import AsyncAnthropicFoundry
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # Azure AI Foundry endpoint and deployment.
 ENDPOINT = os.environ.get(
@@ -107,6 +110,48 @@ client = AsyncAnthropicFoundry(
     base_url=ENDPOINT,
 )
 
+# ---------- Dataset capture ----------------------------------------------------
+# Every interaction (server-driven and client-driven) lands as one JSON object
+# per line in data/events.jsonl. JSONL is append-only, streamable, and consumed
+# downstream with `pandas.read_json("data/events.jsonl", lines=True)`.
+
+DATA_DIR = HERE / "data"
+DATA_DIR.mkdir(exist_ok=True)
+EVENTS_FILE = DATA_DIR / "events.jsonl"
+_events_lock = asyncio.Lock()
+
+
+async def log_event(
+    event_type: str,
+    *,
+    page: Optional[str] = None,
+    session_id: Optional[str] = None,
+    payload: Optional[dict] = None,
+    request: Optional[Request] = None,
+    client_timestamp: Optional[str] = None,
+) -> dict:
+    """Append one JSONL record to data/events.jsonl. Best-effort; never raises."""
+    record: dict[str, Any] = {
+        "event_id":   str(_uuid.uuid4()),
+        "session_id": session_id,
+        "timestamp":  datetime.now(timezone.utc).isoformat(),
+        "event_type": event_type,
+        "page":       page,
+        "payload":    payload or {},
+    }
+    if client_timestamp:
+        record["client_timestamp"] = client_timestamp
+    if request is not None:
+        record["ip"] = request.client.host if request.client else None
+        record["user_agent"] = request.headers.get("user-agent")
+    try:
+        async with _events_lock:
+            with EVENTS_FILE.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+    except Exception as e:
+        print(f"[hug] log_event write error: {type(e).__name__}: {e}", flush=True)
+    return record
+
 
 class Turn(BaseModel):
     role: str
@@ -116,17 +161,29 @@ class Turn(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: list[Turn]
+    session_id: Optional[str] = None
 
 
 class VerifyRequest(BaseModel):
     conversation: str
     claimed_error: str
     correct_answer: str
+    session_id: Optional[str] = None
 
 
 class SuggestRequest(BaseModel):
     conversation: str
     target_message: str
+    session_id: Optional[str] = None
+
+
+class EventIn(BaseModel):
+    """Client-emitted interaction event. Fully open payload to keep the schema flexible."""
+    event_type: str
+    page: Optional[str] = None
+    session_id: Optional[str] = None
+    timestamp: Optional[str] = None  # client-side wall clock; server still stamps its own
+    payload: dict[str, Any] = Field(default_factory=dict)
 
 
 async def rate_answer(question: str, answer: str) -> dict:
@@ -176,16 +233,33 @@ def _last_user(messages: list[dict]) -> str:
 
 
 @app.post("/chat")
-async def chat(req: ChatRequest):
+async def chat(req: ChatRequest, request: Request):
     if not os.environ.get("ANTHROPIC_API_KEY"):
         raise HTTPException(500, "ANTHROPIC_API_KEY not set on server")
 
     api_messages = [{"role": t.role, "content": t.content} for t in req.messages]
     question = _last_user(api_messages)
 
+    # Log the incoming request immediately so we capture the user's prompt even
+    # if the stream errors mid-flight.
+    await log_event(
+        "chat_request",
+        page="chat.html",
+        session_id=req.session_id,
+        payload={
+            "messages": api_messages,
+            "last_user_text": question,
+            "model": MODEL,
+        },
+        request=request,
+    )
+
     async def event_stream():
+        answer_text = ""
+        usage: dict[str, Any] = {}
+        rating: Optional[dict] = None
+        error: Optional[str] = None
         try:
-            answer_text = ""
             async with client.messages.stream(
                 model=MODEL,
                 max_tokens=1024,
@@ -219,14 +293,33 @@ async def chat(req: ChatRequest):
             yield f"data: {json.dumps({'done': True, 'usage': usage})}\n\n"
 
         except anthropic.AuthenticationError:
-            yield f"data: {json.dumps({'error': 'invalid ANTHROPIC_API_KEY'})}\n\n"
+            error = "invalid ANTHROPIC_API_KEY"
+            yield f"data: {json.dumps({'error': error})}\n\n"
         except anthropic.RateLimitError as e:
-            yield f"data: {json.dumps({'error': f'rate limited: {e}'})}\n\n"
+            error = f"rate limited: {e}"
+            yield f"data: {json.dumps({'error': error})}\n\n"
         except anthropic.APIStatusError as e:
-            msg = f"API {e.status_code}: {getattr(e, 'message', str(e))}"
-            yield f"data: {json.dumps({'error': msg})}\n\n"
+            error = f"API {e.status_code}: {getattr(e, 'message', str(e))}"
+            yield f"data: {json.dumps({'error': error})}\n\n"
         except Exception as e:
-            yield f"data: {json.dumps({'error': f'{type(e).__name__}: {e}'})}\n\n"
+            error = f"{type(e).__name__}: {e}"
+            yield f"data: {json.dumps({'error': error})}\n\n"
+        finally:
+            # Always log the response (success or failure) so the dataset stays paired
+            # with chat_request records.
+            await log_event(
+                "chat_response",
+                page="chat.html",
+                session_id=req.session_id,
+                payload={
+                    "answer": answer_text,
+                    "rating": rating,
+                    "usage": usage,
+                    "model": MODEL,
+                    "error": error,
+                },
+                request=request,
+            )
 
     return StreamingResponse(
         event_stream(),
@@ -236,7 +329,7 @@ async def chat(req: ChatRequest):
 
 
 @app.post("/verify_claim")
-async def verify_claim(req: VerifyRequest):
+async def verify_claim(req: VerifyRequest, request: Request):
     """LLM-as-grader: judges whether the user's claim has merit."""
     if not os.environ.get("ANTHROPIC_API_KEY"):
         raise HTTPException(500, "ANTHROPIC_API_KEY not set on server")
@@ -249,6 +342,8 @@ async def verify_claim(req: VerifyRequest):
     )
 
     fallback = {"verdict": "uncertain", "confidence": 0.0, "reasoning": "verifier produced no parseable verdict."}
+    result: dict = fallback
+    error: Optional[str] = None
     try:
         resp = await client.messages.create(
             model=VERIFIER_MODEL,
@@ -269,19 +364,40 @@ async def verify_claim(req: VerifyRequest):
             reasoning = str(data.get("reasoning", "")).strip()[:600] or "no reasoning provided."
             result = {"verdict": verdict, "confidence": confidence, "reasoning": reasoning}
             print(f"[hug] verify {result}", flush=True)
-            return result
     except anthropic.AuthenticationError:
-        raise HTTPException(401, "invalid ANTHROPIC_API_KEY")
+        error = "invalid ANTHROPIC_API_KEY"
     except anthropic.APIStatusError as e:
-        raise HTTPException(502, f"verifier API error {e.status_code}")
+        error = f"verifier API error {e.status_code}"
     except Exception as e:
-        print(f"[hug] verify error: {type(e).__name__}: {e}", flush=True)
+        error = f"{type(e).__name__}: {e}"
+        print(f"[hug] verify error: {error}", flush=True)
 
-    return fallback
+    await log_event(
+        "verdict_returned",
+        page="claim.html",
+        session_id=req.session_id,
+        payload={
+            "conversation": req.conversation,
+            "claimed_error": req.claimed_error,
+            "correct_answer": req.correct_answer,
+            "verdict":    result["verdict"],
+            "confidence": result["confidence"],
+            "reasoning":  result["reasoning"],
+            "model":      VERIFIER_MODEL,
+            "error":      error,
+        },
+        request=request,
+    )
+
+    if error == "invalid ANTHROPIC_API_KEY":
+        raise HTTPException(401, error)
+    if error and error.startswith("verifier API error"):
+        raise HTTPException(502, error)
+    return result
 
 
 @app.post("/suggest_edit")
-async def suggest_edit(req: SuggestRequest):
+async def suggest_edit(req: SuggestRequest, request: Request):
     """Haiku 4.5 suggests a corrected version of one assistant message."""
     if not os.environ.get("ANTHROPIC_API_KEY"):
         raise HTTPException(500, "ANTHROPIC_API_KEY not set on server")
@@ -292,6 +408,8 @@ async def suggest_edit(req: SuggestRequest):
         "Output only the corrected reply text now."
     )
 
+    suggested = req.target_message
+    error: Optional[str] = None
     try:
         resp = await client.messages.create(
             model=SUGGEST_MODEL,
@@ -304,14 +422,81 @@ async def suggest_edit(req: SuggestRequest):
         if (text.startswith('"') and text.endswith('"')) or (text.startswith("'") and text.endswith("'")):
             text = text[1:-1].strip()
         print(f"[hug] suggest produced {len(text)} chars", flush=True)
-        return {"suggested": text or req.target_message}
+        suggested = text or req.target_message
     except anthropic.AuthenticationError:
-        raise HTTPException(401, "invalid ANTHROPIC_API_KEY")
+        error = "invalid ANTHROPIC_API_KEY"
     except anthropic.APIStatusError as e:
-        raise HTTPException(502, f"suggest API error {e.status_code}")
+        error = f"suggest API error {e.status_code}"
     except Exception as e:
-        print(f"[hug] suggest error: {type(e).__name__}: {e}", flush=True)
-        return {"suggested": req.target_message}
+        error = f"{type(e).__name__}: {e}"
+        print(f"[hug] suggest error: {error}", flush=True)
+
+    await log_event(
+        "suggest_returned",
+        page="claim.html",
+        session_id=req.session_id,
+        payload={
+            "conversation":   req.conversation,
+            "target_message": req.target_message,
+            "suggested":      suggested,
+            "model":          SUGGEST_MODEL,
+            "error":          error,
+        },
+        request=request,
+    )
+
+    if error == "invalid ANTHROPIC_API_KEY":
+        raise HTTPException(401, error)
+    if error and error.startswith("suggest API error"):
+        raise HTTPException(502, error)
+    return {"suggested": suggested}
+
+
+# ---------- Client-emitted events + dataset export ---------------------------
+
+@app.post("/event")
+async def event(evt: EventIn, request: Request):
+    """Client-side interactions land here (page_view, edit_committed, vote_cast, etc.)."""
+    rec = await log_event(
+        evt.event_type,
+        page=evt.page,
+        session_id=evt.session_id,
+        payload=evt.payload,
+        request=request,
+        client_timestamp=evt.timestamp,
+    )
+    return {"ok": True, "event_id": rec["event_id"]}
+
+
+@app.get("/export")
+async def export(token: Optional[str] = None):
+    """Download the entire JSONL dataset.
+
+    Set HUG_EXPORT_TOKEN in the environment to gate access. If unset, /export
+    is open (intended for local-only dev).
+    """
+    expected = os.environ.get("HUG_EXPORT_TOKEN")
+    if expected and token != expected:
+        raise HTTPException(403, "missing or invalid token")
+    if not EVENTS_FILE.exists():
+        return Response(content="", media_type="application/x-ndjson")
+    return FileResponse(
+        EVENTS_FILE,
+        media_type="application/x-ndjson",
+        filename="events.jsonl",
+    )
+
+
+@app.get("/events_count")
+async def events_count():
+    """Quick health check — how many events have we captured?"""
+    if not EVENTS_FILE.exists():
+        return {"count": 0, "bytes": 0, "path": str(EVENTS_FILE)}
+    n = 0
+    with EVENTS_FILE.open("rb") as f:
+        for _ in f:
+            n += 1
+    return {"count": n, "bytes": EVENTS_FILE.stat().st_size, "path": str(EVENTS_FILE)}
 
 
 # Serve every static file in the project dir (index.html, claim.html, Math.JPG, etc.).

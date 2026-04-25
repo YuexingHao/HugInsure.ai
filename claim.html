@@ -648,6 +648,115 @@
     color: var(--ink-2);
   }
 
+  /* ---------- Confirm modal (invalid-verdict guard) ---------- */
+  .confirm-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 16, 12, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 24px;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+  .confirm-modal.open { display: flex; animation: cm-fade .2s ease; }
+  @keyframes cm-fade { from { opacity: 0; } to { opacity: 1; } }
+  .confirm-card {
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 32px 30px 24px;
+    max-width: 460px;
+    width: 100%;
+    box-shadow: 0 32px 80px -20px rgba(40, 25, 10, 0.45);
+    animation: cm-rise .26s cubic-bezier(.2,.7,.2,1);
+  }
+  @keyframes cm-rise {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    to   { opacity: 1; transform: none; }
+  }
+  .confirm-icon {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--hug-bg);
+    color: var(--hug-2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 26px;
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .confirm-card h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .confirm-card p {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    margin-bottom: 16px;
+  }
+  .confirm-card p em { color: var(--hug); font-style: italic; }
+  .confirm-reason {
+    background: var(--paper-2);
+    border-left: 2px solid var(--hug-soft);
+    padding: 11px 14px;
+    margin-bottom: 18px;
+    border-radius: 0 8px 8px 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    display: none;
+  }
+  .confirm-reason.has-reason { display: block; }
+  .confirm-reason::before {
+    content: 'verifier said:';
+    display: block;
+    font-family: var(--sans);
+    font-style: normal;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  .confirm-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .confirm-actions button {
+    padding: 11px 20px;
+    border-radius: 999px;
+    font: 500 12px var(--sans);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border: 0;
+    transition: background .18s, color .18s, border-color .18s, transform .15s;
+  }
+  .confirm-back {
+    background: transparent;
+    color: var(--ink-2);
+    border: 1px solid var(--line);
+  }
+  .confirm-back:hover { border-color: var(--ink); color: var(--ink); }
+  .confirm-yes {
+    background: var(--hug);
+    color: var(--paper);
+  }
+  .confirm-yes:hover { background: var(--hug-2); transform: translateY(-1px); }
+
   /* ---------- States ---------- */
   .empty-state {
     text-align: center;
@@ -690,7 +799,28 @@
     transition: border-color .15s;
   }
   .empty-state a:hover { border-color: var(--hug); }
+
+  /* ---------- Footer ---------- */
+  .page-foot {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    text-align: center;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+  }
+  .page-foot a {
+    color: var(--ink-3);
+    text-decoration: none;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: border-color .15s, color .15s;
+  }
+  .page-foot a:hover { color: var(--hug); border-bottom-color: var(--hug); }
 </style>
+<script src="hug-events.js" defer></script>
 </head>
 <body>
 <div class="app">
@@ -733,15 +863,33 @@
     <div class="edits-summary" id="editsSummary">no edits yet &mdash; click any AI reply above to mark errors.</div>
 
     <section class="actions">
-      <button id="submitBtn" class="primary">Submit claim</button>
       <button id="verifyBtn" class="verifier-btn" type="button">
         <span class="vicon">&#x2696;</span> LLM Verifier
       </button>
+      <button id="submitBtn" class="primary">Submit claim</button>
       <a href="chat.html" class="secondary">cancel</a>
     </section>
 
     <div class="verdict" id="verdict" aria-live="polite"></div>
   </main>
+
+  <footer class="page-foot">
+    <a data-hug-export>Export my session</a>
+  </footer>
+</div>
+
+<!-- Confirm modal: shown when user submits despite an "invalid" verifier verdict -->
+<div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="confirm-card">
+    <div class="confirm-icon">!</div>
+    <h2 id="confirmTitle">The verifier disagrees.</h2>
+    <p>Haiku 4.5 reviewed your edits and judged the original AI answer was actually correct. Submitting anyway tells us <em>you still believe the LLM made a mistake</em> &mdash; a human grader will take a closer look.</p>
+    <div class="confirm-reason" id="confirmReason"></div>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-back" id="confirmBack">Back &mdash; let me reconsider</button>
+      <button type="button" class="confirm-yes" id="confirmYes">Yes, the LLM is wrong</button>
+    </div>
+  </div>
 </div>
 
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Expanded image">
@@ -911,9 +1059,19 @@
       delete msg.dataset.editedText;
       msg.innerHTML = msg.dataset.originalHtml || msg.innerHTML;
     } else {
-      msg.innerHTML = renderDiff(diffWords(originalText, editedText));
+      const diff = diffWords(originalText, editedText);
+      msg.innerHTML = renderDiff(diff);
       msg.classList.add('edited');
       msg.dataset.editedText = editedText;
+      if (window.hugEvent) {
+        const allMsgs = Array.from(document.querySelectorAll('#snapshot .msg.assistant'));
+        hugEvent('edit_committed', {
+          original: originalText,
+          edited:   editedText,
+          diff:     diff,
+          msg_index: allMsgs.indexOf(msg),
+        });
+      }
     }
     updateClaimSummary();
   }
@@ -961,6 +1119,9 @@
         reader.onload = () => {
           evidence.push({ name: f.name, dataUrl: String(reader.result) });
           renderEvidence();
+          if (window.hugEvent) hugEvent('evidence_attached', {
+            filename: f.name, size: f.size, mime: f.type
+          });
         };
         reader.readAsDataURL(f);
       }
@@ -1078,7 +1239,11 @@
     return lines.join('\n\n');
   }
 
+  // Latest verifier result — null if user hasn't run the verifier yet.
+  let _lastVerdict = null;
+
   function showVerdict(data) {
+    _lastVerdict = data;  // remember for the submit-confirm guard
     const el = document.getElementById('verdict');
     const v = ['valid', 'invalid', 'uncertain'].includes(data.verdict) ? data.verdict : 'uncertain';
     const icons  = { valid: '✓', invalid: '✗', uncertain: '?' };
@@ -1109,11 +1274,18 @@
       const original = verifyBtn.innerHTML;
       verifyBtn.disabled = true;
       verifyBtn.innerHTML = '<span class="vicon">&#x2696;</span> verifying&hellip;';
+      if (window.hugEvent) hugEvent('verifier_called', {
+        edit_count: edits.length,
+        conversation_length: conversation.length,
+      });
       try {
         const resp = await fetch('/verify_claim', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ conversation, claimed_error: claimedError, correct_answer: correctAnswer })
+          body: JSON.stringify({
+            conversation, claimed_error: claimedError, correct_answer: correctAnswer,
+            session_id: window.HUG_SESSION_ID || null
+          })
         });
         if (!resp.ok) {
           const txt = await resp.text();
@@ -1131,8 +1303,91 @@
     });
   }
 
-  // Mock submit
+  // Mock submit — routes through a confirm modal when the verifier said "invalid".
   const submitBtn = document.getElementById('submitBtn');
+
+  function performSubmit({ overrodeVerifier = false } = {}) {
+    const edits = gatherEdits();
+    const ref = 'HUG-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+    const brand = brandCycle ? brandCycle.textContent.trim() : '';
+    const expectedPayout = (data && Number.isFinite(data.payout) && data.payout > 0) ? data.payout : 0;
+    console.log('[hug] mock claim submitted', {
+      ref, brand, importedUrl, edits, evidenceCount: evidence.length, expectedPayout, overrodeVerifier
+    });
+    if (window.hugEvent) hugEvent('claim_submitted', {
+      ref,
+      brand,
+      edits,
+      evidence_count: evidence.length,
+      evidence_filenames: evidence.map(e => e.name),
+      expected_payout: expectedPayout,
+      imported_url: importedUrl,
+      chat_payout: (data && data.payout) || null,
+      chat_verdict: (data && data.verdict) || null,
+      verifier_verdict: _lastVerdict ? _lastVerdict.verdict : null,
+      verifier_confidence: _lastVerdict ? _lastVerdict.confidence : null,
+      overrode_verifier: overrodeVerifier,
+    });
+    const sourceLine = importedUrl
+      ? `<p style="margin-top:14px;font-family:var(--serif);font-style:italic;color:var(--ink-3);font-size:13px;">source: <a href="${importedUrl}" target="_blank" rel="noopener" style="color:var(--hug);">${new URL(importedUrl).hostname.replace(/^www\./,'')}</a></p>`
+      : '';
+    const overrideLine = overrodeVerifier
+      ? `<p style="margin-top:8px;font-family:var(--serif);font-style:italic;color:var(--hug-2);font-size:13px;">flagged for human review &mdash; verifier disagreed.</p>`
+      : '';
+    main.innerHTML = `
+      <div class="empty-state">
+        <h1>Cash back coming.</h1>
+        <div class="cashback-amount">$${expectedPayout || 0}</div>
+        <p class="cashback-sub">expected back if your edits hold up</p>
+        <p>Filed against <em>${brand || 'AI'}</em> &middot; <em>${edits.length} edit${edits.length > 1 ? 's' : ''}</em> &middot; verdict in <em>24h</em>.</p>
+        ${sourceLine}
+        ${overrideLine}
+        <p class="ref">${ref}</p>
+        <p style="margin-top:28px;"><a href="chat.html">&larr; back to chat</a></p>
+      </div>
+    `;
+    localStorage.removeItem('hug:claim');
+  }
+
+  // Confirm-modal wiring (only relevant when the verifier disagreed)
+  const confirmModal  = document.getElementById('confirmModal');
+  const confirmReason = document.getElementById('confirmReason');
+  const confirmYes    = document.getElementById('confirmYes');
+  const confirmBack   = document.getElementById('confirmBack');
+
+  function openConfirmModal() {
+    if (_lastVerdict && _lastVerdict.reasoning) {
+      confirmReason.textContent = _lastVerdict.reasoning;
+      confirmReason.classList.add('has-reason');
+    } else {
+      confirmReason.classList.remove('has-reason');
+    }
+    confirmModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (window.hugEvent) hugEvent('submit_confirm_shown', {
+      verifier_verdict: _lastVerdict ? _lastVerdict.verdict : null,
+      verifier_confidence: _lastVerdict ? _lastVerdict.confidence : null,
+    });
+  }
+  function closeConfirmModal() {
+    confirmModal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  confirmBack.addEventListener('click', () => {
+    closeConfirmModal();
+    if (window.hugEvent) hugEvent('submit_confirm_dismissed', {});
+  });
+  confirmYes.addEventListener('click', () => {
+    closeConfirmModal();
+    performSubmit({ overrodeVerifier: true });
+  });
+  confirmModal.addEventListener('click', (e) => {
+    if (e.target === confirmModal) closeConfirmModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && confirmModal.classList.contains('open')) closeConfirmModal();
+  });
+
   if (submitBtn) {
     submitBtn.addEventListener('click', () => {
       const edits = gatherEdits();
@@ -1140,28 +1395,12 @@
         alert('Mark at least one error in the conversation above before submitting — click ✎ edit on any AI reply.');
         return;
       }
-
-      const ref = 'HUG-' + Math.random().toString(36).slice(2, 8).toUpperCase();
-      const brand = brandCycle ? brandCycle.textContent.trim() : '';
-      const expectedPayout = (data && Number.isFinite(data.payout) && data.payout > 0) ? data.payout : 0;
-      console.log('[hug] mock claim submitted', {
-        ref, brand, importedUrl, edits, evidenceCount: evidence.length, expectedPayout
-      });
-      const sourceLine = importedUrl
-        ? `<p style="margin-top:14px;font-family:var(--serif);font-style:italic;color:var(--ink-3);font-size:13px;">source: <a href="${importedUrl}" target="_blank" rel="noopener" style="color:var(--hug);">${new URL(importedUrl).hostname.replace(/^www\./,'')}</a></p>`
-        : '';
-      main.innerHTML = `
-        <div class="empty-state">
-          <h1>Cash back coming.</h1>
-          <div class="cashback-amount">$${expectedPayout || 0}</div>
-          <p class="cashback-sub">expected back if your edits hold up</p>
-          <p>Filed against <em>${brand || 'AI'}</em> &middot; <em>${edits.length} edit${edits.length > 1 ? 's' : ''}</em> &middot; verdict in <em>24h</em>.</p>
-          ${sourceLine}
-          <p class="ref">${ref}</p>
-          <p style="margin-top:28px;"><a href="chat.html">&larr; back to chat</a></p>
-        </div>
-      `;
-      localStorage.removeItem('hug:claim');
+      // Guard: if the verifier said the user's edits don't hold, double-check intent.
+      if (_lastVerdict && _lastVerdict.verdict === 'invalid') {
+        openConfirmModal();
+        return;
+      }
+      performSubmit({ overrodeVerifier: false });
     });
   }
 </script>

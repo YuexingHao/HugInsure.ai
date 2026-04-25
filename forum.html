@@ -529,6 +529,7 @@
     .post { padding: 18px 18px 6px; }
   }
 </style>
+<script src="hug-events.js" defer></script>
 </head>
 <body>
 <div class="app">
@@ -982,10 +983,17 @@
 
   <footer class="bottom">
     hug.claims forum &middot; <em>be kind, cite sources</em> &middot; moderated by community
+    &middot; <a data-hug-export style="color:var(--ink-3);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s,color .15s;" onmouseover="this.style.color='var(--hug)';this.style.borderBottomColor='var(--hug)';" onmouseout="this.style.color='var(--ink-3)';this.style.borderBottomColor='transparent';">Export my session</a>
   </footer>
 </div>
 
 <script>
+  // Helper: identify a post by its title for analytics
+  function postKey(post) {
+    const h3 = post.querySelector('h3');
+    return h3 ? h3.textContent.trim().slice(0, 80) : 'unknown';
+  }
+
   // Filter posts by domain
   const filterGroup = document.getElementById('filterGroup');
   const posts = document.querySelectorAll('.post');
@@ -998,6 +1006,7 @@
     posts.forEach(p => {
       p.style.display = (f === 'all' || p.dataset.domain === f) ? '' : 'none';
     });
+    if (window.hugEvent) hugEvent('forum_filter_changed', { filter: f });
   });
 
   // Toggle comments thread on each post
@@ -1005,6 +1014,9 @@
     btn.addEventListener('click', () => {
       const post = btn.closest('.post');
       post.classList.toggle('expanded');
+      if (window.hugEvent) hugEvent('comments_toggled', {
+        post: postKey(post), expanded: post.classList.contains('expanded')
+      });
     });
   });
 
@@ -1025,6 +1037,9 @@
       let n = parseInt(v.textContent, 10) || 0;
       const isVoted = btn.classList.toggle('voted');
       v.textContent = isVoted ? n + 1 : n - 1;
+      if (window.hugEvent) hugEvent('vote_cast', {
+        target: 'post', voted: isVoted, post: postKey(btn.closest('.post'))
+      });
     });
   });
 
@@ -1035,6 +1050,9 @@
       const n = m ? parseInt(m[1], 10) : 0;
       const isVoted = btn.classList.toggle('voted');
       btn.textContent = '▲ ' + (isVoted ? n + 1 : n - 1);
+      if (window.hugEvent) hugEvent('vote_cast', {
+        target: 'comment', voted: isVoted, post: postKey(btn.closest('.post'))
+      });
     });
   });
 
@@ -1058,6 +1076,7 @@
     const arr = Array.from(postsContainer.children);
     arr.sort((a, b) => getSortKey(a, mode) - getSortKey(b, mode));
     arr.forEach(p => postsContainer.appendChild(p));
+    if (window.hugEvent) hugEvent('forum_sort_changed', { sort: mode });
   });
 
   // "Post" comment input — append a new comment locally
@@ -1067,6 +1086,10 @@
     const submit = () => {
       const txt = input.value.trim();
       if (!txt) return;
+      if (window.hugEvent) hugEvent('comment_posted', {
+        text: txt,
+        post: postKey(row.closest('.post')),
+      });
       const c = document.createElement('div');
       c.className = 'comment';
       c.innerHTML = `
