@@ -86,6 +86,80 @@
     font-size: 17px;
     color: var(--ink-2);
   }
+  .brand-cycle {
+    display: inline-block;
+    color: var(--hug);
+    font-style: italic;
+    min-width: 160px;
+    transition: opacity .28s ease, transform .28s ease;
+  }
+  .brand-cycle.fading {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  /* ---------- Conversation-link import row ---------- */
+  .import-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .import-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 14px;
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font: 14px var(--sans);
+    color: var(--ink);
+    outline: none;
+    transition: border-color .18s;
+  }
+  .import-row input:focus { border-color: var(--hug); }
+  .import-row input::placeholder { color: var(--ink-3); font-style: italic; }
+  .import-row button {
+    padding: 11px 20px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 0;
+    border-radius: 10px;
+    font: 500 12px var(--sans);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background .18s, transform .15s;
+    flex-shrink: 0;
+  }
+  .import-row button:hover { background: var(--hug); transform: translateY(-1px); }
+  .import-result {
+    display: none;
+    padding: 11px 16px;
+    margin-bottom: 14px;
+    background: var(--hug-bg);
+    border: 1px solid var(--hug-soft);
+    border-radius: 10px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .import-result.show { display: block; }
+  .import-result strong {
+    font-style: normal;
+    color: var(--hug);
+    margin-right: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .import-result a {
+    color: var(--hug);
+    text-decoration: none;
+    border-bottom: 1px solid var(--hug-soft);
+  }
+  .import-result a:hover { border-bottom-color: var(--hug); }
 
   section { margin-top: 32px; }
   h2 {
@@ -380,11 +454,16 @@
   </header>
 
   <main id="main">
-    <h1>Submit a <em>claim</em>.</h1>
-    <p class="lede">If our answer was wrong, file a claim. Independent verdict in 24 hours.</p>
+    <h1>Submit a <em>claim</em> for <span class="brand-cycle" id="brandCycle">GPT</span></h1>
+    <p class="lede">Find an error from any AI &mdash; Hug pays you. Independent verdict in 24 hours.</p>
 
     <section>
       <h2>The conversation</h2>
+      <div class="import-row">
+        <input type="url" id="convoUrl" placeholder="paste a conversation link &mdash; chatgpt.com, claude.ai, gemini.google.com, &hellip;" />
+        <button id="importBtn" type="button">Import</button>
+      </div>
+      <div class="import-result" id="importResult"></div>
       <div class="snapshot" id="snapshot"></div>
     </section>
 
@@ -500,6 +579,52 @@
     });
   }
 
+  // ---------- Cycling LLM brand in the H1 ----------
+  const brandCycle = document.getElementById('brandCycle');
+  const BRANDS = ['GPT', 'Claude', 'Gemini', 'MetaAI'];
+  let brandIdx = 0;
+  if (brandCycle) {
+    setInterval(() => {
+      brandCycle.classList.add('fading');
+      setTimeout(() => {
+        brandIdx = (brandIdx + 1) % BRANDS.length;
+        brandCycle.textContent = BRANDS[brandIdx];
+        brandCycle.classList.remove('fading');
+      }, 280);
+    }, 2200);
+  }
+
+  // ---------- Conversation-link import ----------
+  let importedUrl = null;
+  const importBtn = document.getElementById('importBtn');
+  const convoUrl = document.getElementById('convoUrl');
+  const importResult = document.getElementById('importResult');
+  function tryImport() {
+    const raw = (convoUrl.value || '').trim();
+    if (!raw) return;
+    let parsed;
+    try { parsed = new URL(raw); }
+    catch {
+      importResult.classList.add('show');
+      importResult.innerHTML = `<strong>could not parse</strong> please paste a full URL (with <code>https://</code>).`;
+      return;
+    }
+    importedUrl = parsed.href;
+    const host = parsed.hostname.replace(/^www\./, '');
+    importResult.classList.add('show');
+    importResult.innerHTML = `
+      <strong>imported</strong>
+      from <a href="${parsed.href}" target="_blank" rel="noopener">${host}</a>
+      &mdash; reference attached to your claim. Preview unavailable (${host} blocks cross-site fetches);
+      describe the wrong answer in the fields below.
+    `;
+    convoUrl.value = '';
+  }
+  if (importBtn) importBtn.addEventListener('click', tryImport);
+  if (convoUrl) convoUrl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); tryImport(); }
+  });
+
   // Lightbox
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightboxImg');
@@ -539,11 +664,18 @@
       if (!correct) { alert('Provide the correct answer.'); return; }
 
       const ref = 'HUG-' + Math.random().toString(36).slice(2, 8).toUpperCase();
-      console.log('[hug] mock claim submitted', { errDesc, correct, evidenceCount: evidence.length, ref });
+      const brand = brandCycle ? brandCycle.textContent.trim() : '';
+      console.log('[hug] mock claim submitted', {
+        ref, brand, importedUrl, errDesc, correct, evidenceCount: evidence.length
+      });
+      const sourceLine = importedUrl
+        ? `<p style="margin-top:14px;font-family:var(--serif);font-style:italic;color:var(--ink-3);font-size:13px;">source: <a href="${importedUrl}" target="_blank" rel="noopener" style="color:var(--hug);">${new URL(importedUrl).hostname.replace(/^www\./,'')}</a></p>`
+        : '';
       main.innerHTML = `
         <div class="empty-state">
           <h1>Claim received.</h1>
-          <p>Independent verdict in <em>24 hours</em>. We&rsquo;ll email you when it lands.</p>
+          <p>Filed against <em>${brand || 'AI'}</em>. Independent verdict in <em>24 hours</em>; we&rsquo;ll email you when it lands.</p>
+          ${sourceLine}
           <p class="ref">reference&nbsp;&middot;&nbsp;${ref}</p>
           <p style="margin-top:32px;"><a href="index.html">&larr; back to chat</a></p>
         </div>
