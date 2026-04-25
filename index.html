@@ -50,69 +50,64 @@
     padding: 0 32px;
   }
 
-  /* ---------- Flippable background grid: × → ✓ ---------- */
+  /* ---------- Seamless background grid: × → $ cluster bloom ---------- */
   .bg-grid {
     position: fixed;
     inset: 0;
     z-index: 0;
-    pointer-events: none;
+    pointer-events: none;        /* JS computes cluster from mousemove */
     display: grid;
-    grid-template-columns: repeat(auto-fill, 84px);
-    grid-auto-rows: 84px;
+    grid-template-columns: repeat(auto-fill, 56px);
+    grid-auto-rows: 56px;
     justify-content: center;
     align-content: start;
-    padding: 32px 16px;
-    gap: 6px;
+    padding: 0;
+    gap: 0;                      /* truly seamless */
     overflow: hidden;
   }
   .bg-cell {
     position: relative;
-    pointer-events: auto;
-    cursor: help;
+    pointer-events: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(235, 226, 210, 0.55);  /* warm beige tile */
-    border: 1px solid rgba(216, 205, 182, 0.45);
-    border-radius: 6px;
-    font-family: var(--serif);
-    font-weight: 300;
-    font-size: 32px;
     user-select: none;
-    transition: background .45s ease, transform .45s ease, border-color .45s ease;
-  }
-  .bg-cell:hover {
-    background: rgba(107, 142, 110, 0.18);  /* sage on hover */
-    border-color: rgba(107, 142, 110, 0.40);
-    transform: scale(1.06);
-    transition: background .2s ease, transform .2s ease, border-color .2s ease;
   }
   .bg-cell .x,
-  .bg-cell .check {
+  .bg-cell .dollar {
     position: absolute;
     line-height: 1;
-    transition: opacity .55s ease, transform .55s ease;
   }
   .bg-cell .x {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 22px;
     color: var(--hug-2);
-    opacity: 0.55;
-    font-weight: 400;
+    opacity: 0.16;
+    transform: scale(1);
+    transition: opacity .65s cubic-bezier(.25, .8, .25, 1),
+                transform .65s cubic-bezier(.25, .8, .25, 1);
   }
-  .bg-cell .check {
+  .bg-cell .dollar {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 22px;
     color: var(--green-2);
     opacity: 0;
-    transform: scale(0.5) rotate(-15deg);
-    font-weight: 500;
+    transform: scale(0.55);
+    transition: opacity .55s cubic-bezier(.25, .8, .25, 1),
+                transform .55s cubic-bezier(.25, .8, .25, 1);
   }
-  .bg-cell:hover .x {
+  .bg-cell.flipped .x {
     opacity: 0;
-    transform: scale(1.5) rotate(20deg);
-    transition: opacity .2s ease, transform .2s ease;
+    transform: scale(0.7);
+    transition: opacity .18s ease, transform .18s ease;
   }
-  .bg-cell:hover .check {
-    opacity: 1;
-    transform: scale(1.15) rotate(0);
-    transition: opacity .2s ease, transform .2s ease;
+  .bg-cell.flipped .dollar {
+    opacity: 0.92;
+    transform: scale(1);
+    transition: opacity .18s ease, transform .18s ease;
   }
   @media (max-width: 720px) {
     .bg-grid { display: none; }
@@ -655,38 +650,75 @@
 </div>
 
 <script>
-  // Build the × → ✓ background grid sized to the viewport.
+  // ---------- Seamless × → $ background grid with cluster bloom ----------
+  const CLUSTER_RADIUS = 120;          // px; ~10–15 cells per cluster at 56px
+  const CELL_SIZE = 56;
+  let _cellPositions = [];
+
   function buildBgGrid() {
     const grid = document.getElementById('bgGrid');
     if (!grid) return;
     if (window.matchMedia('(max-width: 720px)').matches) {
       grid.innerHTML = '';
+      _cellPositions = [];
       return;
     }
-    const cellSize = 90; // 84px cell + 6px gap
-    const cols = Math.ceil(window.innerWidth / cellSize) + 1;
-    const rows = Math.ceil(window.innerHeight / cellSize) + 1;
+    const cols = Math.ceil(window.innerWidth / CELL_SIZE) + 1;
+    const rows = Math.ceil(window.innerHeight / CELL_SIZE) + 1;
     const total = cols * rows;
-    if (grid.childElementCount === total) return;
-    grid.innerHTML = '';
-    const frag = document.createDocumentFragment();
-    for (let i = 0; i < total; i++) {
-      const cell = document.createElement('span');
-      cell.className = 'bg-cell';
-      cell.innerHTML = '<span class="x">&times;</span><span class="check">&check;</span>';
-      frag.appendChild(cell);
+    if (grid.childElementCount !== total) {
+      grid.innerHTML = '';
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < total; i++) {
+        const cell = document.createElement('span');
+        cell.className = 'bg-cell';
+        cell.innerHTML = '<span class="x">&times;</span><span class="dollar">$</span>';
+        frag.appendChild(cell);
+      }
+      grid.appendChild(frag);
     }
-    grid.appendChild(frag);
+    // Cache cell centers for O(N) cluster checks per frame
+    _cellPositions = Array.from(grid.querySelectorAll('.bg-cell')).map(el => {
+      const r = el.getBoundingClientRect();
+      return { el, cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
+    });
   }
-  buildBgGrid();
 
+  function updateCluster(mx, my) {
+    const r2 = CLUSTER_RADIUS * CLUSTER_RADIUS;
+    for (let i = 0; i < _cellPositions.length; i++) {
+      const c = _cellPositions[i];
+      const dx = mx - c.cx, dy = my - c.cy;
+      const inCluster = (dx * dx + dy * dy) < r2;
+      // toggle only when state changes — avoids redundant DOM writes
+      if (inCluster !== c.el.classList.contains('flipped')) {
+        c.el.classList.toggle('flipped', inCluster);
+      }
+    }
+  }
+
+  let _frameQueued = false;
+  let _lastMx = -9999, _lastMy = -9999;
+  document.addEventListener('mousemove', (e) => {
+    _lastMx = e.clientX;
+    _lastMy = e.clientY;
+    if (!_frameQueued) {
+      _frameQueued = true;
+      requestAnimationFrame(() => {
+        _frameQueued = false;
+        updateCluster(_lastMx, _lastMy);
+      });
+    }
+  });
+
+  buildBgGrid();
   let _resizeT;
   window.addEventListener('resize', () => {
     clearTimeout(_resizeT);
     _resizeT = setTimeout(buildBgGrid, 250);
   });
 
-  // Touch fallback: tap any inline swap to flip it.
+  // Inline swap touch fallback (unchanged)
   if (window.matchMedia('(hover: none)').matches) {
     document.querySelectorAll('.swap').forEach(s => {
       s.addEventListener('click', () => s.classList.toggle('flipped'));
