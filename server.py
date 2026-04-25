@@ -45,6 +45,24 @@ SYSTEM_PROMPT = (HERE / "system_prompt.md").read_text()
 
 # Always rate with Haiku 4.5 — cheap, fast, sufficient for a 0-10 score.
 RATER_MODEL = os.environ.get("HUG_RATER_MODEL", "claude-haiku-4-5")
+SUGGEST_MODEL = os.environ.get("HUG_SUGGEST_MODEL", "claude-haiku-4-5")
+SUGGEST_SYSTEM = """You are a fact-checker reviewing an AI assistant's reply for potential errors. \
+A user is considering filing a claim that this reply was wrong. Your job: produce a corrected \
+version of the target reply, fixing factual, logical, or significant errors so the user can \
+accept your suggestion or modify it.
+
+Guidelines:
+- If the target reply has clear factual or logical errors, fix them. Keep the same general \
+  structure, length, and tone; just replace the wrong claims with correct ones.
+- If the target reply is already correct, return it unchanged.
+- Be calibrated: don't manufacture errors that aren't there. Don't reword for style.
+- If you're uncertain, prefer the original over speculative changes.
+
+Output ONLY the corrected message text. No quotation marks, no preamble like "Here's the \
+correction:", no commentary, no markdown, no HTML. Just the text the user should see in \
+their corrected version."""
+
+
 VERIFIER_MODEL = os.environ.get("HUG_VERIFIER_MODEL", "claude-haiku-4-5")
 VERIFIER_SYSTEM = """You are an impartial verifier of error claims against AI assistants. \
 A user has filed a claim that an AI got something wrong. You will see four things:
@@ -104,6 +122,11 @@ class VerifyRequest(BaseModel):
     conversation: str
     claimed_error: str
     correct_answer: str
+
+
+class SuggestRequest(BaseModel):
+    conversation: str
+    target_message: str
 
 
 async def rate_answer(question: str, answer: str) -> dict:
@@ -255,6 +278,40 @@ async def verify_claim(req: VerifyRequest):
         print(f"[hug] verify error: {type(e).__name__}: {e}", flush=True)
 
     return fallback
+
+
+@app.post("/suggest_edit")
+async def suggest_edit(req: SuggestRequest):
+    """Haiku 4.5 suggests a corrected version of one assistant message."""
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        raise HTTPException(500, "ANTHROPIC_API_KEY not set on server")
+
+    user_content = (
+        f"CONVERSATION:\n{req.conversation}\n\n"
+        f"TARGET REPLY TO REVIEW AND CORRECT:\n{req.target_message}\n\n"
+        "Output only the corrected reply text now."
+    )
+
+    try:
+        resp = await client.messages.create(
+            model=SUGGEST_MODEL,
+            max_tokens=600,
+            system=SUGGEST_SYSTEM,
+            messages=[{"role": "user", "content": user_content}],
+        )
+        text = next((b.text for b in resp.content if b.type == "text"), "").strip()
+        # Strip surrounding quotes the model might add despite instructions
+        if (text.startswith('"') and text.endswith('"')) or (text.startswith("'") and text.endswith("'")):
+            text = text[1:-1].strip()
+        print(f"[hug] suggest produced {len(text)} chars", flush=True)
+        return {"suggested": text or req.target_message}
+    except anthropic.AuthenticationError:
+        raise HTTPException(401, "invalid ANTHROPIC_API_KEY")
+    except anthropic.APIStatusError as e:
+        raise HTTPException(502, f"suggest API error {e.status_code}")
+    except Exception as e:
+        print(f"[hug] suggest error: {type(e).__name__}: {e}", flush=True)
+        return {"suggested": req.target_message}
 
 
 # Serve every static file in the project dir (index.html, claim.html, Math.JPG, etc.).
