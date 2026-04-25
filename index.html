@@ -4,9 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>hug claims.ai &mdash; we pay you when AI gets it wrong</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&display=swap" />
 <style>
   :root {
     --paper:   #f3ece0;
@@ -22,8 +19,8 @@
     --green-2: #2f6b40;
     --green-bg: rgba(107, 142, 110, 0.16);
     --line:    #d8cdb6;
-    --serif:   'Fraunces', 'Times New Roman', serif;
-    --sans:    'Hanken Grotesk', ui-sans-serif, sans-serif;
+    --serif:   -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    --sans:    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
@@ -57,13 +54,29 @@
     z-index: 0;
     pointer-events: none;        /* JS computes cluster from mousemove */
     display: grid;
-    grid-template-columns: repeat(auto-fill, 56px);
-    grid-auto-rows: 56px;
+    grid-template-columns: repeat(auto-fill, 32px);
+    grid-auto-rows: 32px;
     justify-content: center;
     align-content: start;
     padding: 0;
     gap: 0;                      /* truly seamless */
     overflow: hidden;
+    /* Hide the grid behind the reading column so words stay distraction-free.
+       Keep glyphs only in the side margins, with a soft 80px fade at the edge. */
+    -webkit-mask-image: linear-gradient(to right,
+      rgba(0,0,0,1) 0,
+      rgba(0,0,0,1) calc(50% - 600px),
+      rgba(0,0,0,0) calc(50% - 520px),
+      rgba(0,0,0,0) calc(50% + 520px),
+      rgba(0,0,0,1) calc(50% + 600px),
+      rgba(0,0,0,1) 100%);
+            mask-image: linear-gradient(to right,
+      rgba(0,0,0,1) 0,
+      rgba(0,0,0,1) calc(50% - 600px),
+      rgba(0,0,0,0) calc(50% - 520px),
+      rgba(0,0,0,0) calc(50% + 520px),
+      rgba(0,0,0,1) calc(50% + 600px),
+      rgba(0,0,0,1) 100%);
   }
   .bg-cell {
     position: relative;
@@ -81,9 +94,9 @@
   .bg-cell .x {
     font-family: var(--serif);
     font-weight: 300;
-    font-size: 22px;
+    font-size: 13px;
     color: var(--hug-2);
-    opacity: 0.16;
+    opacity: 0.18;
     transform: scale(1);
     transition: opacity .65s cubic-bezier(.25, .8, .25, 1),
                 transform .65s cubic-bezier(.25, .8, .25, 1);
@@ -92,7 +105,7 @@
     font-family: var(--serif);
     font-style: italic;
     font-weight: 600;
-    font-size: 22px;
+    font-size: 13px;
     color: var(--green-2);
     opacity: 0;
     transform: scale(0.55);
@@ -265,6 +278,102 @@
   }
   .swap .wrong { animation: nudge 4s ease-in-out infinite; }
 
+  /* ---------- Example-card edit animation ----------
+     Side-by-side end state: ̶w̶r̶o̶n̶g̶ correct.
+     Phase 1 (0–450ms): strike line wipes left→right across the red span.
+     Phase 2 (420ms+):  right span reveals via max-width with steps(),
+                        which looks like a typewriter. */
+  .ex-card .swap {
+    display: inline;
+    position: relative;
+    cursor: help;
+    vertical-align: baseline;
+  }
+  .ex-card .swap .wrong,
+  .ex-card .swap .right {
+    grid-column: auto;
+    grid-row: auto;
+    display: inline-block;
+    padding: 0 5px;
+    border-radius: 3px;
+    vertical-align: baseline;
+  }
+  .ex-card .swap .wrong {
+    position: relative;
+    color: var(--hug-2);
+    background: rgba(196, 74, 63, 0.10);
+    text-decoration: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: background .25s ease;
+    animation: nudge 4s ease-in-out infinite;
+  }
+  .ex-card .swap .wrong::after {
+    content: '';
+    position: absolute;
+    top: 52%;
+    left: 5px;
+    right: 5px;
+    height: 2.5px;
+    background: var(--hug);
+    transform-origin: left center;
+    transform: scaleX(0);
+    transition: transform .45s cubic-bezier(.25, .8, .25, 1);
+    pointer-events: none;
+  }
+  .ex-card .swap .right {
+    position: static;
+    color: var(--green-2);
+    background: var(--green-bg);
+    font-weight: 500;
+    text-decoration: none;
+    opacity: 0;
+    transform: none;
+    filter: none;
+    max-width: 0;
+    margin-left: 0;
+    padding-left: 0;
+    padding-right: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transition:
+      max-width .6s steps(18, jump-end),
+      opacity .25s ease,
+      margin-left .3s ease,
+      padding .3s ease;
+  }
+
+  /* editing state — triggered by hover, focus, or .flipped (auto-play) */
+  .ex-card .swap:hover .wrong::after,
+  .ex-card .swap:focus-visible .wrong::after,
+  .ex-card .swap.flipped .wrong::after { transform: scaleX(1); }
+
+  /* keep the wrong span visible (overrides base .swap hover that fades it) */
+  .ex-card .swap:hover .wrong,
+  .ex-card .swap:focus-visible .wrong,
+  .ex-card .swap.flipped .wrong {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .ex-card .swap:hover .right,
+  .ex-card .swap:focus-visible .right,
+  .ex-card .swap.flipped .right {
+    max-width: 36ch;
+    opacity: 1;
+    margin-left: 6px;
+    padding-left: 5px;
+    padding-right: 5px;
+    transition:
+      max-width .6s steps(18, jump-end) .42s,
+      opacity .25s ease .42s,
+      margin-left .3s ease .42s,
+      padding .3s ease .42s;
+  }
+
+
   /* ---------- Hero ---------- */
   .hero {
     padding: 70px 0 90px;
@@ -311,7 +420,7 @@
     color: var(--ink);
   }
   .hero h1 .mono {
-    font-family: 'Fraunces', 'Times New Roman', serif;
+    font-family: var(--serif);
     font-style: italic;
     font-feature-settings: 'tnum';
   }
@@ -550,6 +659,7 @@
       <span class="brand-text">Hug<span class="em">.</span><span class="small">claims</span></span>
     </a>
     <nav class="nav">
+      <a href="forum.html">forum</a>
       <a href="claim.html">file a claim</a>
       <a href="chat.html" class="cta">try the chat &rarr;</a>
     </nav>
@@ -642,6 +752,8 @@
   <footer class="bottom">
     <div>hug.claims &middot; <em>cash back since 2026</em></div>
     <div>
+      <a href="forum.html">forum</a>
+      &nbsp;&middot;&nbsp;
       <a href="claim.html">file a claim</a>
       &nbsp;&middot;&nbsp;
       <a href="chat.html">try the chat</a>
@@ -651,8 +763,8 @@
 
 <script>
   // ---------- Seamless × → $ background grid with cluster bloom ----------
-  const CLUSTER_RADIUS = 120;          // px; ~10–15 cells per cluster at 56px
-  const CELL_SIZE = 56;
+  const CLUSTER_RADIUS = 36;           // px; ~4 cells per cluster at 32px
+  const CELL_SIZE = 32;
   let _cellPositions = [];
 
   function buildBgGrid() {
@@ -724,6 +836,50 @@
       s.addEventListener('click', () => s.classList.toggle('flipped'));
     });
   }
+
+  // ---------- Example-card fake-edit: auto-play on scroll-in + replay on re-hover ----------
+  const exCards = Array.from(document.querySelectorAll('.ex-card'));
+  function playCard(card, baseDelay = 0) {
+    const swaps = Array.from(card.querySelectorAll('.swap'));
+    swaps.forEach((s, i) => {
+      // Each swap takes ~1100ms to fully play out; stagger so #2 begins after #1 finishes.
+      setTimeout(() => s.classList.add('flipped'), baseDelay + i * 1300);
+    });
+  }
+  function resetCard(card) {
+    card.querySelectorAll('.swap.flipped').forEach((s) => s.classList.remove('flipped'));
+  }
+
+  if (exCards.length && 'IntersectionObserver' in window) {
+    const cardObs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting || e.target.dataset.played === 'true') return;
+        e.target.dataset.played = 'true';
+        const idx = exCards.indexOf(e.target);
+        playCard(e.target, idx * 350 + 400);
+      });
+    }, { threshold: 0.4 });
+    exCards.forEach((c) => cardObs.observe(c));
+  } else {
+    // No-IO fallback: play immediately on load
+    exCards.forEach((c, i) => playCard(c, i * 350 + 400));
+  }
+
+  // Re-play when the user re-enters a card after the auto-play finished
+  exCards.forEach((card) => {
+    let replayTimer = null;
+    card.addEventListener('mouseenter', () => {
+      if (!card.dataset.played) return;       // first play hasn't fired yet — let auto-play handle it
+      const swaps = card.querySelectorAll('.swap.flipped');
+      if (swaps.length === 0) return;          // already idle, hover :hover will play it
+      clearTimeout(replayTimer);
+      resetCard(card);
+      // double-rAF so the class removal commits before re-add
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        replayTimer = setTimeout(() => playCard(card, 0), 80);
+      }));
+    });
+  });
 </script>
 </body>
 </html>

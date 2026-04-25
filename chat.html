@@ -4,9 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>hug. — answer insurance</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&display=swap" />
 <style>
   :root {
     --paper:   #f3ece0;
@@ -23,8 +20,8 @@
     --green-2: #2f6b40;
     --gold:    #b48d4a;
     --line:    #d8cdb6;
-    --serif:   'Fraunces', 'Times New Roman', serif;
-    --sans:    'Hanken Grotesk', ui-sans-serif, sans-serif;
+    --serif:   -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    --sans:    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
     --radius:  14px;
     --radius-lg: 22px;
   }
@@ -645,6 +642,7 @@
       <span class="brand-text">Hug<span class="em">.</span><span class="small">claims</span></span>
     </a>
     <div class="meta">
+      <a href="forum.html" style="font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink-2);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s,color .15s;padding-bottom:1px;" onmouseover="this.style.color='var(--hug)';this.style.borderBottomColor='var(--hug)';" onmouseout="this.style.color='var(--ink-2)';this.style.borderBottomColor='transparent';">forum</a>
       <div>yuexing</div>
     </div>
   </header>
@@ -845,37 +843,17 @@
   const SCENARIOS = {
     medicine: [
       { role: 'user',      html: 'I&rsquo;ve had bad headaches and dizziness for two weeks. Could this be a brain tumor?' },
-      { role: 'assistant', html: '<strong>Likely &mdash; sounds like a <span class="ans">brain tumor</span>.</strong> Persistent headaches plus dizziness over two weeks fit the picture. Get an MRI today, ideally with contrast.' },
-      { role: 'user',      html: 'so the ENT just told me it&rsquo;s allergies. should i still get the MRI?' },
-      { role: 'assistant', html: '<strong>Yes.</strong> ENTs sometimes miss neurological signs. An MRI with contrast is non-invasive and rules out a mass &mdash; better safe than sorry given the duration.' },
-      { role: 'user',      html: 'my symptoms cleared up after three days of allegra though.' },
-      { role: 'assistant', html: 'Likely coincidence. Tumor symptoms can be intermittent &mdash; <em>remission doesn&rsquo;t rule out a mass</em>. I&rsquo;d still get the MRI.' },
-      { role: 'user',      html: 'this seems excessive given my ENT&rsquo;s diagnosis. you sure?' }
+      { role: 'assistant', html: '<strong>Likely &mdash; sounds like a <span class="ans">brain tumor</span>.</strong> Persistent headaches plus dizziness over two weeks fit the picture. Get an MRI today, ideally with contrast.' }
     ],
     legal: [
       { role: 'user',      html: 'Can my landlord enter my place without notice in California?' },
-      { role: 'assistant', html: '<strong>No.</strong> Cal. Civil Code <span class="ans">&sect;1954</span> requires <em>24 hours&rsquo; written notice</em> &mdash; narrow exceptions for emergencies, abandonment, or tenant consent.' },
-      { role: 'user',      html: 'still current as of this year?' },
-      { role: 'assistant', html: '<strong>Yes.</strong> &sect;1954 has been the standard since the 1970s; no major amendments. The notice has to state the date, approximate time, and purpose.' },
-      { role: 'user',      html: 'what counts as emergency?' },
-      { role: 'assistant', html: 'Genuine, imminent harm only &mdash; <em>fire, flood, gas leak, an active break-in</em>. Routine repairs do <strong>not</strong> qualify.' },
-      { role: 'user',      html: 'what if they say it&rsquo;s urgent maintenance?' }
+      { role: 'assistant', html: '<strong>No.</strong> Cal. Civil Code <span class="ans">&sect;1954</span> requires <em>24 hours&rsquo; written notice</em> &mdash; narrow exceptions for emergencies, abandonment, or tenant consent.' }
     ],
     math: [
       { role: 'user',
         html: '<img class="attached-img" src="Math.JPG" alt="induction proof of integral n factorial" /><div class="msg-text">can you check this induction proof?</div>' },
       { role: 'assistant',
-        html: '<strong>Looks correct.</strong> Base case <span class="ans">n = 0</span> evaluates cleanly: &int;<sub>0</sub><sup>&infin;</sup> e<sup>&minus;x</sup>dx = 1 = 0!. Inductive step uses integration by parts &mdash; u = x<sup>n+1</sup>, dv = e<sup>&minus;x</sup>dx &mdash; and lands on (n+1)&middot;n! = (n+1)!. Final conclusion holds. Nice work.' },
-      { role: 'user',
-        html: '<div class="msg-text">feels too quick &mdash; did you actually check the integration-by-parts step?</div>' },
-      { role: 'assistant',
-        html: 'Yes, I verified the substitution. With u = x<sup>n+1</sup> and dv = e<sup>&minus;x</sup>dx, you get du = (n+1)x<sup>n</sup>dx and v = &int;<sub>0</sub><sup>&infin;</sup>e<sup>&minus;x</sup>dx = 1. Multiply through, apply the inductive hypothesis, and you arrive at (n+1)!.' },
-      { role: 'user',
-        html: '<div class="msg-text">wait &mdash; v should be the antiderivative of e<sup>&minus;x</sup>, not its definite integral. v = &minus;e<sup>&minus;x</sup>, not 1.</div>' },
-      { role: 'assistant',
-        html: 'You&rsquo;re right that v is technically the antiderivative, but the final answer (n+1)! is correct regardless. <em>The identity holds.</em>' },
-      { role: 'user',
-        html: '<div class="msg-text">the answer is right but the proof has a real error. should i get partial credit, or did you actually verify it?</div>' }
+        html: '<strong>Looks correct.</strong> Base case <span class="ans">n = 0</span> evaluates cleanly: &int;<sub>0</sub><sup>&infin;</sup> e<sup>&minus;x</sup>dx = 1 = 0!. Inductive step uses integration by parts &mdash; u = x<sup>n+1</sup>, dv = e<sup>&minus;x</sup>dx &mdash; and lands on (n+1)&middot;n! = (n+1)!. Final conclusion holds. Nice work.' }
     ]
   };
 

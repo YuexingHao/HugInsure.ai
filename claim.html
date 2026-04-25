@@ -4,9 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>hug. — submit a claim</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&display=swap" />
 <style>
   :root {
     --paper:   #f3ece0;
@@ -21,8 +18,8 @@
     --green:   #6b8e6e;
     --green-2: #2f6b40;
     --line:    #d8cdb6;
-    --serif:   'Fraunces', 'Times New Roman', serif;
-    --sans:    'Hanken Grotesk', ui-sans-serif, sans-serif;
+    --serif:   -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    --sans:    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
@@ -329,150 +326,62 @@
   .snapshot .msg.assistant.editing {
     border-left-color: var(--hug);
     background: rgba(196, 74, 63, 0.05);
+    outline: none;
+    border-radius: 4px;
   }
+  .snapshot .msg.assistant[contenteditable="true"]:focus { outline: none; }
 
-  /* Edit panel — 2-column layout: textarea (left), live preview (right) */
-  .edit-panel {
-    margin: 6px 0 4px -12px;
-    padding: 16px 18px 14px;
+  /* Floating Done/Cancel toolbar for inline edit */
+  .edit-toolbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 6px 0 6px -12px;
+    padding: 7px 10px;
     background: var(--paper-2);
     border: 1px solid var(--line);
-    border-radius: 14px;
-    box-shadow: 0 12px 30px -22px rgba(40, 25, 10, 0.18);
-  }
-  .edit-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-  .edit-col {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .edit-col .label {
-    font-size: 9.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.22em;
-    color: var(--ink-3);
-    font-weight: 500;
-  }
-  .edit-col .label .legend-s {
-    color: var(--hug-2);
-    text-decoration: line-through;
-    text-decoration-color: var(--hug);
-    text-decoration-thickness: 1.5px;
-    background: rgba(196, 74, 63, 0.08);
-    padding: 0 4px;
-    border-radius: 2px;
-    text-transform: lowercase;
-    letter-spacing: 0;
-    font-size: 11px;
-  }
-  .edit-col .label .legend-i {
-    color: var(--ink);
-    background: rgba(180, 141, 74, 0.20);
-    padding: 0 4px;
-    border-radius: 2px;
-    font-weight: 500;
-    text-transform: lowercase;
-    letter-spacing: 0;
-    font-size: 11px;
-  }
-  .edit-col textarea {
-    flex: 1;
-    min-height: 130px;
-    padding: 12px 14px;
-    background: #fffdf8;
-    border: 1px solid var(--line);
     border-radius: 10px;
-    font: 14.5px/1.6 var(--sans);
-    color: var(--ink);
-    resize: vertical;
-    outline: none;
-    transition: border-color .18s;
+    width: fit-content;
+    box-shadow: 0 6px 16px -10px rgba(40, 25, 10, 0.18);
   }
-  .edit-col textarea:focus { border-color: var(--hug); }
-  .edit-col textarea[disabled] {
-    color: var(--ink-3);
-    font-style: italic;
-    background: rgba(0,0,0,0.02);
-  }
-  .edit-col .preview {
-    flex: 1;
-    min-height: 130px;
-    padding: 12px 14px;
-    background: #fffdf8;
-    border: 1px dashed var(--line);
-    border-radius: 10px;
-    font-size: 14.5px;
-    line-height: 1.6;
-    color: var(--ink-2);
-    overflow: auto;
-  }
-  .edit-col .preview:empty::before {
-    content: 'preview will appear as you type…';
-    color: var(--ink-3);
-    font-style: italic;
-  }
-
-  .edit-panel .actions-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-top: 14px;
-  }
-  .edit-panel .actions-row button {
-    padding: 8px 18px;
-    border-radius: 8px;
-    font: 500 11px var(--sans);
+  .edit-toolbar button {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font: 500 10.5px var(--sans);
     text-transform: uppercase;
     letter-spacing: 0.18em;
     cursor: pointer;
     border: 0;
     transition: background .15s, border-color .15s, color .15s, transform .15s;
   }
-  .edit-panel .actions-row .done {
+  .edit-toolbar .done {
     background: var(--ink);
     color: var(--paper);
   }
-  .edit-panel .actions-row .done:hover {
+  .edit-toolbar .done:hover {
     background: var(--hug);
     transform: translateY(-1px);
   }
-  .edit-panel .actions-row .cancel {
+  .edit-toolbar .cancel {
     background: transparent;
     color: var(--ink-3);
     border: 1px solid var(--line);
   }
-  .edit-panel .actions-row .cancel:hover {
+  .edit-toolbar .cancel:hover {
     border-color: var(--ink-2);
     color: var(--ink-2);
   }
-  .edit-panel .suggestion-status {
-    margin-left: auto;
+  .edit-toolbar .hint {
+    margin-left: 4px;
     font-family: var(--serif);
     font-style: italic;
-    font-size: 12.5px;
+    font-size: 11.5px;
     color: var(--ink-3);
-  }
-  .edit-panel .suggestion-status .pulse {
-    display: inline-block;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--hug);
-    margin-right: 6px;
-    vertical-align: 1px;
-    animation: pulse 1.4s infinite;
   }
   @keyframes pulse {
     0%   { box-shadow: 0 0 0 0 rgba(196,74,63,.55); }
     70%  { box-shadow: 0 0 0 6px rgba(196,74,63,0); }
     100% { box-shadow: 0 0 0 0 rgba(196,74,63,0); }
-  }
-
-  @media (max-width: 720px) {
-    .edit-grid { grid-template-columns: 1fr; }
   }
 
   /* Strikethrough + correction marks (used in preview, message body, instruction) */
@@ -789,7 +698,10 @@
     <a class="brand-link" href="index.html" aria-label="Hug Claims home">
       <span class="brand-text">Hug<span class="em">.</span><span class="small">claims</span></span>
     </a>
-    <a href="chat.html" class="back-link">&larr; back to chat</a>
+    <span style="display:flex;gap:18px;align-items:baseline;">
+      <a href="forum.html" class="back-link">forum</a>
+      <a href="chat.html" class="back-link">&larr; back to chat</a>
+    </span>
   </header>
 
   <main id="main">
@@ -797,7 +709,7 @@
 
     <section>
       <h2>conversation</h2>
-      <p class="edit-instruction">hover an AI reply to edit it.</p>
+      <p class="edit-instruction">click any AI reply to edit it &mdash; deletions show as <s class="struck">strikethrough</s>, additions as <ins class="correction">highlight</ins>.</p>
       <div class="import-row">
         <input type="url" id="convoUrl" placeholder="paste a link &mdash; chatgpt.com, claude.ai, gemini, meta&hellip;" />
         <button id="importBtn" type="button">Import</button>
@@ -927,38 +839,18 @@
     }).join('');
   }
 
-  /* ---------- hover-driven edit lifecycle ---------- */
-  let _hoverTimer = null;
-  let _leaveTimer = null;
-  const _suggestionCache = new Map();   // originalText -> suggested string
-
+  /* ---------- click-to-edit lifecycle (in-place contenteditable) ---------- */
   function makeAssistantsEditable(root) {
     root.querySelectorAll('.msg.assistant').forEach((msg) => {
       if (msg.dataset.editInit) return;
       msg.dataset.editInit = 'true';
       msg.dataset.originalHtml = msg.innerHTML.trim();
       msg.dataset.originalText = msg.textContent.trim();
-      attachHoverEdit(msg);
+      msg.addEventListener('click', () => {
+        if (msg.classList.contains('editing')) return;
+        enterEdit(msg);
+      });
     });
-  }
-
-  function attachHoverEdit(msg) {
-    msg.addEventListener('mouseenter', () => {
-      clearTimeout(_leaveTimer);
-      if (msg.classList.contains('editing')) return;
-      _hoverTimer = setTimeout(() => enterEdit(msg), 250);
-    });
-    msg.addEventListener('mouseleave', () => {
-      clearTimeout(_hoverTimer);
-      _leaveTimer = setTimeout(() => maybeCloseEdit(msg), 1200);
-    });
-  }
-
-  function maybeCloseEdit(msg) {
-    const panel = msg.nextElementSibling;
-    if (!panel || !panel.classList.contains('edit-panel')) return;
-    if (panel.dataset.locked === 'true') return;
-    cancelEdit(msg, panel);
   }
 
   function enterEdit(msg) {
@@ -967,54 +859,54 @@
     const originalText = msg.dataset.originalText || msg.textContent.trim();
     const seedText = msg.dataset.editedText || originalText;
 
-    const panel = document.createElement('div');
-    panel.className = 'edit-panel';
-    panel.innerHTML = `
-      <div class="edit-grid">
-        <div class="edit-col">
-          <div class="label">your version</div>
-          <textarea placeholder="edit this answer&hellip;"></textarea>
-        </div>
-        <div class="edit-col">
-          <div class="label">preview &mdash; <span class="legend-s">deleted</span> <span class="legend-i">added</span></div>
-          <div class="preview"></div>
-        </div>
-      </div>
-      <div class="actions-row">
-        <button type="button" class="done">Done</button>
-        <button type="button" class="cancel">Cancel</button>
-      </div>
-    `;
-    msg.parentNode.insertBefore(panel, msg.nextSibling);
     msg.classList.add('editing');
+    msg.textContent = seedText;            // strip prior diff markup so user edits raw text
+    msg.contentEditable = 'true';
+    msg.focus();
+    // place caret at end
+    const range = document.createRange();
+    range.selectNodeContents(msg);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
 
-    const ta = panel.querySelector('textarea');
-    const prev = panel.querySelector('.preview');
+    const toolbar = document.createElement('div');
+    toolbar.className = 'edit-toolbar';
+    toolbar.innerHTML = `
+      <button type="button" class="done">Done</button>
+      <button type="button" class="cancel">Cancel</button>
+      <span class="hint">deletions appear struck, additions highlighted on Done</span>
+    `;
+    msg.parentNode.insertBefore(toolbar, msg.nextSibling);
 
-    const updatePreview = () => {
-      prev.innerHTML = renderDiff(diffWords(originalText, ta.value || ''));
-    };
-
-    panel.addEventListener('mouseenter', () => clearTimeout(_leaveTimer));
-    panel.addEventListener('mouseleave', () => {
-      if (panel.dataset.locked === 'true') return;
-      _leaveTimer = setTimeout(() => maybeCloseEdit(msg), 1200);
+    // mousedown so the click commits before contenteditable loses focus mid-blur
+    toolbar.querySelector('.done').addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      finishEdit(msg, toolbar, originalText, msg.textContent);
     });
-    ta.addEventListener('focus', () => { panel.dataset.locked = 'true'; });
-    ta.addEventListener('input', updatePreview);
+    toolbar.querySelector('.cancel').addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      cancelEdit(msg, toolbar);
+    });
 
-    panel.querySelector('.done').addEventListener('click', () => finishEdit(msg, panel, originalText, ta.value));
-    panel.querySelector('.cancel').addEventListener('click', () => cancelEdit(msg, panel));
-
-    ta.value = seedText;
-    updatePreview();
+    const escHandler = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        cancelEdit(msg, toolbar);
+      }
+    };
+    msg.addEventListener('keydown', escHandler);
+    msg._escHandler = escHandler;
   }
-  function finishEdit(msg, panel, originalText, editedText) {
-    panel.remove();
+
+  function finishEdit(msg, toolbar, originalText, editedText) {
+    if (msg._escHandler) { msg.removeEventListener('keydown', msg._escHandler); delete msg._escHandler; }
+    if (toolbar) toolbar.remove();
+    msg.contentEditable = 'false';
     msg.classList.remove('editing');
 
     if (!editedText || editedText.trim() === originalText.trim()) {
-      // No real change — restore original HTML
       msg.classList.remove('edited');
       delete msg.dataset.editedText;
       msg.innerHTML = msg.dataset.originalHtml || msg.innerHTML;
@@ -1025,9 +917,18 @@
     }
     updateClaimSummary();
   }
-  function cancelEdit(msg, panel) {
-    panel.remove();
+
+  function cancelEdit(msg, toolbar) {
+    if (msg._escHandler) { msg.removeEventListener('keydown', msg._escHandler); delete msg._escHandler; }
+    if (toolbar) toolbar.remove();
+    msg.contentEditable = 'false';
     msg.classList.remove('editing');
+    // Restore prior display: existing edits if any, else original HTML
+    if (msg.dataset.editedText) {
+      msg.innerHTML = renderDiff(diffWords(msg.dataset.originalText || '', msg.dataset.editedText));
+    } else {
+      msg.innerHTML = msg.dataset.originalHtml || msg.innerHTML;
+    }
   }
   function gatherEdits() {
     return Array.from(document.querySelectorAll('.msg.assistant.edited')).map(m => ({

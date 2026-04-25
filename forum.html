@@ -1,0 +1,1105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>hug. — community claims</title>
+<style>
+  :root {
+    --paper:   #f3ece0;
+    --paper-2: #ebe2d2;
+    --paper-3: #e2d6c0;
+    --ink:     #1a1612;
+    --ink-2:   #4b4339;
+    --ink-3:   #8a8073;
+    --hug:     #c44a3f;
+    --hug-2:   #a83a30;
+    --hug-soft:#ecb8ad;
+    --hug-bg:  #fae9e0;
+    --green:   #6b8e6e;
+    --green-2: #2f6b40;
+    --green-bg:#e6efe3;
+    --gold:    #b48d4a;
+    --gold-bg: #f3e8cf;
+    --line:    #d8cdb6;
+    --serif:   -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    --sans:    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--paper);
+    background-image:
+      radial-gradient(ellipse 60% 40% at 85% -5%, rgba(196,74,63,.08) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at -5% 105%, rgba(180,141,74,.10) 0%, transparent 55%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+    font-size: 16px;
+  }
+
+  .app { max-width: 880px; margin: 0 auto; padding: 0 28px 80px; }
+
+  /* ---------- Header ---------- */
+  header.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 28px 0 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand-link {
+    display: inline-flex;
+    align-items: baseline;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: opacity .15s, transform .15s;
+  }
+  .brand-link:hover { opacity: 0.82; transform: translateY(-1px); }
+  .brand-text {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .brand-text .em { color: var(--hug); font-weight: 500; }
+  .brand-text .small { font-size: 17px; color: var(--ink-3); margin-left: 1px; }
+  .nav {
+    display: flex;
+    gap: 22px;
+    align-items: baseline;
+  }
+  .nav a {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color .15s, color .15s;
+    padding-bottom: 1px;
+  }
+  .nav a:hover { border-bottom-color: var(--hug); color: var(--hug); }
+  .nav a.active { color: var(--ink); border-bottom-color: var(--ink); }
+  .nav a.cta {
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 11px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 9px 16px;
+    border-radius: 999px;
+    border-bottom: 0;
+    transition: background .18s, transform .15s;
+  }
+  .nav a.cta:hover { background: var(--hug); color: var(--paper); transform: translateY(-1px); border-bottom: 0; }
+
+  /* ---------- Title block ---------- */
+  .page-head { padding: 36px 0 18px; }
+  .page-head h1 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 46px;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .page-head h1 em { font-style: italic; color: var(--hug); }
+  .page-head .lede {
+    margin-top: 12px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-2);
+    max-width: 60ch;
+  }
+  .page-head .stat-row {
+    margin-top: 22px;
+    display: flex;
+    gap: 26px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+  .page-head .stat-row .num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: -0.01em;
+    margin-right: 5px;
+    font-weight: 400;
+  }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 28px 0 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .filter-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    border-radius: 999px;
+    padding: 6px 14px 7px;
+    font: 500 11.5px var(--sans);
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s, transform .15s;
+  }
+  .filter-btn:hover { border-color: var(--ink-2); color: var(--ink); transform: translateY(-1px); }
+  .filter-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .sort-group { display: flex; align-items: center; gap: 8px; }
+  .sort-group label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+  .sort-group select {
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 28px 7px 14px;
+    font: 500 11.5px var(--sans);
+    color: var(--ink-2);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M2 4l3 3 3-3' stroke='%238a8073' stroke-width='1.4' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    transition: border-color .15s, color .15s;
+  }
+  .sort-group select:hover { border-color: var(--ink-2); color: var(--ink); }
+
+  /* ---------- Post ---------- */
+  .post {
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px 26px 8px;
+    margin-bottom: 18px;
+    box-shadow: 0 14px 36px -28px rgba(40, 25, 10, 0.18);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s;
+  }
+  .post:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 20px 44px -28px rgba(40, 25, 10, 0.25);
+    border-color: var(--hug-soft);
+  }
+  .post-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+  .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font: 500 11px var(--sans);
+    color: var(--paper);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+  .avatar.c1 { background: #c44a3f; }
+  .avatar.c2 { background: #2f6b40; }
+  .avatar.c3 { background: #b48d4a; }
+  .avatar.c4 { background: #4b4339; }
+  .avatar.c5 { background: #6b8e6e; }
+  .avatar.c6 { background: #8a5a78; }
+  .post-head .author {
+    color: var(--ink);
+    font-weight: 500;
+    font-size: 13.5px;
+  }
+  .post-head .sep { color: var(--line); }
+  .post-head .time { color: var(--ink-3); font-style: italic; font-family: var(--serif); font-size: 13px; }
+  .tag {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    padding: 3px 9px 4px;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+  .tag.brand { background: var(--paper-2); color: var(--ink-2); border: 1px solid var(--line); }
+  .tag.domain { background: var(--paper-3); color: var(--ink-2); }
+  .status {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 11px 5px;
+    border-radius: 999px;
+    font: 500 10.5px var(--sans);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+  .status::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .status.verified  { background: var(--green-bg); color: var(--green-2); }
+  .status.verified::before  { background: var(--green-2); }
+  .status.pending   { background: var(--gold-bg);  color: #8a6730; }
+  .status.pending::before   { background: var(--gold); }
+  .status.disputed  { background: var(--hug-bg);   color: var(--hug-2); }
+  .status.disputed::before  { background: var(--hug); }
+  .status .amt {
+    font-family: var(--serif);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 13px;
+    margin-left: 4px;
+    font-weight: 500;
+  }
+
+  .post h3 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .post .excerpt {
+    background: rgba(0, 0, 0, 0.025);
+    border-left: 2px solid var(--line);
+    padding: 12px 14px;
+    margin: 12px 0 14px;
+    border-radius: 0 8px 8px 0;
+    font-family: var(--serif);
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .post .excerpt em.q {
+    font-style: italic;
+    color: var(--ink-3);
+    font-size: 13px;
+    display: block;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-family: var(--sans);
+    font-weight: 500;
+  }
+  .post .context {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    margin-bottom: 14px;
+  }
+
+  s.struck {
+    color: var(--hug-2);
+    text-decoration: line-through;
+    text-decoration-color: var(--hug);
+    text-decoration-thickness: 2px;
+    background: rgba(196, 74, 63, 0.08);
+    padding: 0 3px;
+    border-radius: 2px;
+  }
+  ins.correction {
+    background: rgba(180, 141, 74, 0.20);
+    color: var(--ink);
+    text-decoration: none;
+    padding: 0 3px;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  /* ---------- Post footer (votes, comments) ---------- */
+  .post-foot {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 12px 0 14px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+  .vote-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px 12px 5px;
+    font: 500 12.5px var(--sans);
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .vote-pill:hover { border-color: var(--hug); color: var(--hug); }
+  .vote-pill .arrow {
+    font-size: 11px;
+    transform: translateY(-0.5px);
+  }
+  .vote-pill.voted {
+    background: var(--hug-bg);
+    border-color: var(--hug-soft);
+    color: var(--hug-2);
+  }
+  .post-foot .meta-link {
+    background: transparent;
+    border: 0;
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-3);
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: color .15s;
+  }
+  .post-foot .meta-link:hover { color: var(--hug); }
+  .post-foot .reply-btn {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 14px 6px;
+    font: 500 11px var(--sans);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .post-foot .reply-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ---------- Comments ---------- */
+  .comments {
+    border-top: 1px dashed var(--line);
+    padding: 14px 0 4px;
+    display: none;
+  }
+  .post.expanded .comments { display: block; }
+
+  .comment {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0 12px;
+    border-bottom: 1px solid var(--paper-3);
+  }
+  .comment:last-child { border-bottom: 0; }
+  .comment .avatar { width: 24px; height: 24px; font-size: 10px; }
+  .comment-body { flex: 1; min-width: 0; }
+  .comment-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 12.5px;
+  }
+  .comment-head .author { font-weight: 500; color: var(--ink); }
+  .comment-head .role-tag {
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    padding: 2px 7px 3px;
+    border-radius: 999px;
+    background: var(--paper-2);
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+  .comment-head .role-tag.expert { background: var(--green-bg); color: var(--green-2); }
+  .comment-head .role-tag.author-self { background: var(--hug-bg); color: var(--hug-2); }
+  .comment-head .time { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 12.5px; margin-left: auto; }
+  .comment-body p {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    margin-bottom: 6px;
+  }
+  .comment-foot {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .comment-foot .vote-mini {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    color: var(--ink-3);
+    font-size: 12px;
+    transition: color .15s;
+    padding: 0;
+  }
+  .comment-foot .vote-mini:hover { color: var(--hug); }
+  .comment-foot .vote-mini.voted { color: var(--hug); font-weight: 500; }
+  .comment-foot .reply-mini {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    color: var(--ink-3);
+    font-size: 12px;
+    font-family: var(--serif);
+    font-style: italic;
+    transition: color .15s;
+    padding: 0;
+  }
+  .comment-foot .reply-mini:hover { color: var(--ink); }
+
+  /* Add comment row */
+  .add-comment {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 6px 0 0;
+  }
+  .add-comment input {
+    flex: 1;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font: 13px var(--sans);
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .add-comment input:focus { border-color: var(--hug); }
+  .add-comment input::placeholder { color: var(--ink-3); font-style: italic; }
+  .add-comment button {
+    background: var(--ink);
+    color: var(--paper);
+    border: 0;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font: 500 11px var(--sans);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    cursor: pointer;
+    transition: background .15s, transform .15s;
+  }
+  .add-comment button:hover { background: var(--hug); transform: translateY(-1px); }
+
+  /* ---------- Footer ---------- */
+  footer.bottom {
+    margin-top: 50px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    text-align: center;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+  }
+  footer.bottom em { font-family: var(--serif); font-style: italic; text-transform: none; letter-spacing: 0; color: var(--ink-2); font-size: 13px; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 720px) {
+    .page-head h1 { font-size: 32px; }
+    .toolbar { flex-direction: column; align-items: flex-start; }
+    .post-head .status { margin-left: 0; }
+    .post { padding: 18px 18px 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a class="brand-link" href="index.html" aria-label="Hug Claims home">
+      <span class="brand-text">Hug<span class="em">.</span><span class="small">claims</span></span>
+    </a>
+    <nav class="nav">
+      <a href="forum.html" class="active">forum</a>
+      <a href="claim.html">file a claim</a>
+      <a href="chat.html" class="cta">try the chat &rarr;</a>
+    </nav>
+  </header>
+
+  <section class="page-head">
+    <h1>What others <em>caught</em>.</h1>
+    <p class="lede">Verified AI mistakes from the community. Read the diffs, weigh in, learn what to watch for &mdash; and earn cash back when your own corrections hold up.</p>
+    <div class="stat-row">
+      <span><span class="num">1,284</span> verified claims</span>
+      <span><span class="num">$31,470</span> paid out</span>
+      <span><span class="num">68%</span> verifier agreement</span>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <div class="filter-group" id="filterGroup">
+      <button class="filter-btn active" data-filter="all">all</button>
+      <button class="filter-btn" data-filter="medicine">medicine</button>
+      <button class="filter-btn" data-filter="legal">legal</button>
+      <button class="filter-btn" data-filter="math">math</button>
+      <button class="filter-btn" data-filter="finance">finance</button>
+    </div>
+    <div class="sort-group">
+      <label for="sort">sort</label>
+      <select id="sort">
+        <option value="recent">most recent</option>
+        <option value="cashback">highest cash back</option>
+        <option value="discussed">most discussed</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="posts" id="posts">
+
+    <!-- Post 1: Math induction proof -->
+    <article class="post" data-domain="math">
+      <div class="post-head">
+        <span class="avatar c1">YH</span>
+        <span class="author">@yuexing</span>
+        <span class="sep">&middot;</span>
+        <span class="tag brand">Claude Haiku 4.5</span>
+        <span class="tag domain">math</span>
+        <span class="sep">&middot;</span>
+        <span class="time">2h ago</span>
+        <span class="status verified">verified <span class="amt">$16</span></span>
+      </div>
+      <h3>Wrong substitution in integration by parts &mdash; v isn&rsquo;t the definite integral</h3>
+      <div class="excerpt">
+        <em class="q">claude said:</em>
+        &ldquo;u = x<sup>n+1</sup>, dv = e<sup>&minus;x</sup>dx, so v = <s class="struck">1</s><ins class="correction">&minus;e<sup>&minus;x</sup></ins>. Multiply through, apply the inductive hypothesis, and you arrive at (n+1)!.&rdquo;
+      </div>
+      <p class="context">Was checking my induction proof for &int;<sub>0</sub><sup>&infin;</sup> x<sup>n</sup>e<sup>&minus;x</sup>dx = n!. Claude treated v as the definite integral &int;<sub>0</sub><sup>&infin;</sup>e<sup>&minus;x</sup>dx = 1, but in IBP v has to be the antiderivative. Final answer happened to be right, the proof was broken.</p>
+      <div class="post-foot">
+        <button class="vote-pill" data-votes="47"><span class="arrow">&#9650;</span> <span class="v">47</span></button>
+        <button class="meta-link toggle-comments">12 comments</button>
+        <button class="reply-btn">reply</button>
+      </div>
+      <div class="comments">
+        <div class="comment">
+          <span class="avatar c2">GS</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@gradstudent_ml</span>
+              <span class="role-tag expert">PhD math</span>
+              <span class="time">1h ago</span>
+            </div>
+            <p>Classic. The model conflated &ldquo;definite integral evaluates to 1&rdquo; with &ldquo;v = 1.&rdquo; Worth flagging for the eval team &mdash; this comes up in any IBP problem with limits at infinity.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 8</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="comment">
+          <span class="avatar c3">DR</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@drewr</span>
+              <span class="time">38m ago</span>
+            </div>
+            <p>Got the same hallucination yesterday on a Laplace transform problem. I think the issue is models pattern-match &ldquo;e<sup>&minus;x</sup> integrated from 0 to &infin;&rdquo; to its evaluated form even when the context wants the antiderivative.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 4</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="comment">
+          <span class="avatar c1">YH</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@yuexing</span>
+              <span class="role-tag author-self">op</span>
+              <span class="time">22m ago</span>
+            </div>
+            <p>That tracks &mdash; I bet this is in the training set as a worked example with definite integrals and the IBP variant got entangled.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 2</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="add-comment">
+          <input type="text" placeholder="add a comment&hellip;" />
+          <button type="button">post</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- Post 2: Medicine -->
+    <article class="post" data-domain="medicine">
+      <div class="post-head">
+        <span class="avatar c5">SK</span>
+        <span class="author">@sara_k</span>
+        <span class="sep">&middot;</span>
+        <span class="tag brand">GPT-4o</span>
+        <span class="tag domain">medicine</span>
+        <span class="sep">&middot;</span>
+        <span class="time">5h ago</span>
+        <span class="status verified">verified <span class="amt">$24</span></span>
+      </div>
+      <h3>AI told me to get an MRI for what turned out to be allergies</h3>
+      <div class="excerpt">
+        <em class="q">gpt said:</em>
+        &ldquo;Persistent headaches plus dizziness <s class="struck">point to a brain tumor</s><ins class="correction">are most often allergies, sinus pressure, or vestibular issues</ins>. <s class="struck">Get an MRI today</s><ins class="correction">try antihistamines first; escalate to imaging only if symptoms persist beyond 2 weeks</ins>.&rdquo;
+      </div>
+      <p class="context">Asked about two weeks of headaches + dizziness. GPT immediately flagged tumor and pushed for imaging. ENT ruled it out the same day &mdash; classic seasonal allergy presentation. Three days of Allegra and I&rsquo;m fine.</p>
+      <div class="post-foot">
+        <button class="vote-pill" data-votes="129"><span class="arrow">&#9650;</span> <span class="v">129</span></button>
+        <button class="meta-link toggle-comments">31 comments</button>
+        <button class="reply-btn">reply</button>
+      </div>
+      <div class="comments">
+        <div class="comment">
+          <span class="avatar c4">MD</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@m.delgado_md</span>
+              <span class="role-tag expert">family medicine</span>
+              <span class="time">4h ago</span>
+            </div>
+            <p>This is textbook anchoring on worst-case differential. The base rate for tumor in this presentation is &lt;0.1%; allergic rhinitis with eustachian dysfunction is closer to 30%. Models need calibrated priors on epidemiology.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 42</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="comment">
+          <span class="avatar c6">JT</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@jamie_t</span>
+              <span class="time">3h ago</span>
+            </div>
+            <p>Same thing happened to me but the AI was right &mdash; I had a benign acoustic neuroma. I&rsquo;d argue the disclaimer (&ldquo;see a clinician&rdquo;) is more important than getting the differential perfect.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 17</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="comment">
+          <span class="avatar c2">RV</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@rvelez</span>
+              <span class="time">2h ago</span>
+            </div>
+            <p>The verifier&rsquo;s reasoning was great here &mdash; cited two NEJM diagnostic-prior papers in the verdict. Worth reading even if you don&rsquo;t care about the cash back.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 9</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="add-comment">
+          <input type="text" placeholder="add a comment&hellip;" />
+          <button type="button">post</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- Post 3: Legal -->
+    <article class="post" data-domain="legal">
+      <div class="post-head">
+        <span class="avatar c3">MA</span>
+        <span class="author">@marcus_a</span>
+        <span class="sep">&middot;</span>
+        <span class="tag brand">Gemini 2.0</span>
+        <span class="tag domain">legal</span>
+        <span class="sep">&middot;</span>
+        <span class="time">9h ago</span>
+        <span class="status pending">pending <span class="amt">$12</span></span>
+      </div>
+      <h3>Wrong section cited for landlord-entry rules in California</h3>
+      <div class="excerpt">
+        <em class="q">gemini said:</em>
+        &ldquo;Landlords must give <s class="struck">48 hours&rsquo;</s><ins class="correction">24 hours&rsquo;</ins> written notice under <s class="struck">California Civil Code &sect;1947</s><ins class="correction">California Civil Code &sect;1954</ins>.&rdquo;
+      </div>
+      <p class="context">Was reading my lease and asked Gemini to verify entry-notice rules. Both the hours and the section were off. &sect;1947 is about rent payment; &sect;1954 is the actual entry statute. Real attorney confirmed.</p>
+      <div class="post-foot">
+        <button class="vote-pill" data-votes="22"><span class="arrow">&#9650;</span> <span class="v">22</span></button>
+        <button class="meta-link toggle-comments">7 comments</button>
+        <button class="reply-btn">reply</button>
+      </div>
+      <div class="comments">
+        <div class="comment">
+          <span class="avatar c1">LP</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@lpark_esq</span>
+              <span class="role-tag expert">housing attorney</span>
+              <span class="time">8h ago</span>
+            </div>
+            <p>Confirming: &sect;1954(a) requires 24 hr written notice. The 48-hour figure may come from local rent-board overlays (e.g., Berkeley) but those are jurisdiction-specific. Models keep mixing state and city rules.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 11</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="comment">
+          <span class="avatar c4">AB</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@ash_b</span>
+              <span class="time">6h ago</span>
+            </div>
+            <p>Why is this still pending? Seems open and shut to me.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 1</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="comment">
+          <span class="avatar c3">MA</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@marcus_a</span>
+              <span class="role-tag author-self">op</span>
+              <span class="time">5h ago</span>
+            </div>
+            <p>Verifier flagged it for human review since I cited only the section, not a court ruling. Adding a Westlaw link in a follow-up.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 3</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="add-comment">
+          <input type="text" placeholder="add a comment&hellip;" />
+          <button type="button">post</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- Post 4: Finance -->
+    <article class="post" data-domain="finance">
+      <div class="post-head">
+        <span class="avatar c2">MO</span>
+        <span class="author">@mark_oh</span>
+        <span class="sep">&middot;</span>
+        <span class="tag brand">Claude Sonnet 4.6</span>
+        <span class="tag domain">finance</span>
+        <span class="sep">&middot;</span>
+        <span class="time">1d ago</span>
+        <span class="status verified">verified <span class="amt">$19</span></span>
+      </div>
+      <h3>Inverted Q4 NVIDIA revenue beat as a miss</h3>
+      <div class="excerpt">
+        <em class="q">claude said:</em>
+        &ldquo;NVIDIA Q4 revenue <s class="struck">missed by $1B</s><ins class="correction">beat consensus by $1.2B</ins>; forward guide <s class="struck">conservative</s><ins class="correction">ahead of Street estimates</ins>.&rdquo;
+      </div>
+      <p class="context">Pulled the press release after a colleague flagged the bot was off. Reported revenue was $39.3B vs $38.1B consensus &mdash; a beat, not a miss. Forward guide $43B vs $42.1B Street.</p>
+      <div class="post-foot">
+        <button class="vote-pill" data-votes="74"><span class="arrow">&#9650;</span> <span class="v">74</span></button>
+        <button class="meta-link toggle-comments">19 comments</button>
+        <button class="reply-btn">reply</button>
+      </div>
+      <div class="comments">
+        <div class="comment">
+          <span class="avatar c5">EK</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@e_kowalski</span>
+              <span class="role-tag expert">sell-side analyst</span>
+              <span class="time">22h ago</span>
+            </div>
+            <p>This is the most dangerous failure mode &mdash; sign-flip on a magnitude. If a trader had acted on this verbatim before the open, it&rsquo;s real money.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 33</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="comment">
+          <span class="avatar c6">TI</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@tina_i</span>
+              <span class="time">20h ago</span>
+            </div>
+            <p>How did the cache let this through? Was the model citing pre-release whisper numbers vs posted? The diff is too clean for a hallucination &mdash; smells like a stale-data issue.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 12</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="add-comment">
+          <input type="text" placeholder="add a comment&hellip;" />
+          <button type="button">post</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- Post 5: Medicine - disputed -->
+    <article class="post" data-domain="medicine">
+      <div class="post-head">
+        <span class="avatar c6">PR</span>
+        <span class="author">@priya_r</span>
+        <span class="sep">&middot;</span>
+        <span class="tag brand">MetaAI Llama 4</span>
+        <span class="tag domain">medicine</span>
+        <span class="sep">&middot;</span>
+        <span class="time">2d ago</span>
+        <span class="status disputed">disputed <span class="amt">$22</span></span>
+      </div>
+      <h3>Drug interaction call: AI said sertraline + tramadol is fine</h3>
+      <div class="excerpt">
+        <em class="q">meta said:</em>
+        &ldquo;Sertraline and tramadol can be co-prescribed <s class="struck">without significant interaction</s><ins class="correction">only with caution &mdash; both are serotonergic and combined use raises serotonin syndrome risk; monitor closely</ins>.&rdquo;
+      </div>
+      <p class="context">My friend (RN) flagged this immediately. Both drugs increase serotonin, and the combo carries a real serotonin syndrome risk. Even &ldquo;monitor closely&rdquo; is doing a lot of work &mdash; many guidelines recommend avoidance unless necessary.</p>
+      <div class="post-foot">
+        <button class="vote-pill" data-votes="58"><span class="arrow">&#9650;</span> <span class="v">58</span></button>
+        <button class="meta-link toggle-comments">24 comments</button>
+        <button class="reply-btn">reply</button>
+      </div>
+      <div class="comments">
+        <div class="comment">
+          <span class="avatar c4">CM</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@c.matsumoto_pharmd</span>
+              <span class="role-tag expert">clinical pharmacist</span>
+              <span class="time">2d ago</span>
+            </div>
+            <p>Disputing partial. The original response wasn&rsquo;t &ldquo;safe&rdquo; &mdash; it was incomplete. Most pharmacy databases flag this as a moderate interaction with monitoring, not contraindicated. The OP&rsquo;s correction overstates the risk by implying avoidance.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 28</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="comment">
+          <span class="avatar c1">NS</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@n.singh_rn</span>
+              <span class="role-tag expert">ICU nurse</span>
+              <span class="time">1d ago</span>
+            </div>
+            <p>I&rsquo;ve seen serotonin syndrome from this exact combo. &ldquo;Without significant interaction&rdquo; is genuinely wrong. The dispute should be about wording, not whether there&rsquo;s an error.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 19</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="comment">
+          <span class="avatar c6">PR</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@priya_r</span>
+              <span class="role-tag author-self">op</span>
+              <span class="time">1d ago</span>
+            </div>
+            <p>Fair pushback @c.matsumoto_pharmd &mdash; I&rsquo;ll edit the correction to match Lexi-Comp&rsquo;s &ldquo;moderate, monitor&rdquo; phrasing rather than implying avoidance. The original is still wrong on &ldquo;without significant interaction.&rdquo;</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 14</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="add-comment">
+          <input type="text" placeholder="add a comment&hellip;" />
+          <button type="button">post</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- Post 6: Math (smaller) -->
+    <article class="post" data-domain="math">
+      <div class="post-head">
+        <span class="avatar c5">DT</span>
+        <span class="author">@dtanaka</span>
+        <span class="sep">&middot;</span>
+        <span class="tag brand">GPT-4o</span>
+        <span class="tag domain">math</span>
+        <span class="sep">&middot;</span>
+        <span class="time">3d ago</span>
+        <span class="status verified">verified <span class="amt">$8</span></span>
+      </div>
+      <h3>Sign error in eigenvalue derivation</h3>
+      <div class="excerpt">
+        <em class="q">gpt said:</em>
+        &ldquo;det(A &minus; &lambda;I) = <s class="struck">&lambda;² &minus; 5&lambda; + 6</s><ins class="correction">&lambda;² &minus; 5&lambda; &minus; 6</ins>, so eigenvalues are <s class="struck">2 and 3</s><ins class="correction">6 and &minus;1</ins>.&rdquo;
+      </div>
+      <p class="context">Linear algebra homework. The constant term was off by sign and the eigenvalues followed. Easy to miss because the structure looked right.</p>
+      <div class="post-foot">
+        <button class="vote-pill" data-votes="31"><span class="arrow">&#9650;</span> <span class="v">31</span></button>
+        <button class="meta-link toggle-comments">5 comments</button>
+        <button class="reply-btn">reply</button>
+      </div>
+      <div class="comments">
+        <div class="comment">
+          <span class="avatar c2">JL</span>
+          <div class="comment-body">
+            <div class="comment-head">
+              <span class="author">@jenna_l</span>
+              <span class="time">2d ago</span>
+            </div>
+            <p>This is why showing work matters &mdash; if you check the trace and determinant against the matrix, the error is immediate.</p>
+            <div class="comment-foot">
+              <button class="vote-mini">&#9650; 7</button>
+              <button class="reply-mini">reply</button>
+            </div>
+          </div>
+        </div>
+        <div class="add-comment">
+          <input type="text" placeholder="add a comment&hellip;" />
+          <button type="button">post</button>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <footer class="bottom">
+    hug.claims forum &middot; <em>be kind, cite sources</em> &middot; moderated by community
+  </footer>
+</div>
+
+<script>
+  // Filter posts by domain
+  const filterGroup = document.getElementById('filterGroup');
+  const posts = document.querySelectorAll('.post');
+  filterGroup.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    filterGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const f = btn.dataset.filter;
+    posts.forEach(p => {
+      p.style.display = (f === 'all' || p.dataset.domain === f) ? '' : 'none';
+    });
+  });
+
+  // Toggle comments thread on each post
+  document.querySelectorAll('.toggle-comments').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const post = btn.closest('.post');
+      post.classList.toggle('expanded');
+    });
+  });
+
+  // Reply button also expands the thread
+  document.querySelectorAll('.reply-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const post = btn.closest('.post');
+      post.classList.add('expanded');
+      const input = post.querySelector('.add-comment input');
+      if (input) setTimeout(() => input.focus(), 50);
+    });
+  });
+
+  // Vote pill (toggle voted state, increment count)
+  document.querySelectorAll('.vote-pill').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const v = btn.querySelector('.v');
+      let n = parseInt(v.textContent, 10) || 0;
+      const isVoted = btn.classList.toggle('voted');
+      v.textContent = isVoted ? n + 1 : n - 1;
+    });
+  });
+
+  // Comment vote-mini (toggle, increment)
+  document.querySelectorAll('.vote-mini').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const m = btn.textContent.match(/(\d+)/);
+      const n = m ? parseInt(m[1], 10) : 0;
+      const isVoted = btn.classList.toggle('voted');
+      btn.textContent = '▲ ' + (isVoted ? n + 1 : n - 1);
+    });
+  });
+
+  // Sort dropdown — re-orders posts in the DOM by chosen key
+  const postsContainer = document.getElementById('posts');
+  const sortSelect = document.getElementById('sort');
+  function getSortKey(post, mode) {
+    if (mode === 'cashback') {
+      const m = post.querySelector('.status .amt')?.textContent.match(/\d+/);
+      return -(m ? parseInt(m[0], 10) : 0);  // negative for desc
+    }
+    if (mode === 'discussed') {
+      const m = post.querySelector('.toggle-comments')?.textContent.match(/\d+/);
+      return -(m ? parseInt(m[0], 10) : 0);
+    }
+    // recent — use original DOM index
+    return Array.from(postsContainer.children).indexOf(post);
+  }
+  sortSelect.addEventListener('change', () => {
+    const mode = sortSelect.value;
+    const arr = Array.from(postsContainer.children);
+    arr.sort((a, b) => getSortKey(a, mode) - getSortKey(b, mode));
+    arr.forEach(p => postsContainer.appendChild(p));
+  });
+
+  // "Post" comment input — append a new comment locally
+  document.querySelectorAll('.add-comment').forEach((row) => {
+    const input = row.querySelector('input');
+    const btn   = row.querySelector('button');
+    const submit = () => {
+      const txt = input.value.trim();
+      if (!txt) return;
+      const c = document.createElement('div');
+      c.className = 'comment';
+      c.innerHTML = `
+        <span class="avatar c1">YOU</span>
+        <div class="comment-body">
+          <div class="comment-head">
+            <span class="author">@you</span>
+            <span class="time">just now</span>
+          </div>
+          <p></p>
+          <div class="comment-foot">
+            <button class="vote-mini">&#9650; 0</button>
+            <button class="reply-mini">reply</button>
+          </div>
+        </div>
+      `;
+      c.querySelector('p').textContent = txt;
+      row.parentNode.insertBefore(c, row);
+      input.value = '';
+      // re-bind vote-mini for the new comment
+      c.querySelector('.vote-mini').addEventListener('click', () => {
+        const b = c.querySelector('.vote-mini');
+        const m = b.textContent.match(/(\d+)/);
+        const n = m ? parseInt(m[1], 10) : 0;
+        const isVoted = b.classList.toggle('voted');
+        b.textContent = '▲ ' + (isVoted ? n + 1 : n - 1);
+      });
+    };
+    btn.addEventListener('click', submit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); submit(); }
+    });
+  });
+</script>
+</body>
+</html>
