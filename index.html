@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>hug. — answer insurance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&display=swap" />
+<style>
+  :root {
+    --paper:   #f3ece0;
+    --paper-2: #ebe2d2;
+    --paper-3: #e2d6c0;
+    --ink:     #1a1612;
+    --ink-2:   #4b4339;
+    --ink-3:   #8a8073;
+    --hug:     #c44a3f;
+    --hug-2:   #a83a30;
+    --hug-soft:#ecb8ad;
+    --hug-bg:  #fae9e0;
+    --gold:    #b48d4a;
+    --line:    #d8cdb6;
+    --serif:   'Fraunces', 'Times New Roman', serif;
+    --sans:    'Hanken Grotesk', ui-sans-serif, sans-serif;
+    --radius:  14px;
+    --radius-lg: 22px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--paper);
+    background-image:
+      radial-gradient(ellipse 60% 40% at 85% -5%, rgba(196,74,63,.08) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at -5% 105%, rgba(180,141,74,.10) 0%, transparent 55%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-attachment: fixed;
+    background-size: auto, auto, 180px 180px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.55;
+    font-size: 16px;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ---------- Header ---------- */
+  header.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 0 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: baseline; gap: 14px; }
+  .mark {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .mark .dot { color: var(--hug); }
+  .tag {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+    padding-left: 14px;
+    border-left: 1px solid var(--line);
+    line-height: 1.3;
+  }
+  .tag em { font-family: var(--serif); font-style: italic; text-transform: none; letter-spacing: 0; color: var(--ink-2); font-size: 12px; }
+
+  .meta { display: flex; align-items: center; gap: 18px; font-size: 13px; color: var(--ink-2); }
+  .meta .live {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+  }
+  .meta .live::before {
+    content: '';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--hug);
+    box-shadow: 0 0 0 0 rgba(196, 74, 63, .55);
+    animation: pulse 2.2s infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(196,74,63,.55); }
+    70%  { box-shadow: 0 0 0 8px rgba(196,74,63,0); }
+    100% { box-shadow: 0 0 0 0 rgba(196,74,63,0); }
+  }
+
+  /* ---------- Scenario chips ---------- */
+  .scenarios {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 18px 0 0;
+  }
+  .scenarios .lead {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 13.5px;
+    color: var(--ink-3);
+    margin-right: 6px;
+  }
+  .scenarios .chip {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    border-radius: 999px;
+    padding: 6px 13px 7px;
+    font: 500 11.5px var(--sans);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+  }
+  .scenarios .chip:hover {
+    border-color: var(--ink-2);
+    color: var(--ink);
+    transform: translateY(-1px);
+  }
+  .scenarios .chip.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  /* ---------- Chat ---------- */
+  main.chat {
+    flex: 1;
+    padding: 32px 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  #convo {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .greeting {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 38px;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: rise 0.85s 0.05s forwards cubic-bezier(.2,.7,.2,1);
+  }
+  .greeting em { font-style: italic; color: var(--hug); }
+
+  .msg {
+    max-width: 88%;
+    opacity: 0;
+    animation: rise 0.7s forwards cubic-bezier(.2,.7,.2,1);
+  }
+  .msg.user {
+    align-self: flex-end;
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    padding: 13px 18px;
+    border-radius: 18px 18px 4px 18px;
+    font-size: 15.5px;
+  }
+  .msg.assistant {
+    align-self: flex-start;
+    font-size: 16.5px;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+  .msg.assistant strong { font-weight: 600; }
+  .msg.assistant .ans {
+    font-family: var(--serif);
+    font-weight: 500;
+    background: linear-gradient(180deg, transparent 60%, var(--hug-soft) 60%, var(--hug-soft) 95%, transparent 95%);
+    padding: 0 2px;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* coverage badge appended to assistant msg */
+  .coverage {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+    background: var(--hug-bg);
+    color: var(--hug-2);
+    border: 1px solid var(--hug-soft);
+    padding: 2px 10px 3px;
+    border-radius: 999px;
+    font: 500 10.5px var(--sans);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    vertical-align: 2px;
+  }
+  .coverage svg { stroke: var(--hug); }
+
+  /* ---------- Composer ---------- */
+  .composer-wrap {
+    position: sticky;
+    bottom: 14px;
+    padding-top: 18px;
+    background: linear-gradient(to top, var(--paper) 55%, rgba(243,236,224,0));
+  }
+
+  .composer {
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px 12px;
+    box-shadow: 0 22px 50px -28px rgba(40, 25, 10, 0.22);
+  }
+  .composer textarea {
+    width: 100%;
+    border: 0; outline: none; resize: none;
+    font: 16px/1.5 var(--sans);
+    color: var(--ink);
+    background: transparent;
+    min-height: 22px;
+    max-height: 140px;
+  }
+  .composer textarea::placeholder { color: var(--ink-3); }
+
+  .composer-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 8px;
+  }
+  .composer-tools { display: flex; gap: 4px; align-items: center; }
+  .iconbtn {
+    width: 30px; height: 30px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 8px; border: 0; background: transparent;
+    color: var(--ink-2); cursor: pointer;
+    transition: background .15s;
+  }
+  .iconbtn:hover { background: var(--paper-2); }
+
+  .send {
+    background: var(--ink); color: var(--paper);
+    border: 0; width: 34px; height: 34px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform .18s, background .18s;
+  }
+  .send:hover { transform: translateY(-1px); background: var(--hug); }
+
+  /* ---------- Bet bar (replaces "Claude is AI..." footer) ---------- */
+  .bet {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 0 6px;
+  }
+  .bet-line {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 16.5px;
+    color: var(--ink-2);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bet-line .heart {
+    display: inline-block;
+    color: var(--hug);
+    font-style: normal;
+    transform: translateY(-1px);
+  }
+
+  .hug-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px 8px 8px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 0;
+    border-radius: 999px;
+    font: 500 13px/1 var(--sans);
+    cursor: pointer;
+    transition: transform .2s ease, background .2s ease;
+  }
+  .hug-trigger:hover { transform: translateY(-1px); background: var(--hug); }
+  .hug-trigger .pill {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--hug); color: #fff;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    transition: background .2s, color .2s;
+  }
+  .hug-trigger:hover .pill { background: #fff; color: var(--hug); }
+  .hug-trigger .from {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    color: rgba(243,236,224,.7);
+    margin-left: 1px;
+  }
+
+  /* ---------- Picker ---------- */
+  .picker {
+    margin-top: 14px;
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 22px 22px 18px;
+    box-shadow: 0 24px 60px -28px rgba(40, 25, 10, 0.25);
+    display: none;
+  }
+  .picker.open {
+    display: block;
+    animation: rise 0.45s ease forwards;
+  }
+  .picker .ph {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .picker h3 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: -0.022em;
+  }
+  .picker h3 em { font-style: italic; color: var(--hug); }
+  .picker .sub {
+    font-size: 10.5px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+  }
+
+  .tiers {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  .tier {
+    text-align: left;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 14px 14px;
+    cursor: pointer;
+    transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+  }
+  .tier:hover {
+    transform: translateY(-3px);
+    border-color: var(--hug);
+    background: var(--hug-bg);
+  }
+  .tier.selected {
+    border-color: var(--hug);
+    background: var(--hug-bg);
+    box-shadow: inset 0 0 0 1px var(--hug);
+  }
+
+  .tier .price {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 30px;
+    letter-spacing: -0.022em;
+    color: var(--ink);
+    line-height: 1.05;
+  }
+  .tier .price .cur {
+    color: var(--hug);
+    font-style: italic;
+    margin-right: 1px;
+  }
+  .tier .name {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+  }
+
+  /* hover explainer */
+  .tier .tip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    width: 210px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 14px 13px;
+    border-radius: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s ease, transform .22s ease;
+    z-index: 20;
+    box-shadow: 0 18px 36px -12px rgba(0,0,0,.42);
+  }
+  .tier .tip::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--ink);
+  }
+  .tier:hover .tip,
+  .tier:focus-visible .tip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .tier .tip .label {
+    display: block;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--hug-soft);
+    margin-bottom: 6px;
+  }
+  .tier .tip .ex {
+    display: block;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.4;
+    color: var(--paper);
+  }
+  @media (hover: none) { .tier .tip { display: none; } }
+
+  .picker .fine {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line);
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+  }
+  .picker .fine em {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-2);
+    font-size: 13px;
+    letter-spacing: 0;
+  }
+
+  /* ---------- Streaming cursor ---------- */
+  .cursor {
+    display: inline-block;
+    width: 7px;
+    height: 1em;
+    background: var(--ink);
+    margin-left: 1px;
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed;
+    bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 999px;
+    padding: 12px 22px;
+    font: 500 13.5px var(--sans);
+    display: flex; align-items: center; gap: 10px;
+    opacity: 0; pointer-events: none;
+    transition: all 0.45s cubic-bezier(.2,.7,.2,1);
+    z-index: 50;
+    box-shadow: 0 22px 40px -10px rgba(0,0,0,0.32);
+    max-width: calc(100vw - 32px);
+  }
+  .toast .h {
+    color: var(--hug-soft);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16px;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ---------- Footer micro ---------- */
+  .micro {
+    text-align: center;
+    padding: 16px 0 24px;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    color: var(--ink-3);
+  }
+  .micro .sep { margin: 0 10px; color: var(--line); }
+  .micro em { font-family: var(--serif); font-style: italic; text-transform: none; letter-spacing: 0; color: var(--ink-2); font-size: 12px; }
+
+  /* responsive */
+  @media (max-width: 720px) {
+    .tiers { grid-template-columns: repeat(2, 1fr); }
+    .greeting { font-size: 28px; }
+    .meta .live { display: none; }
+    .bet { flex-direction: column; align-items: flex-start; }
+    .bet-line { font-size: 15px; }
+    .tag { display: none; }
+  }
+  @media (max-width: 420px) {
+    .tiers { grid-template-columns: 1fr 1fr 1fr; }
+    .tier .payout { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">hug<span class="dot">.</span></div>
+      <div class="tag">answer insurance<br/><em>est. 2026</em></div>
+    </div>
+    <div class="meta">
+      <div class="live">live coverage</div>
+      <div>yuexing</div>
+    </div>
+  </header>
+
+  <nav class="scenarios" id="scenarios" aria-label="Test scenarios">
+    <span class="lead">try a scenario.</span>
+    <button class="chip active" data-id="medicine">medicine</button>
+    <button class="chip" data-id="finance">finance</button>
+    <button class="chip" data-id="legal">legal</button>
+    <button class="chip" data-id="history">history</button>
+    <button class="chip" data-id="travel">travel</button>
+  </nav>
+
+  <main class="chat" id="chat">
+    <div class="greeting">Good evening, Yuexing.<br/>What do you want <em>covered</em> today?</div>
+    <div id="convo"></div>
+  </main>
+
+  <div class="composer-wrap">
+    <div class="composer">
+      <textarea id="ta" placeholder="Reply, or ask another question…" rows="1"></textarea>
+      <div class="composer-row">
+        <div class="composer-tools">
+          <button class="iconbtn" title="Attach" aria-label="Attach">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-9 9a5.5 5.5 0 0 1-7.78-7.78l9-9a3.5 3.5 0 0 1 4.95 4.95l-9 9a1.5 1.5 0 0 1-2.12-2.12l8.49-8.49"/></svg>
+          </button>
+          <button class="iconbtn" title="Tools" aria-label="Tools">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+          </button>
+          <button class="iconbtn" title="Voice" aria-label="Voice">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          </button>
+        </div>
+        <button class="send" id="send" title="Send" aria-label="Send">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- bet bar replaces the standard Claude disclaimer -->
+    <div class="bet">
+      <div class="bet-line">
+        <span class="heart">&#10084;</span> Let's bet on this answer?
+      </div>
+      <button class="hug-trigger" id="hugBtn" aria-expanded="false" aria-controls="picker">
+        <span class="pill">h</span>
+        Buy insurance from Hug
+        <span class="from">— from $3</span>
+      </button>
+    </div>
+
+    <div class="picker" id="picker" role="dialog" aria-label="Select coverage">
+      <div class="ph">
+        <h3>Cover this <em>answer</em>.</h3>
+        <div class="sub">choose your hug</div>
+      </div>
+      <div class="tiers" id="tiers">
+        <button class="tier" data-price="3" data-name="Light Hug" data-payout="$30">
+          <div class="price"><span class="cur">$</span>3</div>
+          <div class="name">Light Hug</div>
+          <span class="tip">
+            <span class="label">pays up to $30</span>
+            <span class="ex">e.g., an OTC drug-interaction check before a refill.</span>
+          </span>
+        </button>
+        <button class="tier" data-price="5" data-name="Warm Hug" data-payout="$60">
+          <div class="price"><span class="cur">$</span>5</div>
+          <div class="name">Warm Hug</div>
+          <span class="tip">
+            <span class="label">pays up to $60</span>
+            <span class="ex">e.g., decoding a friend&rsquo;s lab report.</span>
+          </span>
+        </button>
+        <button class="tier" data-price="10" data-name="Deep Hug" data-payout="$150">
+          <div class="price"><span class="cur">$</span>10</div>
+          <div class="name">Deep Hug</div>
+          <span class="tip">
+            <span class="label">pays up to $150</span>
+            <span class="ex">e.g., a pre-trade scan on earnings night.</span>
+          </span>
+        </button>
+        <button class="tier" data-price="25" data-name="Full Embrace" data-payout="$500">
+          <div class="price"><span class="cur">$</span>25</div>
+          <div class="name">Full Embrace</div>
+          <span class="tip">
+            <span class="label">pays up to $500</span>
+            <span class="ex">e.g., triage at 2am &mdash; ER or wait?</span>
+          </span>
+        </button>
+        <button class="tier" data-price="100" data-name="Lifetime Hug" data-payout="$2,500">
+          <div class="price"><span class="cur">$</span>100</div>
+          <div class="name">Lifetime Hug</div>
+          <span class="tip">
+            <span class="label">pays up to $2,500</span>
+            <span class="ex">e.g., choosing a parent&rsquo;s treatment protocol.</span>
+          </span>
+        </button>
+      </div>
+      <div class="fine">
+        <em>independent verdict</em> &middot; 24-hour payout &middot; policy <em>#HUG&#8202;-&#8202;2604&#8202;-&#8202;Q9F</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="micro">
+    Hug Insurance Co. <span class="sep">&middot;</span> licensed nowhere <span class="sep">&middot;</span> <em>regulated by curiosity</em>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="h">covered.</span>
+  <span id="toast-text">your $3 Light Hug is active.</span>
+</div>
+
+<script>
+  const hugBtn   = document.getElementById('hugBtn');
+  const picker   = document.getElementById('picker');
+  const tiers    = document.getElementById('tiers');
+  const toast    = document.getElementById('toast');
+  const toastText= document.getElementById('toast-text');
+  const ta       = document.getElementById('ta');
+  const send     = document.getElementById('send');
+  const convo    = document.getElementById('convo');
+  const scenariosEl = document.getElementById('scenarios');
+
+  /* ---------- scenario library ---------- */
+  const SCENARIOS = {
+    medicine: [
+      { role: 'user',      html: 'Is ibuprofen safe to take with my Plavix?' },
+      { role: 'assistant', html: '<strong>Generally no.</strong> NSAIDs like ibuprofen can blunt <span class="ans">clopidogrel&rsquo;s</span> antiplatelet effect and raise bleeding risk. Acetaminophen is the usual alternative &mdash; confirm with your prescriber.' },
+      { role: 'user',      html: 'good to know. cover me.' }
+    ],
+    finance: [
+      { role: 'user',      html: 'Did NVIDIA beat earnings last quarter?' },
+      { role: 'assistant', html: '<strong>Yes.</strong> Revenue came in near <span class="ans">$39.3B</span> vs. ~$38.1B consensus &mdash; about a 3% beat. Data center grew ~93% YoY; forward guide also above the Street.' },
+      { role: 'user',      html: 'are those numbers fresh?' }
+    ],
+    legal: [
+      { role: 'user',      html: 'Can my landlord enter my place without notice in California?' },
+      { role: 'assistant', html: '<strong>No.</strong> Cal. Civil Code <span class="ans">&sect;1954</span> requires <em>24 hours&rsquo; written notice</em> &mdash; with narrow exceptions for emergencies, abandonment, or tenant consent.' },
+      { role: 'user',      html: 'still current as of this year?' }
+    ],
+    history: [
+      { role: 'user',      html: 'Did Einstein win the Nobel Prize for relativity?' },
+      { role: 'assistant', html: '<strong>No.</strong> Einstein won the <span class="ans">1921 Nobel Prize in Physics</span> for the <em>photoelectric effect</em> &mdash; not relativity, which the committee found too theoretical at the time.' },
+      { role: 'user',      html: 'huh &mdash; worth a hug?' }
+    ],
+    travel: [
+      { role: 'user',      html: 'Do I need a yellow fever vaccine for a 3-day Kenya safari?' },
+      { role: 'assistant', html: '<strong>Usually yes.</strong> Kenya requires proof of <span class="ans">yellow fever vaccination</span> for travelers from at-risk countries; CDC also recommends it for safari areas. Cert must be 10+ days old at entry.' },
+      { role: 'user',      html: 'i fly friday.' }
+    ]
+  };
+
+  function renderConvo(id) {
+    convo.innerHTML = '';
+    SCENARIOS[id].forEach((t, i) => {
+      const m = document.createElement('div');
+      m.className = `msg ${t.role}`;
+      m.innerHTML = t.html;
+      m.style.animationDelay = `${0.05 + i * 0.14}s`;
+      convo.appendChild(m);
+    });
+    document.querySelectorAll('.tier').forEach(x => x.classList.remove('selected'));
+  }
+
+  scenariosEl.addEventListener('click', (e) => {
+    const c = e.target.closest('.chip');
+    if (!c) return;
+    document.querySelectorAll('.scenarios .chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    renderConvo(c.dataset.id);
+  });
+
+  /* ---------- hug picker ---------- */
+  hugBtn.addEventListener('click', () => {
+    const open = picker.classList.toggle('open');
+    hugBtn.setAttribute('aria-expanded', String(open));
+    if (open) picker.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  tiers.addEventListener('click', (e) => {
+    const t = e.target.closest('.tier');
+    if (!t) return;
+    document.querySelectorAll('.tier').forEach(x => x.classList.remove('selected'));
+    t.classList.add('selected');
+
+    const price  = t.dataset.price;
+    const name   = t.dataset.name;
+    const payout = t.dataset.payout;
+
+    toastText.innerHTML = `your <strong>$${price} ${name}</strong> is active &mdash; pays up to ${payout} if this answer is wrong.`;
+    toast.classList.add('show');
+    clearTimeout(window._tt);
+    window._tt = setTimeout(() => toast.classList.remove('show'), 4400);
+
+    const lastA = document.querySelectorAll('.msg.assistant');
+    const target = lastA[lastA.length - 1];
+    if (target) {
+      let badge = target.querySelector('.coverage');
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'coverage';
+        target.appendChild(document.createTextNode(' '));
+        target.appendChild(badge);
+      }
+      badge.innerHTML = `
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+        covered &middot; $${price}
+      `;
+    }
+  });
+
+  /* ---------- composer ---------- */
+  ta.addEventListener('input', () => {
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 140) + 'px';
+  });
+
+  function buildHistory() {
+    // Walk the rendered conversation, merging consecutive same-role turns
+    // (scenarios end with a user "follow-up" line, so a freshly-typed user
+    // message can land back-to-back with another user turn — collapse them).
+    const turns = [];
+    for (const el of convo.querySelectorAll('.msg')) {
+      const role = el.classList.contains('user') ? 'user' : 'assistant';
+      let content;
+      if (role === 'user') {
+        content = el.textContent.trim();
+      } else {
+        const clone = el.cloneNode(true);
+        clone.querySelectorAll('.coverage').forEach(c => c.remove());
+        content = clone.innerHTML.trim();
+      }
+      if (!content) continue;
+      if (turns.length && turns[turns.length - 1].role === role) {
+        turns[turns.length - 1].content += '\n\n' + content;
+      } else {
+        turns.push({ role, content });
+      }
+    }
+    return turns;
+  }
+
+  async function sendToClaude() {
+    const v = ta.value.trim();
+    if (!v) return;
+
+    // 1. Render the user turn
+    const userEl = document.createElement('div');
+    userEl.className = 'msg user';
+    userEl.textContent = v;
+    userEl.style.animation = 'rise 0.5s forwards';
+    convo.appendChild(userEl);
+    ta.value = '';
+    ta.style.height = 'auto';
+
+    const history = buildHistory();
+
+    // 2. Render an assistant placeholder with a blinking cursor
+    const aEl = document.createElement('div');
+    aEl.className = 'msg assistant';
+    aEl.innerHTML = '<span class="cursor"></span>';
+    aEl.style.animation = 'rise 0.3s forwards';
+    convo.appendChild(aEl);
+    aEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+    // 3. Stream from /chat
+    let text = '';
+    try {
+      const resp = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history })
+      });
+      if (!resp.ok) {
+        const errBody = await resp.text();
+        aEl.innerHTML = `<em>error: ${errBody.replace(/</g, '&lt;')}</em>`;
+        return;
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        let idx;
+        while ((idx = buffer.indexOf('\n\n')) !== -1) {
+          const event = buffer.slice(0, idx);
+          buffer = buffer.slice(idx + 2);
+          if (!event.startsWith('data: ')) continue;
+          let data;
+          try { data = JSON.parse(event.slice(6)); } catch { continue; }
+
+          if (data.text) {
+            text += data.text;
+            aEl.innerHTML = text + '<span class="cursor"></span>';
+            aEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+          if (data.done) {
+            aEl.innerHTML = text;
+            if (data.usage) {
+              const tag = data.usage.cache_read > 0 ? '✓ cache hit' : '— no cache hit';
+              console.log('[hug]', data.usage, tag);
+            }
+          }
+          if (data.error) {
+            aEl.innerHTML = `<em>error: ${String(data.error).replace(/</g, '&lt;')}</em>`;
+          }
+        }
+      }
+    } catch (e) {
+      aEl.innerHTML = `<em>connection error: ${e.message}</em>`;
+    }
+  }
+
+  send.addEventListener('click', sendToClaude);
+
+  ta.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendToClaude();
+    }
+  });
+
+  /* ---------- init ---------- */
+  renderConvo('medicine');
+</script>
+</body>
+</html>
