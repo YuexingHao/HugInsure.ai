@@ -1423,7 +1423,7 @@
     ],
     math: [
       { role: 'user',
-        html: '<img class="attached-img" src="Math.JPG" alt="induction proof of integral n factorial" /><div class="msg-text">can you check this induction proof?</div>' },
+        html: '<img class="attached-img" src="data/Math.JPG" alt="induction proof of integral n factorial" /><div class="msg-text">can you check this induction proof?</div>' },
       { role: 'assistant',
         html: '<strong>Looks correct.</strong> Base case <span class="ans">n = 0</span> evaluates cleanly: &int;<sub>0</sub><sup>&infin;</sup> e<sup>&minus;x</sup>dx = 1 = 0!. Inductive step uses integration by parts &mdash; u = x<sup>n+1</sup>, dv = e<sup>&minus;x</sup>dx &mdash; and lands on (n+1)&middot;n! = (n+1)!. Final conclusion holds. Nice work.' }
     ]

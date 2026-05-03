@@ -32,7 +32,8 @@ Cash back when your AI gets it wrong. A prototype of an LLM-error claims platfor
 ├── requirements.txt      ← anthropic, fastapi, uvicorn[standard].
 ├── run.sh                ← one-command launcher: creates .venv, installs
 │                            deps, starts uvicorn on 127.0.0.1:8000.
-└── Math.JPG              ← sample induction-proof image used in the "math"
+└── data/
+    └── Math.JPG          ← sample induction-proof image used in the "math"
                              scenario chip.
 ```
 
@@ -92,4 +93,4 @@ Prompt caching is wired in (`cache_control: {type: "ephemeral"}` on the system b
 
 ## Deploying the frontend separately
 
-The three HTML files plus `Math.JPG` are everything the UI needs. GitHub Pages serves them as-is; the chat composer's `fetch('/chat', …)` will fail without a backend somewhere to forward to. For a fully working hosted demo, deploy `server.py` (Render, Railway, Modal, Fly), set CORS for the Pages origin, and point the frontend's `fetch` at the backend's URL.
+The HTML files plus the sample assets under `data/` are everything the UI needs. GitHub Pages serves them as-is; the chat composer's `fetch('/chat', …)` will fail without a backend somewhere to forward to. For a fully working hosted demo, deploy `server.py` (Render, Railway, Modal, Fly), set CORS for the Pages origin, and point the frontend's `fetch` at the backend's URL.

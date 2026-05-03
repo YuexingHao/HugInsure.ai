@@ -534,7 +534,7 @@ async def events_count():
     return {"count": n, "bytes": EVENTS_FILE.stat().st_size, "path": str(EVENTS_FILE)}
 
 
-# Serve every static file in the project dir (index.html, claim.html, Math.JPG, etc.).
+# Serve every static file in the project dir (HTML pages, data assets, etc.).
 # Mounted last so the POST /chat route above takes priority over GET /chat.
 app.mount("/", StaticFiles(directory=str(HERE), html=True), name="static")
 

@@ -142,6 +142,38 @@
     margin-right: 5px;
     font-weight: 400;
   }
+  .page-head .stat-row .num.bump {
+    color: var(--hug);
+    animation: stat-bump .55s ease;
+  }
+  .live-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 10px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 12.5px;
+    color: var(--ink-3);
+  }
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green-2);
+    box-shadow: 0 0 0 0 rgba(47, 107, 64, .45);
+    animation: live-pulse 1.8s infinite;
+  }
+  @keyframes stat-bump {
+    0% { transform: translateY(0); }
+    35% { transform: translateY(-3px); }
+    100% { transform: translateY(0); }
+  }
+  @keyframes live-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(47, 107, 64, .45); }
+    70% { box-shadow: 0 0 0 7px rgba(47, 107, 64, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(47, 107, 64, 0); }
+  }
 
   /* ---------- Toolbar ---------- */
   .toolbar {
@@ -329,6 +361,19 @@
   .avatar.c4 { background: #4b4339; }
   .avatar.c5 { background: #6b8e6e; }
   .avatar.c6 { background: #8a5a78; }
+  .avatar.photo {
+    color: transparent;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(255, 253, 248, 0.8);
+    box-shadow: 0 0 0 1px rgba(40, 25, 10, 0.08), 0 6px 14px -10px rgba(40, 25, 10, 0.5);
+  }
+  .avatar.photo.p1 {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect width='80' height='80' fill='%23f0c9a5'/><circle cx='40' cy='33' r='21' fill='%23885f44'/><circle cx='40' cy='40' r='22' fill='%23d79c72'/><path d='M19 31c5-17 34-23 44 0-8-6-17-7-24-4-7 3-13 5-20 4Z' fill='%232b2019'/><circle cx='32' cy='41' r='2.2' fill='%231a1612'/><circle cx='48' cy='41' r='2.2' fill='%231a1612'/><path d='M36 52c3 2 7 2 10 0' stroke='%23885040' stroke-width='2' fill='none' stroke-linecap='round'/><path d='M8 80c5-17 19-27 32-27s27 10 32 27Z' fill='%23c44a3f'/></svg>");
+  }
+  .avatar.photo.p2 {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect width='80' height='80' fill='%23d6e7d0'/><circle cx='40' cy='38' r='23' fill='%23b87855'/><path d='M18 36c1-16 12-26 24-26 11 0 21 8 21 22-8-7-17-9-27-7-7 1-13 5-18 11Z' fill='%231b1713'/><circle cx='32' cy='42' r='2.2' fill='%231a1612'/><circle cx='49' cy='42' r='2.2' fill='%231a1612'/><path d='M35 53c4 2 8 2 12 0' stroke='%23764736' stroke-width='2' fill='none' stroke-linecap='round'/><path d='M7 80c6-16 19-26 33-26s27 10 33 26Z' fill='%232f6b40'/><circle cx='61' cy='34' r='6' fill='%23b87855'/></svg>");
+  }
   .post-head .author {
     color: var(--ink);
     font-weight: 500;
@@ -415,6 +460,124 @@
     line-height: 1.6;
     color: var(--ink-2);
     margin-bottom: 14px;
+  }
+  .pdf-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin: -2px 0 14px;
+    padding: 9px 13px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 253, 248, 0.72);
+    color: var(--ink-2);
+    font: 500 12px var(--sans);
+    cursor: pointer;
+    transition: border-color .16s, color .16s, background .16s, transform .16s;
+  }
+  .pdf-toggle:hover {
+    border-color: var(--hug-soft);
+    color: var(--hug);
+    background: #fffdf8;
+    transform: translateY(-1px);
+  }
+  .pdf-toggle .mini-doc {
+    color: var(--hug);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+  .pdf-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 42px;
+    background: rgba(20, 16, 12, 0.92);
+    z-index: 100;
+    cursor: zoom-out;
+  }
+  .pdf-modal.open {
+    display: flex;
+    animation: modal-fade .2s ease;
+  }
+  @keyframes modal-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .pdf-modal-shell {
+    width: min(980px, 94vw);
+    height: min(82vh, 820px);
+    background: #fffdf8;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+    cursor: default;
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+  .pdf-modal-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .pdf-modal-head .doc-icon {
+    width: 30px;
+    height: 34px;
+    border: 1px solid var(--hug-soft);
+    border-radius: 6px;
+    background: var(--hug-bg);
+    color: var(--hug);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font: 700 10px var(--sans);
+    letter-spacing: 0.08em;
+    flex: 0 0 auto;
+  }
+  .pdf-modal-head strong {
+    display: block;
+    font-size: 13px;
+  }
+  .pdf-modal-head span:last-child {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .pdf-close {
+    margin-left: auto;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink-3);
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    transition: border-color .16s, color .16s, background .16s;
+  }
+  .pdf-close:hover {
+    border-color: var(--hug-soft);
+    color: var(--hug);
+    background: var(--hug-bg);
+  }
+  .pdf-frame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: var(--paper-2);
+  }
+  .pdf-fallback {
+    display: block;
+    padding: 18px;
+    color: var(--hug);
   }
 
   s.struck {
@@ -568,6 +731,26 @@
     padding: 0;
   }
   .comment-foot .reply-mini:hover { color: var(--ink); }
+  .source-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--hug-2);
+    text-decoration: none;
+    border: 1px solid var(--hug-soft);
+    border-radius: 999px;
+    padding: 2px 8px 3px;
+    background: var(--hug-bg);
+    font: 500 10.5px var(--sans);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    transition: background .15s, border-color .15s, transform .15s;
+  }
+  .source-link:hover {
+    background: #fffdf8;
+    border-color: var(--hug);
+    transform: translateY(-1px);
+  }
 
   /* Add comment row */
   .add-comment {
@@ -644,10 +827,11 @@
     <h1>What others <em>caught</em>.</h1>
     <p class="lede">Verified AI mistakes from the community. Read the diffs, weigh in, learn what to watch for &mdash; and earn cash back when your own corrections hold up.</p>
     <div class="stat-row">
-      <span><span class="num">1,284</span> verified claims</span>
-      <span><span class="num">$31,470</span> paid out</span>
-      <span><span class="num">68%</span> verifier agreement</span>
+      <span><span class="num" id="verifiedClaims" data-value="1284">1,284</span> verified claims</span>
+      <span><span class="num" id="paidOut" data-value="31470">$31,470</span> paid out</span>
+      <span><span class="num" id="verifierAgreement" data-value="68">68%</span> verifier agreement</span>
     </div>
+    <div class="live-note"><span class="live-dot"></span><span id="liveStatsNote">live community feed</span></div>
   </section>
 
   <section class="leaderboard" aria-label="Top AI error contributors">
@@ -659,7 +843,7 @@
     <div class="leader-row">
       <div class="leader-rank">1.</div>
       <div class="leader-user">
-        <span class="avatar c1">YH</span>
+        <span class="avatar photo p1" aria-label="Fake headshot for @yuexing">YH</span>
         <div>
           <div class="leader-name">@yuexing</div>
           <div class="leader-domain">math + reasoning</div>
@@ -672,7 +856,7 @@
     <div class="leader-row">
       <div class="leader-rank">2.</div>
       <div class="leader-user">
-        <span class="avatar c5">SK</span>
+        <span class="avatar photo p2" aria-label="Fake headshot for @sara_k">SK</span>
         <div>
           <div class="leader-name">@sara_k</div>
           <div class="leader-domain">medical triage</div>
@@ -840,6 +1024,8 @@
             <div class="comment-foot">
               <button class="vote-mini">&#9650; 42</button>
               <button class="reply-mini">reply</button>
+              <a class="source-link" href="https://www.aafp.org/pubs/afp/issues/2022/0900/acute-headache-adults.html" target="_blank" rel="noopener">AAFP</a>
+              <a class="source-link" href="https://www.mayoclinic.org/first-aid/first-aid-headache/basics/art-20056639" target="_blank" rel="noopener">Mayo</a>
             </div>
           </div>
         </div>
@@ -896,60 +1082,65 @@
         &ldquo;Landlords must give <s class="struck">48 hours&rsquo;</s><ins class="correction">24 hours&rsquo;</ins> written notice under <s class="struck">California Civil Code &sect;1947</s><ins class="correction">California Civil Code &sect;1954</ins>.&rdquo;
       </div>
       <p class="context">Was reading my lease and asked Gemini to verify entry-notice rules. Both the hours and the section were off. &sect;1947 is about rent payment; &sect;1954 is the actual entry statute. Real attorney confirmed.</p>
+      <button class="pdf-toggle" type="button" data-pdf-src="data/Sample_Housing_Contract.pdf#toolbar=0&navpanes=0&page=1">
+        <span class="mini-doc">PDF</span>
+        Look into Sample_Housing_Contract.pdf
+      </button>
       <div class="post-foot">
         <button class="vote-pill" data-votes="22"><span class="arrow">&#9650;</span> <span class="v">22</span></button>
         <button class="meta-link toggle-comments">7 comments</button>
         <button class="reply-btn">reply</button>
       </div>
       <div class="comments">
-        <div class="comment">
-          <span class="avatar c1">LP</span>
-          <div class="comment-body">
-            <div class="comment-head">
-              <span class="author">@lpark_esq</span>
-              <span class="role-tag expert">housing attorney</span>
-              <span class="time">8h ago</span>
+            <div class="comment">
+              <span class="avatar c1">LP</span>
+              <div class="comment-body">
+                <div class="comment-head">
+                  <span class="author">@lpark_esq</span>
+                  <span class="role-tag expert">housing attorney</span>
+                  <span class="time">8h ago</span>
+                </div>
+                <p>Confirming: &sect;1954(a) requires 24 hr written notice. The 48-hour figure may come from local rent-board overlays (e.g., Berkeley) but those are jurisdiction-specific. Models keep mixing state and city rules.</p>
+                <div class="comment-foot">
+                  <button class="vote-mini">&#9650; 11</button>
+                  <button class="reply-mini">reply</button>
+                  <a class="source-link" href="https://california.public.law/codes/civil_code_section_1954" target="_blank" rel="noopener">§1954</a>
+                </div>
+              </div>
             </div>
-            <p>Confirming: &sect;1954(a) requires 24 hr written notice. The 48-hour figure may come from local rent-board overlays (e.g., Berkeley) but those are jurisdiction-specific. Models keep mixing state and city rules.</p>
-            <div class="comment-foot">
-              <button class="vote-mini">&#9650; 11</button>
-              <button class="reply-mini">reply</button>
+            <div class="comment">
+              <span class="avatar c4">AB</span>
+              <div class="comment-body">
+                <div class="comment-head">
+                  <span class="author">@ash_b</span>
+                  <span class="time">6h ago</span>
+                </div>
+                <p>Why is this still pending? Seems open and shut to me.</p>
+                <div class="comment-foot">
+                  <button class="vote-mini">&#9650; 1</button>
+                  <button class="reply-mini">reply</button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="comment">
-          <span class="avatar c4">AB</span>
-          <div class="comment-body">
-            <div class="comment-head">
-              <span class="author">@ash_b</span>
-              <span class="time">6h ago</span>
+            <div class="comment">
+              <span class="avatar c3">MA</span>
+              <div class="comment-body">
+                <div class="comment-head">
+                  <span class="author">@marcus_a</span>
+                  <span class="role-tag author-self">op</span>
+                  <span class="time">5h ago</span>
+                </div>
+                <p>Verifier flagged it for human review since I cited only the section, not a court ruling. Adding a Westlaw link in a follow-up.</p>
+                <div class="comment-foot">
+                  <button class="vote-mini">&#9650; 3</button>
+                  <button class="reply-mini">reply</button>
+                </div>
+              </div>
             </div>
-            <p>Why is this still pending? Seems open and shut to me.</p>
-            <div class="comment-foot">
-              <button class="vote-mini">&#9650; 1</button>
-              <button class="reply-mini">reply</button>
+            <div class="add-comment">
+              <input type="text" placeholder="add a comment&hellip;" />
+              <button type="button">post</button>
             </div>
-          </div>
-        </div>
-        <div class="comment">
-          <span class="avatar c3">MA</span>
-          <div class="comment-body">
-            <div class="comment-head">
-              <span class="author">@marcus_a</span>
-              <span class="role-tag author-self">op</span>
-              <span class="time">5h ago</span>
-            </div>
-            <p>Verifier flagged it for human review since I cited only the section, not a court ruling. Adding a Westlaw link in a follow-up.</p>
-            <div class="comment-foot">
-              <button class="vote-mini">&#9650; 3</button>
-              <button class="reply-mini">reply</button>
-            </div>
-          </div>
-        </div>
-        <div class="add-comment">
-          <input type="text" placeholder="add a comment&hellip;" />
-          <button type="button">post</button>
-        </div>
       </div>
     </article>
 
@@ -989,6 +1180,7 @@
             <div class="comment-foot">
               <button class="vote-mini">&#9650; 33</button>
               <button class="reply-mini">reply</button>
+              <a class="source-link" href="https://investor.nvidia.com/news/press-release-details/2025/NVIDIA-Announces-Financial-Results-for-Fourth-Quarter-and-Fiscal-2025/default.aspx" target="_blank" rel="noopener">NVIDIA</a>
             </div>
           </div>
         </div>
@@ -1049,6 +1241,7 @@
             <div class="comment-foot">
               <button class="vote-mini">&#9650; 28</button>
               <button class="reply-mini">reply</button>
+              <a class="source-link" href="https://www.fda.gov/drugs/postmarket-drug-safety-information-patients-and-providers/sertraline-marketed-zoloft-information" target="_blank" rel="noopener">FDA</a>
             </div>
           </div>
         </div>
@@ -1143,7 +1336,78 @@
   </footer>
 </div>
 
+<div class="pdf-modal" id="pdfModal" role="dialog" aria-modal="true" aria-label="Expanded PDF evidence">
+  <div class="pdf-modal-shell">
+    <div class="pdf-modal-head">
+      <span class="doc-icon">PDF</span>
+      <span>
+        <strong>Sample_Housing_Contract.pdf</strong>
+        <span>lease excerpt for landlord-entry clause</span>
+      </span>
+      <button class="pdf-close" id="pdfModalClose" type="button" aria-label="Close PDF">&times;</button>
+    </div>
+    <object class="pdf-frame" id="pdfModalFrame" data="" type="application/pdf">
+      <a class="pdf-fallback" href="data/Sample_Housing_Contract.pdf">Open Sample_Housing_Contract.pdf</a>
+    </object>
+  </div>
+</div>
+
 <script>
+  /* ---------- Live community stats ---------- */
+  const liveStats = {
+    claims: 1284,
+    paid: 31470,
+    agreement: 68,
+  };
+  const statEls = {
+    claims: document.getElementById('verifiedClaims'),
+    paid: document.getElementById('paidOut'),
+    agreement: document.getElementById('verifierAgreement'),
+    note: document.getElementById('liveStatsNote'),
+  };
+  function fmtNumber(n) {
+    return new Intl.NumberFormat('en-US').format(n);
+  }
+  function bumpStat(el) {
+    if (!el) return;
+    el.classList.remove('bump');
+    void el.offsetWidth;
+    el.classList.add('bump');
+  }
+  function renderLiveStats(changes) {
+    if (statEls.claims) statEls.claims.textContent = fmtNumber(liveStats.claims);
+    if (statEls.paid) statEls.paid.textContent = `$${fmtNumber(liveStats.paid)}`;
+    if (statEls.agreement) statEls.agreement.textContent = `${liveStats.agreement}%`;
+    changes.forEach(key => bumpStat(statEls[key]));
+    if (statEls.note) {
+      statEls.note.textContent = changes.includes('paid')
+        ? 'new verified claim paid out just now'
+        : 'live community feed updated';
+    }
+  }
+  function tickLiveStats() {
+    const claimDelta = Math.random() < 0.55 ? 1 : 2;
+    const changed = ['claims'];
+    liveStats.claims += claimDelta;
+
+    if (Math.random() < 0.65) {
+      liveStats.paid += claimDelta * (8 + Math.floor(Math.random() * 18));
+      changed.push('paid');
+    }
+
+    const direction = Math.random() < 0.5 ? -1 : 1;
+    liveStats.agreement = Math.max(63, Math.min(73, liveStats.agreement + direction));
+    changed.push('agreement');
+
+    renderLiveStats(changed);
+    if (window.hugEvent) hugEvent('forum_live_stats_tick', {
+      claims: liveStats.claims,
+      paid: liveStats.paid,
+      agreement: liveStats.agreement,
+    });
+  }
+  setInterval(tickLiveStats, 5000);
+
   // Helper: identify a post by its title for analytics
   function postKey(post) {
     const h3 = post.querySelector('h3');
@@ -1184,6 +1448,38 @@
       const input = post.querySelector('.add-comment input');
       if (input) setTimeout(() => input.focus(), 50);
     });
+  });
+
+  // Zoom PDF evidence in a modal, mirroring the image lightbox behavior.
+  const pdfModal = document.getElementById('pdfModal');
+  const pdfModalFrame = document.getElementById('pdfModalFrame');
+  const pdfModalClose = document.getElementById('pdfModalClose');
+  function openPdfModal(src, post) {
+    if (!pdfModal || !pdfModalFrame) return;
+    pdfModalFrame.setAttribute('data', src);
+    pdfModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (window.hugEvent) hugEvent('forum_pdf_opened', { post });
+  }
+  function closePdfModal() {
+    if (!pdfModal || !pdfModalFrame) return;
+    pdfModal.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { pdfModalFrame.setAttribute('data', ''); }, 180);
+  }
+  document.querySelectorAll('.pdf-toggle').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      openPdfModal(btn.dataset.pdfSrc || 'data/Sample_Housing_Contract.pdf', postKey(btn.closest('.post')));
+    });
+  });
+  if (pdfModalClose) pdfModalClose.addEventListener('click', closePdfModal);
+  if (pdfModal) {
+    pdfModal.addEventListener('click', (e) => {
+      if (e.target === pdfModal) closePdfModal();
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && pdfModal && pdfModal.classList.contains('open')) closePdfModal();
   });
 
   // Vote pill (toggle voted state, increment count)

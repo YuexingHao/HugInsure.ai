@@ -144,69 +144,6 @@
     transform: translateY(-6px);
   }
 
-  /* ---------- Conversation-link import row ---------- */
-  .import-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-  .import-row input {
-    flex: 1;
-    min-width: 0;
-    padding: 11px 14px;
-    background: #fffdf8;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    font: 14px var(--sans);
-    color: var(--ink);
-    outline: none;
-    transition: border-color .18s;
-  }
-  .import-row input:focus { border-color: var(--hug); }
-  .import-row input::placeholder { color: var(--ink-3); font-style: italic; }
-  .import-row button {
-    padding: 11px 20px;
-    background: var(--ink);
-    color: var(--paper);
-    border: 0;
-    border-radius: 10px;
-    font: 500 12px var(--sans);
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transition: background .18s, transform .15s;
-    flex-shrink: 0;
-  }
-  .import-row button:hover { background: var(--hug); transform: translateY(-1px); }
-  .import-result {
-    display: none;
-    padding: 11px 16px;
-    margin-bottom: 14px;
-    background: var(--hug-bg);
-    border: 1px solid var(--hug-soft);
-    border-radius: 10px;
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 13.5px;
-    line-height: 1.45;
-    color: var(--ink-2);
-  }
-  .import-result.show { display: block; }
-  .import-result strong {
-    font-style: normal;
-    color: var(--hug);
-    margin-right: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    font-size: 11px;
-    font-weight: 500;
-  }
-  .import-result a {
-    color: var(--hug);
-    text-decoration: none;
-    border-bottom: 1px solid var(--hug-soft);
-  }
-  .import-result a:hover { border-bottom-color: var(--hug); }
-
   section { margin-top: 32px; }
   h2 {
     font-size: 10.5px;
@@ -558,7 +495,6 @@
     color: var(--ink-3);
     font-style: italic;
   }
-
   /* ---------- File upload ---------- */
   input[type=file] { display: none; }
   .upload-btn {
@@ -894,49 +830,71 @@
   }
   .page-foot a:hover { color: var(--hug); border-bottom-color: var(--hug); }
   .payment-setup {
-    margin-top: 14px;
-    display: inline-flex;
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: 12px;
-    padding: 13px 16px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: #fffdf8;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 1px solid rgba(99, 91, 255, 0.22);
+    border-radius: 18px;
+    background:
+      linear-gradient(135deg, rgba(255, 253, 248, 0.98), rgba(245, 240, 255, 0.88)),
+      #fffdf8;
     color: var(--ink);
     text-decoration: none;
-    box-shadow: 0 14px 34px -28px rgba(40, 25, 10, 0.24);
-    transition: border-color .15s, transform .15s, box-shadow .15s;
+    box-shadow: 0 18px 45px -34px rgba(40, 25, 10, 0.34), inset 0 1px 0 rgba(255,255,255,.8);
+    transition: border-color .15s, transform .15s, box-shadow .15s, background .15s;
   }
   .payment-setup:hover {
-    border-color: var(--hug-soft);
-    transform: translateY(-1px);
-    box-shadow: 0 18px 40px -30px rgba(40, 25, 10, 0.32);
+    border-color: rgba(99, 91, 255, 0.42);
+    transform: translateY(-2px);
+    box-shadow: 0 24px 54px -36px rgba(40, 25, 10, 0.42), inset 0 1px 0 rgba(255,255,255,.9);
   }
   .payment-setup .pay-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #635bff;
+    background: linear-gradient(135deg, #635bff, #7d75ff);
     color: #fff;
     font-weight: 800;
     letter-spacing: -0.04em;
     flex: 0 0 auto;
+    box-shadow: 0 12px 26px -18px #635bff;
+  }
+  .payment-setup .pay-copy {
+    min-width: 0;
   }
   .payment-setup strong {
     display: block;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.2;
   }
-  .payment-setup span:last-child {
+  .payment-setup .pay-copy span {
     display: block;
-    margin-top: 2px;
+    margin-top: 4px;
     font-family: var(--serif);
     font-style: italic;
-    font-size: 12px;
+    font-size: 12.5px;
     color: var(--ink-3);
+  }
+  .payment-setup .pay-arrow {
+    color: #635bff;
+    font-size: 18px;
+    transform: translateX(0);
+    transition: transform .15s;
+  }
+  .payment-setup:hover .pay-arrow { transform: translateX(3px); }
+  @media (max-width: 560px) {
+    .payment-setup {
+      grid-template-columns: auto 1fr;
+    }
+    .payment-setup .pay-arrow {
+      display: none;
+    }
   }
 </style>
 <script src="hug-config.js"></script>
@@ -974,11 +932,6 @@
     <section>
       <h2>conversation</h2>
       <p class="edit-instruction">click any AI reply to edit it &mdash; headings, bullets, paragraphs, and highlights stay intact.</p>
-      <div class="import-row">
-        <input type="url" id="convoUrl" placeholder="paste a link &mdash; chatgpt.com, claude.ai, gemini, meta&hellip;" />
-        <button id="importBtn" type="button">Import</button>
-      </div>
-      <div class="import-result" id="importResult"></div>
       <div class="snapshot" id="snapshot"></div>
     </section>
 
@@ -987,10 +940,11 @@
       <div class="tier-info" id="tierInfo"></div>
       <a class="payment-setup" href="payment.html">
         <span class="pay-icon">S</span>
-        <span>
+        <span class="pay-copy">
           <strong>Set up payment method</strong>
           <span>Receive approved cash back through Stripe</span>
         </span>
+        <span class="pay-arrow" aria-hidden="true">&rarr;</span>
       </a>
     </section>
 
@@ -1174,7 +1128,7 @@
     toolbar.innerHTML = `
       <button type="button" class="done">Done</button>
       <button type="button" class="cancel">Cancel</button>
-      <span class="hint">formatting stays intact on Done</span>
+      <span class="hint">autosaves when you click away</span>
     `;
     msg.parentNode.insertBefore(toolbar, msg.nextSibling);
 
@@ -1187,6 +1141,12 @@
       e.preventDefault();
       cancelEdit(msg, toolbar);
     });
+    const blurHandler = (e) => {
+      if (toolbar.contains(e.relatedTarget)) return;
+      finishEdit(msg, toolbar, originalText, msg.innerHTML, readableText(msg));
+    };
+    msg.addEventListener('blur', blurHandler);
+    msg._blurHandler = blurHandler;
 
     const escHandler = (e) => {
       if (e.key === 'Escape') {
@@ -1200,6 +1160,7 @@
 
   function finishEdit(msg, toolbar, originalText, editedHtml, editedText) {
     if (msg._escHandler) { msg.removeEventListener('keydown', msg._escHandler); delete msg._escHandler; }
+    if (msg._blurHandler) { msg.removeEventListener('blur', msg._blurHandler); delete msg._blurHandler; }
     if (toolbar) toolbar.remove();
     msg.contentEditable = 'false';
     msg.classList.remove('editing');
@@ -1230,6 +1191,7 @@
 
   function cancelEdit(msg, toolbar) {
     if (msg._escHandler) { msg.removeEventListener('keydown', msg._escHandler); delete msg._escHandler; }
+    if (msg._blurHandler) { msg.removeEventListener('blur', msg._blurHandler); delete msg._blurHandler; }
     if (toolbar) toolbar.remove();
     msg.contentEditable = 'false';
     msg.classList.remove('editing');
@@ -1345,37 +1307,6 @@
     });
   }
   wireShareLinks();
-
-  // ---------- Conversation-link import ----------
-  let importedUrl = null;
-  const importBtn = document.getElementById('importBtn');
-  const convoUrl = document.getElementById('convoUrl');
-  const importResult = document.getElementById('importResult');
-  function tryImport() {
-    const raw = (convoUrl.value || '').trim();
-    if (!raw) return;
-    let parsed;
-    try { parsed = new URL(raw); }
-    catch {
-      importResult.classList.add('show');
-      importResult.innerHTML = `<strong>could not parse</strong> please paste a full URL (with <code>https://</code>).`;
-      return;
-    }
-    importedUrl = parsed.href;
-    const host = parsed.hostname.replace(/^www\./, '');
-    importResult.classList.add('show');
-    importResult.innerHTML = `
-      <strong>imported</strong>
-      from <a href="${parsed.href}" target="_blank" rel="noopener">${host}</a>
-      &mdash; reference attached to your claim. Preview unavailable (${host} blocks cross-site fetches);
-      describe the wrong answer in the fields below.
-    `;
-    convoUrl.value = '';
-  }
-  if (importBtn) importBtn.addEventListener('click', tryImport);
-  if (convoUrl) convoUrl.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); tryImport(); }
-  });
 
   // Lightbox
   const lightbox = document.getElementById('lightbox');
@@ -1495,7 +1426,7 @@
     const brand = brandCycle ? brandCycle.textContent.trim() : '';
     const expectedPayout = (data && Number.isFinite(data.payout) && data.payout > 0) ? data.payout : 0;
     console.log('[hug] mock claim submitted', {
-      ref, brand, importedUrl, edits, evidenceCount: evidence.length, expectedPayout, overrodeVerifier
+      ref, brand, edits, evidenceCount: evidence.length, expectedPayout, overrodeVerifier
     });
     if (window.hugEvent) hugEvent('claim_submitted', {
       ref,
@@ -1504,16 +1435,12 @@
       evidence_count: evidence.length,
       evidence_filenames: evidence.map(e => e.name),
       expected_payout: expectedPayout,
-      imported_url: importedUrl,
       chat_payout: (data && data.payout) || null,
       chat_verdict: (data && data.verdict) || null,
       verifier_verdict: _lastVerdict ? _lastVerdict.verdict : null,
       verifier_confidence: _lastVerdict ? _lastVerdict.confidence : null,
       overrode_verifier: overrodeVerifier,
     });
-    const sourceLine = importedUrl
-      ? `<p style="margin-top:14px;font-family:var(--serif);font-style:italic;color:var(--ink-3);font-size:13px;">source: <a href="${importedUrl}" target="_blank" rel="noopener" style="color:var(--hug);">${new URL(importedUrl).hostname.replace(/^www\./,'')}</a></p>`
-      : '';
     const overrideLine = overrodeVerifier
       ? `<p style="margin-top:8px;font-family:var(--serif);font-style:italic;color:var(--hug-2);font-size:13px;">flagged for human review &mdash; verifier disagreed.</p>`
       : '';
@@ -1523,7 +1450,6 @@
         <div class="cashback-amount">$${expectedPayout || 0}</div>
         <p class="cashback-sub">expected back if your edits hold up</p>
         <p>Filed against <em>${brand || 'AI'}</em> &middot; <em>${edits.length} edit${edits.length > 1 ? 's' : ''}</em> &middot; verdict in <em>24h</em>.</p>
-        ${sourceLine}
         ${overrideLine}
         <p class="ref">${ref}</p>
         <p style="margin-top:28px;"><a href="chat.html">&larr; back to chat</a></p>
