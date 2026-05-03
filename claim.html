@@ -266,6 +266,44 @@
   }
   .snapshot .msg.assistant strong { font-weight: 600; }
   .snapshot .msg.assistant em { font-style: italic; }
+  .snapshot .ai-formatted {
+    display: grid;
+    gap: 10px;
+  }
+  .snapshot .ai-formatted h2,
+  .snapshot .ai-formatted h3,
+  .snapshot .ai-formatted h4 {
+    margin: 8px 0 0;
+    font-family: var(--serif);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .snapshot .ai-formatted h2 {
+    font-size: 20px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 5px;
+  }
+  .snapshot .ai-formatted h3 { font-size: 17px; color: var(--hug); }
+  .snapshot .ai-formatted h4 {
+    font-size: 15px;
+    font-family: var(--sans);
+    font-weight: 700;
+  }
+  .snapshot .ai-formatted p { margin: 0; }
+  .snapshot .ai-formatted ul,
+  .snapshot .ai-formatted ol {
+    margin: 0;
+    padding-left: 22px;
+  }
+  .snapshot .ai-formatted li { margin: 4px 0; }
+  .snapshot .ai-formatted code {
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 1px 5px;
+    font-size: 0.92em;
+  }
   .snapshot .msg.assistant .ans {
     font-family: var(--serif);
     font-weight: 500;
@@ -855,6 +893,51 @@
     transition: border-color .15s, color .15s;
   }
   .page-foot a:hover { color: var(--hug); border-bottom-color: var(--hug); }
+  .payment-setup {
+    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fffdf8;
+    color: var(--ink);
+    text-decoration: none;
+    box-shadow: 0 14px 34px -28px rgba(40, 25, 10, 0.24);
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+  }
+  .payment-setup:hover {
+    border-color: var(--hug-soft);
+    transform: translateY(-1px);
+    box-shadow: 0 18px 40px -30px rgba(40, 25, 10, 0.32);
+  }
+  .payment-setup .pay-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #635bff;
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    flex: 0 0 auto;
+  }
+  .payment-setup strong {
+    display: block;
+    font-size: 13px;
+    line-height: 1.2;
+  }
+  .payment-setup span:last-child {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-3);
+  }
 </style>
 <script src="hug-config.js"></script>
 <script src="hug-events.js" defer></script>
@@ -890,7 +973,7 @@
 
     <section>
       <h2>conversation</h2>
-      <p class="edit-instruction">click any AI reply to edit it &mdash; deletions show as <s class="struck">strikethrough</s>, additions as <ins class="correction">highlight</ins>.</p>
+      <p class="edit-instruction">click any AI reply to edit it &mdash; headings, bullets, paragraphs, and highlights stay intact.</p>
       <div class="import-row">
         <input type="url" id="convoUrl" placeholder="paste a link &mdash; chatgpt.com, claude.ai, gemini, meta&hellip;" />
         <button id="importBtn" type="button">Import</button>
@@ -902,7 +985,13 @@
     <section>
       <h2>cash back</h2>
       <div class="tier-info" id="tierInfo"></div>
-      <p class="edit-instruction"><a href="payment.html">Set up Stripe payouts</a> to receive approved cash back.</p>
+      <a class="payment-setup" href="payment.html">
+        <span class="pay-icon">S</span>
+        <span>
+          <strong>Set up payment method</strong>
+          <span>Receive approved cash back through Stripe</span>
+        </span>
+      </a>
     </section>
 
     <section>
@@ -1042,6 +1131,11 @@
       return '';
     }).join('');
   }
+  function readableText(el) {
+    return (el.innerText || el.textContent || '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
 
   /* ---------- click-to-edit lifecycle (in-place contenteditable) ---------- */
   function makeAssistantsEditable(root) {
@@ -1049,7 +1143,7 @@
       if (msg.dataset.editInit) return;
       msg.dataset.editInit = 'true';
       msg.dataset.originalHtml = msg.innerHTML.trim();
-      msg.dataset.originalText = msg.textContent.trim();
+      msg.dataset.originalText = readableText(msg);
       msg.addEventListener('click', () => {
         if (msg.classList.contains('editing')) return;
         enterEdit(msg);
@@ -1060,11 +1154,11 @@
   function enterEdit(msg) {
     if (msg.classList.contains('editing')) return;
 
-    const originalText = msg.dataset.originalText || msg.textContent.trim();
-    const seedText = msg.dataset.editedText || originalText;
+    const originalText = msg.dataset.originalText || readableText(msg);
+    const seedHtml = msg.dataset.editedHtml || msg.dataset.originalHtml || msg.innerHTML;
 
     msg.classList.add('editing');
-    msg.textContent = seedText;            // strip prior diff markup so user edits raw text
+    msg.innerHTML = seedHtml;
     msg.contentEditable = 'true';
     msg.focus();
     // place caret at end
@@ -1080,14 +1174,14 @@
     toolbar.innerHTML = `
       <button type="button" class="done">Done</button>
       <button type="button" class="cancel">Cancel</button>
-      <span class="hint">deletions appear struck, additions highlighted on Done</span>
+      <span class="hint">formatting stays intact on Done</span>
     `;
     msg.parentNode.insertBefore(toolbar, msg.nextSibling);
 
     // mousedown so the click commits before contenteditable loses focus mid-blur
     toolbar.querySelector('.done').addEventListener('mousedown', (e) => {
       e.preventDefault();
-      finishEdit(msg, toolbar, originalText, msg.textContent);
+      finishEdit(msg, toolbar, originalText, msg.innerHTML, readableText(msg));
     });
     toolbar.querySelector('.cancel').addEventListener('mousedown', (e) => {
       e.preventDefault();
@@ -1104,7 +1198,7 @@
     msg._escHandler = escHandler;
   }
 
-  function finishEdit(msg, toolbar, originalText, editedText) {
+  function finishEdit(msg, toolbar, originalText, editedHtml, editedText) {
     if (msg._escHandler) { msg.removeEventListener('keydown', msg._escHandler); delete msg._escHandler; }
     if (toolbar) toolbar.remove();
     msg.contentEditable = 'false';
@@ -1113,12 +1207,14 @@
     if (!editedText || editedText.trim() === originalText.trim()) {
       msg.classList.remove('edited');
       delete msg.dataset.editedText;
+      delete msg.dataset.editedHtml;
       msg.innerHTML = msg.dataset.originalHtml || msg.innerHTML;
     } else {
       const diff = diffWords(originalText, editedText);
-      msg.innerHTML = renderDiff(diff);
+      msg.innerHTML = editedHtml;
       msg.classList.add('edited');
       msg.dataset.editedText = editedText;
+      msg.dataset.editedHtml = editedHtml;
       if (window.hugEvent) {
         const allMsgs = Array.from(document.querySelectorAll('#snapshot .msg.assistant'));
         hugEvent('edit_committed', {
@@ -1138,8 +1234,8 @@
     msg.contentEditable = 'false';
     msg.classList.remove('editing');
     // Restore prior display: existing edits if any, else original HTML
-    if (msg.dataset.editedText) {
-      msg.innerHTML = renderDiff(diffWords(msg.dataset.originalText || '', msg.dataset.editedText));
+    if (msg.dataset.editedHtml) {
+      msg.innerHTML = msg.dataset.editedHtml;
     } else {
       msg.innerHTML = msg.dataset.originalHtml || msg.innerHTML;
     }

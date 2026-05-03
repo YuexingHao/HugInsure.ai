@@ -133,7 +133,7 @@
   .mode-tabs {
     display: flex;
     gap: 18px;
-    align-items: baseline;
+    align-items: center;
     border-bottom: 1px solid var(--line);
     margin-top: -8px;
     padding-bottom: 1px;
@@ -156,6 +156,35 @@
     color: var(--ink);
     border-bottom-color: var(--hug);
   }
+  .restart-chat {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    background: #fffdf8;
+    color: var(--ink-2);
+    border-radius: 999px;
+    padding: 7px 12px;
+    font: 500 11px var(--sans);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color .16s, color .16s, transform .16s, background .16s;
+  }
+  .restart-chat:hover {
+    border-color: var(--hug);
+    background: #fff7f2;
+    color: var(--hug);
+    transform: translateY(-1px);
+  }
+  .app[data-mode="examples"] .restart-chat,
+  .app[data-mode="import"] .restart-chat {
+    display: none;
+  }
+  .app[data-mode="chat"] .restart-chat {
+    display: inline-flex;
+  }
   /* Fast one-time cycling sweep on page load (visual hint that 3 modes exist) */
   .mode-tab.cycling {
     color: var(--ink);
@@ -163,7 +192,7 @@
   }
 
   /* ---------- Import chat panel ---------- */
-  .import-panel { display: none; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .import-panel { display: none; flex-direction: column; gap: 14px; margin-top: 4px; }
   .app[data-mode="import"] .import-panel { display: flex; }
   .app[data-mode="import"] .scenarios { display: none; }
   .app[data-mode="import"] .empty-hint { display: none; }
@@ -206,6 +235,27 @@
     opacity: 0;
     transform: translateY(-4px);
   }
+  .sample-callout {
+    display: grid;
+    gap: 8px;
+    align-items: start;
+    border: 1px solid rgba(159, 54, 40, 0.22);
+    border-radius: 14px;
+    background: #fff7f2;
+    padding: 14px;
+  }
+  .sample-callout .eyebrow {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    color: var(--hug);
+  }
+  .sample-callout .copy {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-2);
+  }
   .import-paste {
     width: 100%;
     min-height: 130px;
@@ -227,10 +277,9 @@
   }
   .import-paste::placeholder { color: var(--ink-3); font-style: italic; }
   .import-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    display: grid;
+    gap: 10px;
+    align-items: start;
   }
   .load-btn {
     background: var(--ink);
@@ -244,6 +293,103 @@
     transition: background .18s, transform .15s;
   }
   .load-btn:hover { background: var(--hug); transform: translateY(-1px); }
+  .sample-btn {
+    justify-self: start;
+    background: var(--hug);
+    padding-inline: 20px;
+  }
+  .sample-btn:hover { background: var(--ink); }
+  .source-picker {
+    display: grid;
+    gap: 6px;
+    margin-top: 2px;
+    position: relative;
+  }
+  .source-picker label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+  }
+  .ai-select {
+    position: relative;
+    width: min(100%, 280px);
+  }
+  .ai-select-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fffdf8;
+    color: var(--ink);
+    padding: 10px 12px;
+    font: 13px var(--sans);
+    cursor: pointer;
+    transition: border-color .16s, box-shadow .16s, transform .16s;
+  }
+  .ai-select-trigger:hover,
+  .ai-select.open .ai-select-trigger {
+    border-color: var(--hug);
+    box-shadow: 0 10px 26px -22px rgba(159, 54, 40, 0.55);
+  }
+  .ai-select-trigger:focus-visible {
+    outline: 2px solid rgba(159, 54, 40, 0.24);
+    outline-offset: 2px;
+  }
+  .ai-chevron {
+    width: 8px;
+    height: 8px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform .18s;
+    opacity: 0.65;
+  }
+  .ai-select.open .ai-chevron {
+    transform: rotate(225deg) translateY(-2px);
+  }
+  .ai-options {
+    position: absolute;
+    z-index: 8;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    max-height: 226px;
+    overflow-y: auto;
+    display: none;
+    padding: 6px;
+    border: 1px solid rgba(159, 54, 40, 0.20);
+    border-radius: 12px;
+    background: #fffdf8;
+    box-shadow: 0 24px 48px -34px rgba(40, 25, 10, 0.34);
+  }
+  .ai-select.open .ai-options {
+    display: grid;
+    gap: 3px;
+  }
+  .ai-options button {
+    width: 100%;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ink-2);
+    padding: 9px 10px;
+    text-align: left;
+    font: 13px var(--sans);
+    cursor: pointer;
+    transition: background .12s, color .12s, transform .12s;
+  }
+  .ai-options button:hover,
+  .ai-options button[aria-selected="true"] {
+    background: #fff2ed;
+    color: var(--hug);
+  }
+  .ai-options button:hover {
+    transform: translateX(2px);
+  }
   .import-hint {
     font-family: var(--serif);
     font-style: italic;
@@ -281,6 +427,14 @@
     letter-spacing: 0.22em;
     color: var(--hug-2);
     margin-bottom: 6px;
+  }
+  .llm-label {
+    display: inline-block;
+    margin-bottom: 7px;
+    font: 700 10px var(--sans);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--hug);
   }
 
   /* Empty-chat hint, shown only in chat mode with no messages */
@@ -372,6 +526,44 @@
     color: var(--ink);
   }
   .msg.assistant strong { font-weight: 600; }
+  .ai-formatted {
+    display: grid;
+    gap: 10px;
+  }
+  .ai-formatted h2,
+  .ai-formatted h3,
+  .ai-formatted h4 {
+    margin: 8px 0 0;
+    font-family: var(--serif);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .ai-formatted h2 {
+    font-size: 22px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 5px;
+  }
+  .ai-formatted h3 { font-size: 19px; color: var(--hug); }
+  .ai-formatted h4 {
+    font-size: 16px;
+    font-family: var(--sans);
+    font-weight: 700;
+  }
+  .ai-formatted p { margin: 0; }
+  .ai-formatted ul,
+  .ai-formatted ol {
+    margin: 0;
+    padding-left: 22px;
+  }
+  .ai-formatted li { margin: 5px 0; }
+  .ai-formatted code {
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 1px 5px;
+    font-size: 0.92em;
+  }
   .msg.assistant .ans {
     font-family: var(--serif);
     font-weight: 500;
@@ -475,6 +667,111 @@
     flex-direction: column;
     gap: 18px;
     padding-top: 36px;
+  }
+
+  .history-panel {
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 18px 40px -30px rgba(40, 25, 10, 0.16);
+  }
+  .history-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .history-head span {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+  }
+  .history-new {
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink-2);
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: border-color .18s, color .18s, transform .18s;
+  }
+  .history-new:hover {
+    border-color: var(--hug);
+    color: var(--hug);
+    transform: translateY(-1px);
+  }
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 240px;
+    overflow: auto;
+  }
+  .history-empty {
+    color: var(--ink-3);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    padding: 8px 2px 4px;
+  }
+  .history-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    border-radius: 10px;
+    padding: 8px 8px 8px 10px;
+    transition: border-color .18s, background .18s;
+  }
+  .history-item.active {
+    border-color: rgba(159, 54, 40, 0.35);
+    background: #fff7f2;
+  }
+  .history-open {
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+  }
+  .history-title {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    line-height: 1.25;
+  }
+  .history-meta {
+    display: block;
+    margin-top: 3px;
+    color: var(--ink-3);
+    font-size: 11px;
+  }
+  .history-delete {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ink-3);
+    cursor: pointer;
+    font-size: 17px;
+    line-height: 1;
+    transition: border-color .18s, color .18s, background .18s;
+  }
+  .history-delete:hover {
+    border-color: rgba(159, 54, 40, 0.25);
+    background: #fff2ed;
+    color: var(--hug);
   }
 
   /* ---------- Stakes bar (compact) ---------- */
@@ -797,6 +1094,7 @@
           <button class="mode-tab active" data-mode="chat" type="button">your chat</button>
           <button class="mode-tab" data-mode="examples" type="button">examples</button>
           <button class="mode-tab" data-mode="import" type="button">import chat</button>
+          <button class="restart-chat" id="restartChatBtn" type="button">Restart</button>
         </div>
         <nav class="scenarios" id="scenarios" aria-label="Sample scenarios">
           <button class="chip active" data-id="medicine">medicine</button>
@@ -804,17 +1102,42 @@
           <button class="chip" data-id="math">math</button>
         </nav>
         <div class="import-panel" id="importPanel">
-          <div class="import-sources">
-            <span class="label">paste from</span>
-            <span class="src-rotator" id="srcRotator">ChatGPT</span>
-            <span class="tail">&mdash; or any other LLM</span>
+          <div class="sample-callout">
+            <span class="eyebrow">Try me</span>
+            <span class="copy">Load a real exported chat and watch it split into user prompts and AI responses.</span>
+            <button class="load-btn sample-btn" id="sampleData" type="button">Sample Chat</button>
           </div>
           <textarea class="import-paste" id="importText"
-            placeholder="Paste a conversation here&#10;&#10;User: ...&#10;Assistant: ...&#10;&#10;We'll parse it into turns and ask Claude to review."></textarea>
+            placeholder="Paste a conversation here&#10;&#10;User: ...&#10;Assistant: ...&#10;&#10;We'll separate user prompts from AI responses for a claim-ready record."></textarea>
           <div class="import-actions">
             <button class="load-btn" id="loadImport" type="button">Load chat &rarr;</button>
-            <button class="load-btn sample-btn" id="sampleData" type="button">Sample Data</button>
-            <span class="import-hint" id="importHint">Detects role markers (User / Assistant / ChatGPT / Claude / Gemini&hellip;).</span>
+            <span class="import-hint" id="importHint">Choose the AI source, then load the chat as claim evidence.</span>
+          </div>
+          <div class="source-picker">
+            <label id="sourceAILabel">Which AI made the responses?</label>
+            <div class="ai-select" id="aiSelect">
+              <button class="ai-select-trigger" id="sourceAIButton" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="sourceAILabel sourceAIValue">
+                <span id="sourceAIValue">Claude Opus 4.6</span>
+                <span class="ai-chevron" aria-hidden="true"></span>
+              </button>
+              <div class="ai-options" id="sourceAIOptions" role="listbox" aria-labelledby="sourceAILabel">
+                <button type="button" role="option" data-value="Claude Opus 4.6" aria-selected="true">Claude Opus 4.6</button>
+                <button type="button" role="option" data-value="ChatGPT" aria-selected="false">ChatGPT</button>
+                <button type="button" role="option" data-value="Claude" aria-selected="false">Claude</button>
+                <button type="button" role="option" data-value="Gemini" aria-selected="false">Gemini</button>
+                <button type="button" role="option" data-value="Grok" aria-selected="false">Grok</button>
+                <button type="button" role="option" data-value="DeepSeek" aria-selected="false">DeepSeek</button>
+                <button type="button" role="option" data-value="Perplexity" aria-selected="false">Perplexity</button>
+                <button type="button" role="option" data-value="Copilot" aria-selected="false">Copilot</button>
+                <button type="button" role="option" data-value="Mistral" aria-selected="false">Mistral</button>
+                <button type="button" role="option" data-value="Llama" aria-selected="false">Llama</button>
+                <button type="button" role="option" data-value="Qwen" aria-selected="false">Qwen</button>
+                <button type="button" role="option" data-value="Kimi" aria-selected="false">Kimi</button>
+                <button type="button" role="option" data-value="Meta AI" aria-selected="false">Meta AI</button>
+                <button type="button" role="option" data-value="Other AI" aria-selected="false">Other AI</button>
+              </div>
+            </div>
+            <input type="hidden" id="sourceAI" value="Claude Opus 4.6" />
           </div>
         </div>
         <div class="empty-hint" id="emptyHint">
@@ -846,6 +1169,14 @@
     </div>
 
     <aside class="bet-panel" aria-label="Stakes and compensation">
+      <div class="history-panel" aria-label="Saved conversations">
+        <div class="history-head">
+          <span>conversations</span>
+          <button class="history-new" id="newChatBtn" type="button">new</button>
+        </div>
+        <div class="history-list" id="historyList"></div>
+      </div>
+
       <div class="risk" id="risk" data-band="mid">
         <div class="head">
           <span>stakes</span>
@@ -902,6 +1233,9 @@
   const voiceBtn    = document.getElementById('voiceBtn');
   const imageInput  = document.getElementById('imageInput');
   const preview     = document.getElementById('preview');
+  const historyList = document.getElementById('historyList');
+  const newChatBtn  = document.getElementById('newChatBtn');
+  const restartChatBtn = document.getElementById('restartChatBtn');
   const HUG_API_BASE = (window.HUG_API_BASE || '').replace(/\/+$/, '');
   const hugApiUrl = (path) => `${HUG_API_BASE}${path}`;
 
@@ -1185,6 +1519,210 @@
     if (resetBounty) setPayout(payoutFor(0));
   }
 
+  /* ---------- saved conversations ---------- */
+  const CHAT_STORE_KEY = 'hug:chat_conversations';
+  const ACTIVE_CHAT_KEY = 'hug:active_chat_id';
+  const MAX_SAVED_CHATS = 20;
+  let activeChatId = null;
+  let _saveTimer = null;
+
+  function makeChatId() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return `chat-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  function readChatStore() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(CHAT_STORE_KEY) || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.warn('saved chat read failed:', e);
+      return [];
+    }
+  }
+
+  function writeChatStore(items) {
+    try {
+      localStorage.setItem(CHAT_STORE_KEY, JSON.stringify(items));
+    } catch (e) {
+      console.warn('saved chat write failed:', e);
+    }
+  }
+
+  function getActiveMessageCount() {
+    return convo.querySelectorAll('.msg.user, .msg.assistant').length;
+  }
+
+  function getConversationTitle() {
+    const firstUser = convo.querySelector('.msg.user .msg-text') || convo.querySelector('.msg.user');
+    const text = (firstUser ? firstUser.textContent : '').replace(/\s+/g, ' ').trim();
+    if (!text) return 'Untitled chat';
+    return text.length > 56 ? `${text.slice(0, 53)}...` : text;
+  }
+
+  function safeConversationHtml() {
+    const clone = convo.cloneNode(true);
+    clone.querySelectorAll('[data-raw-response]').forEach((el) => {
+      delete el.dataset.rawResponse;
+    });
+    clone.querySelectorAll('img.attached-img').forEach((img) => {
+      img.removeAttribute('src');
+      img.alt = img.alt || 'attached image';
+    });
+    return clone.innerHTML;
+  }
+
+  function currentChatSnapshot() {
+    const count = getActiveMessageCount();
+    if (!count) return null;
+    if (!activeChatId) activeChatId = makeChatId();
+    return {
+      id: activeChatId,
+      title: getConversationTitle(),
+      updatedAt: new Date().toISOString(),
+      conversationHtml: safeConversationHtml(),
+      payout: parseInt(payoutAmount.textContent, 10) || 0,
+      verdict: (riskVerdict.textContent || '').trim(),
+      reason: (promiseSub.textContent || '').trim(),
+      band: riskEl.dataset.band || 'mid',
+      messageCount: count,
+    };
+  }
+
+  function saveActiveConversationNow() {
+    const snapshot = currentChatSnapshot();
+    if (!snapshot) return;
+    const items = readChatStore().filter(item => item && item.id !== snapshot.id);
+    items.unshift(snapshot);
+    writeChatStore(items.slice(0, MAX_SAVED_CHATS));
+    try { localStorage.setItem(ACTIVE_CHAT_KEY, snapshot.id); } catch (e) {}
+    renderHistoryList();
+  }
+
+  function queueConversationSave() {
+    if (_saveTimer) clearTimeout(_saveTimer);
+    _saveTimer = setTimeout(() => {
+      _saveTimer = null;
+      saveActiveConversationNow();
+    }, 250);
+  }
+
+  function setSavedScore(item) {
+    const score = item && item.payout ? Math.max(0, Math.min(10, Number(item.payout) / 2.7)) : 0;
+    renderScore(score, item && item.reason ? item.reason : 'saved conversation.');
+    if (item && item.verdict) riskVerdict.textContent = item.verdict;
+    if (item && item.band) riskEl.dataset.band = item.band;
+    if (item && item.payout) payoutAmount.textContent = item.payout;
+  }
+
+  function renderHistoryList() {
+    if (!historyList) return;
+    const items = readChatStore();
+    historyList.innerHTML = '';
+    if (!items.length) {
+      const empty = document.createElement('div');
+      empty.className = 'history-empty';
+      empty.textContent = 'No saved chats yet.';
+      historyList.appendChild(empty);
+      return;
+    }
+    items.forEach((item) => {
+      const row = document.createElement('div');
+      row.className = `history-item${item.id === activeChatId ? ' active' : ''}`;
+      row.dataset.id = item.id;
+
+      const open = document.createElement('button');
+      open.type = 'button';
+      open.className = 'history-open';
+      open.dataset.action = 'open';
+
+      const title = document.createElement('span');
+      title.className = 'history-title';
+      title.textContent = item.title || 'Untitled chat';
+
+      const meta = document.createElement('span');
+      meta.className = 'history-meta';
+      const date = item.updatedAt ? new Date(item.updatedAt) : null;
+      const when = date && !Number.isNaN(date.getTime()) ? date.toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'saved';
+      meta.textContent = `${item.messageCount || 0} turns · ${when}`;
+
+      open.appendChild(title);
+      open.appendChild(meta);
+
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'history-delete';
+      del.dataset.action = 'delete';
+      del.setAttribute('aria-label', `Delete ${item.title || 'saved chat'}`);
+      del.textContent = '×';
+
+      row.appendChild(open);
+      row.appendChild(del);
+      historyList.appendChild(row);
+    });
+  }
+
+  function loadSavedConversation(id) {
+    const item = readChatStore().find(chat => chat && chat.id === id);
+    if (!item) return;
+    activeChatId = item.id;
+    try { localStorage.setItem(ACTIVE_CHAT_KEY, activeChatId); } catch (e) {}
+    convo.innerHTML = item.conversationHtml || '';
+    userImages.clear();
+    setSavedScore(item);
+    renderHistoryList();
+    stopLLMRotator();
+  }
+
+  function startNewConversation() {
+    saveActiveConversationNow();
+    activeChatId = makeChatId();
+    try { localStorage.setItem(ACTIVE_CHAT_KEY, activeChatId); } catch (e) {}
+    convo.innerHTML = '';
+    userImages.clear();
+    resetScore('ask a question to size the bounty.');
+    renderHistoryList();
+    stopLLMRotator();
+  }
+
+  function initChatPersistence() {
+    try { activeChatId = localStorage.getItem(ACTIVE_CHAT_KEY) || null; } catch (e) {}
+    const items = readChatStore();
+    if (activeChatId && items.some(item => item && item.id === activeChatId)) {
+      loadSavedConversation(activeChatId);
+    } else {
+      activeChatId = makeChatId();
+      renderHistoryList();
+    }
+  }
+
+  if (historyList) {
+    historyList.addEventListener('click', (e) => {
+      const row = e.target.closest('.history-item');
+      const action = e.target.closest('[data-action]');
+      if (!row || !action) return;
+      const id = row.dataset.id;
+      if (action.dataset.action === 'open') {
+        saveActiveConversationNow();
+        loadSavedConversation(id);
+      } else if (action.dataset.action === 'delete') {
+        const items = readChatStore().filter(item => item && item.id !== id);
+        writeChatStore(items);
+        if (id === activeChatId) {
+          activeChatId = makeChatId();
+          convo.innerHTML = '';
+          userImages.clear();
+          resetScore('ask a question to size the bounty.');
+          try { localStorage.setItem(ACTIVE_CHAT_KEY, activeChatId); } catch (err) {}
+        }
+        renderHistoryList();
+      }
+    });
+  }
+  if (newChatBtn) newChatBtn.addEventListener('click', startNewConversation);
+  if (restartChatBtn) restartChatBtn.addEventListener('click', startNewConversation);
+  window.addEventListener('beforeunload', saveActiveConversationNow);
+
   function renderConvo(id) {
     convo.innerHTML = '';
     SCENARIOS[id].forEach((t, i) => {
@@ -1241,6 +1779,99 @@
   /* ---------- composer ---------- */
   ta.addEventListener('input', resizeComposerText);
 
+  function escapeHtml(raw) {
+    return String(raw || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatInlineMarkdown(raw) {
+    return restoreAllowedInlineTags(escapeHtml(raw))
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  }
+
+  function restoreAllowedInlineTags(html) {
+    return String(html || '')
+      .replace(/&lt;(\/?)strong&gt;/gi, '<$1strong>')
+      .replace(/&lt;(\/?)em&gt;/gi, '<$1em>')
+      .replace(/&lt;br\s*\/?&gt;/gi, '<br>')
+      .replace(/&lt;span\s+class=&quot;ans&quot;&gt;/gi, '<span class="ans">')
+      .replace(/&lt;span\s+class=&#39;ans&#39;&gt;/gi, '<span class="ans">')
+      .replace(/&lt;span\s+class=ans&gt;/gi, '<span class="ans">')
+      .replace(/&lt;\/span&gt;/gi, '</span>');
+  }
+
+  function formatAIResponse(raw, opts = {}) {
+    const lines = String(raw || '').replace(/\r\n/g, '\n').split('\n');
+    const html = [];
+    let paragraph = [];
+    let listType = null;
+
+    const closeList = () => {
+      if (listType) {
+        html.push(`</${listType}>`);
+        listType = null;
+      }
+    };
+    const flushParagraph = () => {
+      if (!paragraph.length) return;
+      html.push(`<p>${formatInlineMarkdown(paragraph.join(' '))}</p>`);
+      paragraph = [];
+    };
+    const openList = (type) => {
+      if (listType !== type) {
+        closeList();
+        html.push(`<${type}>`);
+        listType = type;
+      }
+    };
+
+    lines.forEach((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        flushParagraph();
+        closeList();
+        return;
+      }
+
+      const heading = trimmed.match(/^(#{1,3})\s+(.+)$/);
+      if (heading) {
+        flushParagraph();
+        closeList();
+        const level = heading[1].length + 1;
+        html.push(`<h${level}>${formatInlineMarkdown(heading[2])}</h${level}>`);
+        return;
+      }
+
+      const bullet = trimmed.match(/^[-*]\s+(.+)$/);
+      if (bullet) {
+        flushParagraph();
+        openList('ul');
+        html.push(`<li>${formatInlineMarkdown(bullet[1])}</li>`);
+        return;
+      }
+
+      const numbered = trimmed.match(/^\d+[.)]\s+(.+)$/);
+      if (numbered) {
+        flushParagraph();
+        openList('ol');
+        html.push(`<li>${formatInlineMarkdown(numbered[1])}</li>`);
+        return;
+      }
+
+      closeList();
+      paragraph.push(trimmed);
+    });
+
+    flushParagraph();
+    closeList();
+    return `<div class="ai-formatted">${html.join('')}${opts.cursor ? '<span class="cursor"></span>' : ''}</div>`;
+  }
+
   function buildHistory() {
     const turns = [];
     for (const el of convo.querySelectorAll('.msg')) {
@@ -1262,7 +1893,7 @@
       } else {
         const clone = el.cloneNode(true);
         clone.querySelectorAll('.coverage').forEach(c => c.remove());
-        content = clone.innerHTML.trim();
+        content = el.dataset.rawResponse || clone.textContent.trim();
       }
       if (!content || (Array.isArray(content) && content.length === 0)) continue;
       // Merge consecutive same-role *text-only* turns (scenarios sometimes leave a trailing user line).
@@ -1305,6 +1936,7 @@
     resizeComposerText();
     pendingImage = null;
     showPreview();
+    queueConversationSave();
 
     const history = buildHistory();
 
@@ -1334,6 +1966,7 @@
       if (!resp.ok) {
         const errBody = await resp.text();
         aEl.innerHTML = `<em>error: ${errBody.replace(/</g, '&lt;')}</em>`;
+        queueConversationSave();
         return;
       }
 
@@ -1356,27 +1989,33 @@
 
           if (data.text) {
             text += data.text;
-            aEl.innerHTML = text + '<span class="cursor"></span>';
+            aEl.dataset.rawResponse = text;
+            aEl.innerHTML = formatAIResponse(text, { cursor: true });
             aEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
           }
           if (data.done) {
-            aEl.innerHTML = text;
+            aEl.dataset.rawResponse = text;
+            aEl.innerHTML = formatAIResponse(text);
             if (data.usage) {
               const tag = data.usage.cache_read > 0 ? '✓ cache hit' : '— no cache hit';
               console.log('[hug]', data.usage, tag);
             }
+            queueConversationSave();
           }
           if (data.score != null) {
             renderScore(data.score, data.reason);
+            queueConversationSave();
           }
           if (data.error) {
             aEl.innerHTML = `<em>error: ${String(data.error).replace(/</g, '&lt;')}</em>`;
             resetScore('rating unavailable.');
+            queueConversationSave();
           }
         }
       }
     } catch (e) {
       aEl.innerHTML = `<em>connection error: ${e.message}</em>`;
+      queueConversationSave();
     }
   }
 
@@ -1433,10 +2072,10 @@
     });
 
     if (mode === 'chat') {
-      // Clean canvas — user starts a fresh conversation; stakes reset.
-      convo.innerHTML = '';
       userImages.clear();
-      resetScore('ask a question to size the bounty.');
+      const savedActive = activeChatId && readChatStore().some(item => item && item.id === activeChatId);
+      if (savedActive) loadSavedConversation(activeChatId);
+      else if (!convo.querySelector('.msg')) resetScore('ask a question to size the bounty.');
       stopLLMRotator();
     } else if (mode === 'examples') {
       const activeChip = document.querySelector('.chip.active') || document.querySelector('.chip');
@@ -1461,8 +2100,13 @@
   const sampleData = document.getElementById('sampleData');
   const importHint = document.getElementById('importHint');
   const srcRotator = document.getElementById('srcRotator');
+  const sourceAI = document.getElementById('sourceAI');
+  const aiSelect = document.getElementById('aiSelect');
+  const sourceAIButton = document.getElementById('sourceAIButton');
+  const sourceAIValue = document.getElementById('sourceAIValue');
+  const sourceAIOptions = document.getElementById('sourceAIOptions');
 
-  const DEFAULT_HINT = 'Detects role markers (User / Assistant / ChatGPT / Claude / Gemini&hellip;).';
+  const DEFAULT_HINT = 'Choose the AI source, then load the chat as claim evidence.';
   const SAMPLE_DATA_URL = 'data/RAG%20Faithfulness%20Measurement%20Methods.json';
 
   // Name rotator above the paste box. Communicates "any LLM works."
@@ -1490,7 +2134,7 @@
 
   // Universal role-marker regex — covers virtually any LLM transcript.
   // Captured group 1 is the original marker text (used to label turns in the review prompt).
-  const ROLE_MARKER_RE = /^[ \t]*(User|You|Me|Human|H|ChatGPT|GPT-?\d?o?|GPT|Assistant|A|Claude|Gemini|Bard|Grok|DeepSeek|Perplexity|Copilot|Mistral|Llama|Qwen|Kimi|Pi|Yi|Character(?:\.AI)?|Replika|Meta\s*AI|Meta|Model|AI|Bot|System)\s*:\s*/gim;
+  const ROLE_MARKER_RE = /^[ \t]*(User|You|Me|Human|H|Assistant|A|System|(?:ChatGPT|GPT-?\d?o?|GPT|Claude|Gemini|Bard|Grok|DeepSeek|Perplexity|Copilot|Mistral|Llama|Qwen|Kimi|Pi|Yi|Character(?:\.AI)?|Replika|Meta\s*AI|Meta|Model|AI|Bot)(?:\s+[A-Za-z0-9._-]+)*)\s*:\s*/gim;
   const USER_TAGS = new Set(['user', 'you', 'me', 'human', 'h']);
 
   function parseImported(raw) {
@@ -1565,6 +2209,99 @@
     return lines.join('\n\n');
   }
 
+  function inferExportAI(data) {
+    const counts = {};
+    const visit = (nodes) => {
+      if (!Array.isArray(nodes)) return;
+      nodes.forEach((msg) => {
+        const sender = String(msg && msg.sender || '').trim();
+        const isUser = msg && (msg.isCreatedByUser === true || /^user$/i.test(sender));
+        if (sender && !isUser) counts[sender] = (counts[sender] || 0) + 1;
+        visit(msg && msg.children);
+      });
+    };
+    visit(data && data.messages);
+    return Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0] || '';
+  }
+
+  function setSourceAI(name) {
+    if (!sourceAI || !name) return;
+    let option = sourceAIOptions
+      ? Array.from(sourceAIOptions.querySelectorAll('[role="option"]')).find(opt => opt.dataset.value === name)
+      : null;
+    if (!option && sourceAIOptions) {
+      option = document.createElement('button');
+      option.type = 'button';
+      option.setAttribute('role', 'option');
+      option.dataset.value = name;
+      option.textContent = name;
+      sourceAIOptions.insertBefore(option, sourceAIOptions.firstChild);
+    }
+    sourceAI.value = name;
+    if (sourceAIValue) sourceAIValue.textContent = name;
+    if (sourceAIOptions) {
+      sourceAIOptions.querySelectorAll('[role="option"]').forEach(opt => {
+        opt.setAttribute('aria-selected', opt.dataset.value === name ? 'true' : 'false');
+      });
+    }
+  }
+
+  function setAISelectOpen(open) {
+    if (!aiSelect || !sourceAIButton) return;
+    aiSelect.classList.toggle('open', open);
+    sourceAIButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open && sourceAIOptions) {
+      const selected = sourceAIOptions.querySelector('[aria-selected="true"]');
+      if (selected) selected.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  if (sourceAIButton && sourceAIOptions) {
+    sourceAIButton.addEventListener('click', () => {
+      setAISelectOpen(!aiSelect.classList.contains('open'));
+    });
+    sourceAIOptions.addEventListener('click', (e) => {
+      const opt = e.target.closest('[role="option"]');
+      if (!opt) return;
+      setSourceAI(opt.dataset.value || opt.textContent.trim());
+      setAISelectOpen(false);
+      sourceAIButton.focus();
+    });
+    sourceAIButton.addEventListener('keydown', (e) => {
+      if (!['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) return;
+      e.preventDefault();
+      setAISelectOpen(true);
+      const selected = sourceAIOptions.querySelector('[aria-selected="true"]') || sourceAIOptions.querySelector('[role="option"]');
+      if (selected) selected.focus();
+    });
+    sourceAIOptions.addEventListener('keydown', (e) => {
+      const options = Array.from(sourceAIOptions.querySelectorAll('[role="option"]'));
+      const idx = options.indexOf(document.activeElement);
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setAISelectOpen(false);
+        sourceAIButton.focus();
+      } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const next = e.key === 'ArrowDown'
+          ? Math.min(options.length - 1, idx + 1)
+          : Math.max(0, idx - 1);
+        if (options[next]) options[next].focus();
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const opt = document.activeElement && document.activeElement.closest('[role="option"]');
+        if (opt) {
+          setSourceAI(opt.dataset.value || opt.textContent.trim());
+          setAISelectOpen(false);
+          sourceAIButton.focus();
+        }
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (aiSelect && !aiSelect.contains(e.target)) setAISelectOpen(false);
+    });
+  }
+
   async function loadSampleData() {
     if (!sampleData) return;
     const original = sampleData.textContent;
@@ -1576,11 +2313,11 @@
       const data = await resp.json();
       const transcript = transcriptFromExport(data);
       if (!transcript) throw new Error('No chat turns found in sample export');
+      const inferredAI = inferExportAI(data) || 'Claude Opus 4.6';
+      setSourceAI(inferredAI);
       importText.value = transcript;
       importText.dispatchEvent(new Event('input', { bubbles: true }));
-      importHint.classList.remove('is-url-nudge');
-      importHint.innerHTML = 'Sample Data loaded &mdash; click <em>Load chat</em> to review it.';
-      importText.focus();
+      loadImportedTranscript(transcript, { sourceName: inferredAI, sampleTitle: data.title || 'Sample Chat' });
       if (window.hugEvent) hugEvent('sample_import_loaded', {
         title: data.title || null,
         chars: transcript.length,
@@ -1598,7 +2335,7 @@
   if (sampleData) sampleData.addEventListener('click', loadSampleData);
 
   // ---- Long-import trimming: keep first/last turns; mark the elided middle.
-  // Roughly 80K chars ≈ 20K tokens, leaves headroom for the review prompt + reply.
+  // Roughly 80K chars ≈ 20K tokens, enough for a readable evidence preview.
   const MAX_TRANSCRIPT_CHARS = 80000;
   function trimToContext(turns, budget) {
     let total = 0;
@@ -1631,167 +2368,84 @@
     }
     const elided = rightStart - leftEnd;
     if (elided <= 0) return { kept: turns, elided: 0 };
-    const marker = { role: 'elided', text: `[${elided} turn${elided === 1 ? '' : 's'} omitted to fit Claude’s context]` };
+    const marker = { role: 'elided', text: `[${elided} turn${elided === 1 ? '' : 's'} omitted to keep the evidence preview readable]` };
     return { kept: [...turns.slice(0, leftEnd), marker, ...turns.slice(rightStart)], elided };
   }
 
-  // ---- Claude review of the imported transcript ----
-  // Builds a labelled transcript using the markers found in the paste itself
-  // (so "Gemini Response:" stays "Gemini Response:") and asks Claude to flag
-  // factual errors. The existing /chat scoring path drives the bounty.
-  function inferAssistantLabel(kept) {
-    const counts = {};
-    for (const t of kept) {
-      if (t.role !== 'assistant' || !t.marker) continue;
-      counts[t.marker] = (counts[t.marker] || 0) + 1;
+  function renderImportedTurn(turn, i, sourceName) {
+    const el = document.createElement('div');
+    if (turn.role === 'elided') {
+      el.className = 'msg-elided';
+      el.textContent = turn.text;
+    } else {
+      el.className = `msg ${turn.role}`;
+      if (turn.role === 'user') {
+        const tx = document.createElement('div');
+        tx.className = 'msg-text';
+        tx.textContent = turn.text;
+        el.appendChild(tx);
+      } else {
+        const label = document.createElement('span');
+        label.className = 'llm-label';
+        label.textContent = `${sourceName || turn.marker || 'AI'} response`;
+        const body = document.createElement('div');
+        body.innerHTML = formatAIResponse(turn.text);
+        el.dataset.rawResponse = turn.text;
+        el.appendChild(label);
+        el.appendChild(body);
+      }
     }
-    let best = null, bestN = 0;
-    for (const k of Object.keys(counts)) {
-      if (counts[k] > bestN) { best = k; bestN = counts[k]; }
-    }
-    return best || 'AI';
+    el.style.animationDelay = `${0.04 + i * 0.04}s`;
+    convo.appendChild(el);
   }
 
-  async function analyzeImport(kept) {
-    const assistantLabel = inferAssistantLabel(kept);
-
-    const transcript = kept.map(t => {
-      if (t.role === 'elided') return t.text;
-      const label = t.role === 'user'
-        ? 'User Query'
-        : `${(t.marker || assistantLabel)} Response`;
-      return `${label}:\n${t.text}`;
-    }).join('\n\n');
-
-    const prompt =
-      `Below is a conversation the user had with ${assistantLabel}. Review each ${assistantLabel} ` +
-      `response for factual accuracy. Call out any incorrect claims and state what's actually ` +
-      `correct. Conclude with a one-line verdict on whether the user can rely on this conversation.\n\n` +
-      `---\n${transcript}\n---`;
-
-    resetScore('reviewing the imported chat&hellip;', { resetBounty: false });
-
-    const aEl = document.createElement('div');
-    aEl.className = 'msg assistant import-review';
-    aEl.innerHTML = '<span class="review-tag">Claude review</span><br><span class="cursor"></span>';
-    aEl.style.animation = 'rise 0.4s forwards';
-    convo.appendChild(aEl);
-    aEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
-
-    let text = '';
-    try {
-      const resp = await fetch(hugApiUrl('/chat'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [{ role: 'user', content: prompt }],
-          session_id: window.HUG_SESSION_ID || null,
-        }),
-      });
-      if (!resp.ok) {
-        const err = await resp.text();
-        aEl.innerHTML = `<span class="review-tag">Claude review</span><br><em>analysis unavailable: ${err.replace(/</g, '&lt;')}</em>`;
-        resetScore('rating unavailable.');
-        return;
-      }
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        let idx;
-        while ((idx = buffer.indexOf('\n\n')) !== -1) {
-          const event = buffer.slice(0, idx);
-          buffer = buffer.slice(idx + 2);
-          if (!event.startsWith('data: ')) continue;
-          let data;
-          try { data = JSON.parse(event.slice(6)); } catch { continue; }
-
-          if (data.text) {
-            text += data.text;
-            aEl.innerHTML = '<span class="review-tag">Claude review</span><br>' + text + '<span class="cursor"></span>';
-            aEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
-          }
-          if (data.done) {
-            aEl.innerHTML = '<span class="review-tag">Claude review</span><br>' + text;
-          }
-          if (data.score != null) renderScore(data.score, data.reason);
-          if (data.error) {
-            aEl.innerHTML = `<span class="review-tag">Claude review</span><br><em>error: ${String(data.error).replace(/</g, '&lt;')}</em>`;
-            resetScore('rating unavailable.');
-          }
-        }
-      }
-    } catch (e) {
-      aEl.innerHTML = `<span class="review-tag">Claude review</span><br><em>connection error: ${e.message}</em>`;
-    }
-
-    if (window.hugEvent) hugEvent('import_analysis_done', {
-      assistant_label: assistantLabel,
-      transcript_chars: transcript.length,
-      review_chars: text.length,
-    });
-  }
-
-  loadImport.addEventListener('click', () => {
-    const raw = importText.value;
+  function loadImportedTranscript(raw, opts = {}) {
     const trimmedRaw = raw.trim();
     // Don't try to parse a bare share URL — re-show the nudge and bail.
     if (SHARE_URL_RE.test(trimmedRaw)) {
       importHint.classList.add('is-url-nudge');
       importHint.innerHTML = 'That&rsquo;s a share link &mdash; <em>open it, &#8984;A on the conversation, then paste the text back here</em>.';
       importText.focus();
-      return;
+      return false;
     }
     const turns = parseImported(raw);
     if (turns.length === 0) {
       importHint.classList.remove('is-url-nudge');
       importHint.innerHTML = 'Nothing to load &mdash; paste a chat first.';
       importText.focus();
-      return;
+      return false;
     }
 
     const { kept, elided } = trimToContext(turns, MAX_TRANSCRIPT_CHARS);
 
-    // Clean canvas, then render kept turns (incl. elided marker).
+    const sourceName = opts.sourceName || (sourceAI ? sourceAI.value : 'AI');
+
+    // Clean canvas, then render kept turns (incl. elided marker) as claim-ready evidence.
     switchMode('chat');
-    kept.forEach((turn, i) => {
-      const el = document.createElement('div');
-      if (turn.role === 'elided') {
-        el.className = 'msg-elided';
-        el.textContent = turn.text;
-        el.style.animationDelay = `${0.04 + i * 0.04}s`;
-      } else {
-        el.className = `msg ${turn.role}`;
-        if (turn.role === 'user') {
-          const tx = document.createElement('div');
-          tx.className = 'msg-text';
-          tx.textContent = turn.text;
-          el.appendChild(tx);
-        } else {
-          el.textContent = turn.text;
-        }
-        el.style.animationDelay = `${0.04 + i * 0.04}s`;
-      }
-      convo.appendChild(el);
-    });
+    startNewConversation();
+    kept.forEach((turn, i) => renderImportedTurn(turn, i, sourceName));
 
     if (window.hugEvent) hugEvent('chat_imported', {
       turn_count: turns.length,
       kept_count: turns.length - elided,
       elided_count: elided,
       raw_chars: raw.length,
+      source_ai: sourceName,
+      sample_title: opts.sampleTitle || null,
     });
 
     importText.value = '';
     importHint.classList.remove('is-url-nudge');
     importHint.innerHTML = elided > 0
-      ? `Loaded ${turns.length - elided} of ${turns.length} turns &mdash; ${elided} elided. Asking Claude to review&hellip;`
-      : `Loaded ${turns.length} turn${turns.length === 1 ? '' : 's'} &mdash; asking Claude to review&hellip;`;
+      ? `Loaded ${turns.length - elided} of ${turns.length} turns &mdash; ${elided} elided. Ready to submit a claim.`
+      : `Loaded ${turns.length} turn${turns.length === 1 ? '' : 's'} from ${sourceName} &mdash; ready to submit a claim.`;
+    renderScore(6, `${sourceName} chat loaded as claim evidence; submit the exact error on the claim page.`);
+    queueConversationSave();
+    return true;
+  }
 
-    analyzeImport(kept);
+  loadImport.addEventListener('click', () => {
+    loadImportedTranscript(importText.value);
   });
 
   /* ---------- one-time fast cycling sweep on first load ----------
@@ -1816,7 +2470,8 @@
 
   /* ---------- init: open on an empty real chat ---------- */
   appEl.dataset.mode = 'chat';
-  resetScore('ask a question to size the bounty.');
+  initChatPersistence();
+  if (!convo.querySelector('.msg')) resetScore('ask a question to size the bounty.');
 
   try {
     if (!sessionStorage.getItem('hug:cycled')) {
