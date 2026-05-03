@@ -12,6 +12,11 @@
   const SESSION_KEY  = 'hug:session_id';
   const BUFFER_KEY   = 'hug:events';
   const BUFFER_LIMIT = 500;
+  const API_BASE = (window.HUG_API_BASE || '').replace(/\/+$/, '');
+
+  function apiUrl(path) {
+    return `${API_BASE}${path}`;
+  }
 
   function uuid() {
     if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -60,7 +65,7 @@
     refreshCounts();
     try {
       // best-effort POST — silently fails on static hosts (GitHub Pages, file://)
-      await fetch('/event', {
+      await fetch(apiUrl('/event'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(record),

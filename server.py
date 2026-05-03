@@ -30,6 +30,7 @@ from typing import Any, Optional, Union
 import anthropic
 from anthropic import AsyncAnthropicFoundry
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -105,6 +106,22 @@ Respond with ONLY a valid JSON object on a single line, no prose, no code fences
 {"score": <integer 0-10>, "reason": "<one short clause, <=14 words, why these stakes>"}"""
 
 app = FastAPI()
+
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        "ALLOWED_ORIGINS",
+        "https://yuexinghao.github.io,http://127.0.0.1:8000,http://localhost:8000",
+    ).split(",")
+    if origin.strip()
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
+)
+
 client = AsyncAnthropicFoundry(
     api_key=os.environ.get("ANTHROPIC_API_KEY"),
     base_url=ENDPOINT,

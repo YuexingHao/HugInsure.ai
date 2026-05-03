@@ -760,6 +760,7 @@
     .tag { display: none; }
   }
 </style>
+<script src="hug-config.js"></script>
 <script src="hug-events.js" defer></script>
 </head>
 <body>
@@ -881,6 +882,8 @@
   const attachBtn   = document.getElementById('attachBtn');
   const imageInput  = document.getElementById('imageInput');
   const preview     = document.getElementById('preview');
+  const HUG_API_BASE = (window.HUG_API_BASE || '').replace(/\/+$/, '');
+  const hugApiUrl = (path) => `${HUG_API_BASE}${path}`;
 
   /* ---------- multimodal image attachment ---------- */
   let pendingImage = null;       // {dataUrl, base64, mediaType, fileName}
@@ -1233,7 +1236,7 @@
     // 3. Stream from /chat
     let text = '';
     try {
-      const resp = await fetch('/chat', {
+      const resp = await fetch(hugApiUrl('/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: history, session_id: window.HUG_SESSION_ID || null })
@@ -1520,7 +1523,7 @@
 
     let text = '';
     try {
-      const resp = await fetch('/chat', {
+      const resp = await fetch(hugApiUrl('/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

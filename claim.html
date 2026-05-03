@@ -820,6 +820,7 @@
   }
   .page-foot a:hover { color: var(--hug); border-bottom-color: var(--hug); }
 </style>
+<script src="hug-config.js"></script>
 <script src="hug-events.js" defer></script>
 </head>
 <body>
@@ -900,6 +901,8 @@
 
 <script>
   const main = document.getElementById('main');
+  const HUG_API_BASE = (window.HUG_API_BASE || '').replace(/\/+$/, '');
+  const hugApiUrl = (path) => `${HUG_API_BASE}${path}`;
   const data = (() => {
     try { return JSON.parse(localStorage.getItem('hug:claim') || 'null'); }
     catch { return null; }
@@ -1279,7 +1282,7 @@
         conversation_length: conversation.length,
       });
       try {
-        const resp = await fetch('/verify_claim', {
+        const resp = await fetch(hugApiUrl('/verify_claim'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
