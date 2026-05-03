@@ -192,6 +192,101 @@
   }
   .sort-group select:hover { border-color: var(--ink-2); color: var(--ink); }
 
+  /* ---------- Leaderboard ---------- */
+  .leaderboard {
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin: 24px 0 10px;
+    box-shadow: 0 14px 36px -28px rgba(40, 25, 10, 0.18);
+  }
+  .leaderboard-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 14px;
+  }
+  .leaderboard h2 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+  }
+  .leaderboard .caption {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+  .leader-row {
+    display: grid;
+    grid-template-columns: 42px 1fr auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-top: 1px solid var(--paper-2);
+  }
+  .leader-row:first-of-type { border-top: 0; }
+  .leader-rank {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--hug);
+    font-size: 18px;
+  }
+  .leader-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .leader-name {
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .leader-domain {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .18em;
+    color: var(--ink-3);
+  }
+  .leader-stat {
+    text-align: right;
+    min-width: 86px;
+  }
+  .leader-stat strong {
+    display: block;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .leader-stat span {
+    display: block;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: .18em;
+    color: var(--ink-3);
+    margin-top: 2px;
+  }
+  @media (max-width: 680px) {
+    .leaderboard-head { flex-direction: column; gap: 4px; }
+    .leader-row { grid-template-columns: 34px 1fr; }
+    .leader-stat {
+      grid-column: 2;
+      text-align: left;
+      display: inline-flex;
+      gap: 8px;
+      align-items: baseline;
+      min-width: 0;
+    }
+    .leader-stat strong, .leader-stat span { display: inline; }
+  }
+
   /* ---------- Post ---------- */
   .post {
     background: #fffdf8;
@@ -552,6 +647,65 @@
       <span><span class="num">1,284</span> verified claims</span>
       <span><span class="num">$31,470</span> paid out</span>
       <span><span class="num">68%</span> verifier agreement</span>
+    </div>
+  </section>
+
+  <section class="leaderboard" aria-label="Top AI error contributors">
+    <div class="leaderboard-head">
+      <h2>Leaderboard</h2>
+      <div class="caption">Most verified AI errors submitted</div>
+    </div>
+
+    <div class="leader-row">
+      <div class="leader-rank">1.</div>
+      <div class="leader-user">
+        <span class="avatar c1">YH</span>
+        <div>
+          <div class="leader-name">@yuexing</div>
+          <div class="leader-domain">math + reasoning</div>
+        </div>
+      </div>
+      <div class="leader-stat"><strong>42</strong><span>errors</span></div>
+      <div class="leader-stat"><strong>$684</strong><span>cash back</span></div>
+    </div>
+
+    <div class="leader-row">
+      <div class="leader-rank">2.</div>
+      <div class="leader-user">
+        <span class="avatar c5">SK</span>
+        <div>
+          <div class="leader-name">@sara_k</div>
+          <div class="leader-domain">medical triage</div>
+        </div>
+      </div>
+      <div class="leader-stat"><strong>31</strong><span>errors</span></div>
+      <div class="leader-stat"><strong>$527</strong><span>cash back</span></div>
+    </div>
+
+    <div class="leader-row">
+      <div class="leader-rank">3.</div>
+      <div class="leader-user">
+        <span class="avatar c2">MO</span>
+        <div>
+          <div class="leader-name">@mark_oh</div>
+          <div class="leader-domain">finance + data</div>
+        </div>
+      </div>
+      <div class="leader-stat"><strong>27</strong><span>errors</span></div>
+      <div class="leader-stat"><strong>$463</strong><span>cash back</span></div>
+    </div>
+
+    <div class="leader-row">
+      <div class="leader-rank">4.</div>
+      <div class="leader-user">
+        <span class="avatar c3">MA</span>
+        <div>
+          <div class="leader-name">@marcus_a</div>
+          <div class="leader-domain">legal citations</div>
+        </div>
+      </div>
+      <div class="leader-stat"><strong>19</strong><span>errors</span></div>
+      <div class="leader-stat"><strong>$288</strong><span>cash back</span></div>
     </div>
   </section>
 
@@ -984,6 +1138,7 @@
 
   <footer class="bottom">
     hug.claims forum &middot; <em>be kind, cite sources</em> &middot; moderated by community
+    &middot; <a href="disclaimer.html" style="color:var(--ink-3);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s,color .15s;" onmouseover="this.style.color='var(--hug)';this.style.borderBottomColor='var(--hug)';" onmouseout="this.style.color='var(--ink-3)';this.style.borderBottomColor='transparent';">Disclaimer</a>
     &middot; <a data-hug-export style="color:var(--ink-3);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s,color .15s;" onmouseover="this.style.color='var(--hug)';this.style.borderBottomColor='var(--hug)';" onmouseout="this.style.color='var(--ink-3)';this.style.borderBottomColor='transparent';">Export my session</a>
   </footer>
 </div>

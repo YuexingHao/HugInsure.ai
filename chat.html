@@ -441,6 +441,20 @@
     transition: background .15s;
   }
   .iconbtn:hover { background: var(--paper-2); }
+  .iconbtn.recording {
+    background: var(--hug-bg);
+    color: var(--hug);
+    box-shadow: 0 0 0 3px rgba(196, 74, 63, 0.12);
+    animation: mic-pulse 1.1s ease-in-out infinite;
+  }
+  .iconbtn.unsupported {
+    opacity: 0.38;
+    cursor: not-allowed;
+  }
+  @keyframes mic-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
 
   .send {
     background: var(--ink); color: var(--paper);
@@ -799,6 +813,7 @@
             placeholder="Paste a conversation here&#10;&#10;User: ...&#10;Assistant: ...&#10;&#10;We'll parse it into turns and ask Claude to review."></textarea>
           <div class="import-actions">
             <button class="load-btn" id="loadImport" type="button">Load chat &rarr;</button>
+            <button class="load-btn sample-btn" id="sampleData" type="button">Sample Data</button>
             <span class="import-hint" id="importHint">Detects role markers (User / Assistant / ChatGPT / Claude / Gemini&hellip;).</span>
           </div>
         </div>
@@ -817,6 +832,9 @@
             <div class="composer-tools">
               <button class="iconbtn" id="attachBtn" title="Attach image" aria-label="Attach image">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-9 9a5.5 5.5 0 0 1-7.78-7.78l9-9a3.5 3.5 0 0 1 4.95 4.95l-9 9a1.5 1.5 0 0 1-2.12-2.12l8.49-8.49"/></svg>
+              </button>
+              <button class="iconbtn" id="voiceBtn" title="Voice input" aria-label="Start voice input">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/><path d="M8 22h8"/></svg>
               </button>
             </div>
             <button class="send" id="send" title="Send" aria-label="Send">
@@ -854,6 +872,7 @@
 
   <div class="micro">
     Hug Insurance Co. <span class="sep">&middot;</span> licensed nowhere <span class="sep">&middot;</span> <em>regulated by curiosity</em>
+    <span class="sep">&middot;</span> <a href="disclaimer.html" style="color:var(--ink-3);text-decoration:none;text-transform:uppercase;letter-spacing:0.24em;font-size:10.5px;border-bottom:1px solid transparent;transition:border-color .15s,color .15s;" onmouseover="this.style.color='var(--hug)';this.style.borderBottomColor='var(--hug)';" onmouseout="this.style.color='var(--ink-3)';this.style.borderBottomColor='transparent';">Disclaimer</a>
     <span class="sep">&middot;</span> <a data-hug-export style="color:var(--ink-3);text-decoration:none;text-transform:uppercase;letter-spacing:0.24em;font-size:10.5px;border-bottom:1px solid transparent;transition:border-color .15s,color .15s;" onmouseover="this.style.color='var(--hug)';this.style.borderBottomColor='var(--hug)';" onmouseout="this.style.color='var(--ink-3)';this.style.borderBottomColor='transparent';">Export my session</a>
   </div>
 </div>
@@ -880,6 +899,7 @@
   const promiseSub  = document.getElementById('promiseSub');
   const payoutAmount = document.getElementById('payoutAmount');
   const attachBtn   = document.getElementById('attachBtn');
+  const voiceBtn    = document.getElementById('voiceBtn');
   const imageInput  = document.getElementById('imageInput');
   const preview     = document.getElementById('preview');
   const HUG_API_BASE = (window.HUG_API_BASE || '').replace(/\/+$/, '');
@@ -983,6 +1003,79 @@
       imageInput.value = '';
     }
   });
+
+  /* ---------- voice input ---------- */
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  let isRecordingVoice = false;
+  let voiceBaseText = '';
+  let voiceFinalText = '';
+
+  function setVoiceRecording(on) {
+    isRecordingVoice = on;
+    voiceBtn.classList.toggle('recording', on);
+    voiceBtn.title = on ? 'Stop voice input' : 'Voice input';
+    voiceBtn.setAttribute('aria-label', on ? 'Stop voice input' : 'Start voice input');
+  }
+
+  function resizeComposerText() {
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 140) + 'px';
+  }
+
+  if (!SpeechRecognition) {
+    voiceBtn.classList.add('unsupported');
+    voiceBtn.disabled = true;
+    voiceBtn.title = 'Voice input is not supported in this browser';
+  } else {
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.addEventListener('start', () => {
+      voiceBaseText = ta.value.trim();
+      voiceFinalText = '';
+      setVoiceRecording(true);
+      if (window.hugEvent) hugEvent('voice_input_started', {});
+    });
+
+    recognition.addEventListener('result', (event) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const text = event.results[i][0].transcript.trim();
+        if (event.results[i].isFinal) voiceFinalText = `${voiceFinalText} ${text}`.trim();
+        else interim = `${interim} ${text}`.trim();
+      }
+      ta.value = [voiceBaseText, voiceFinalText, interim].filter(Boolean).join(' ');
+      resizeComposerText();
+    });
+
+    recognition.addEventListener('end', () => {
+      setVoiceRecording(false);
+      ta.value = ta.value.trim();
+      resizeComposerText();
+      if (window.hugEvent) hugEvent('voice_input_stopped', { transcript_length: ta.value.length });
+    });
+
+    recognition.addEventListener('error', (event) => {
+      setVoiceRecording(false);
+      console.warn('[hug] voice input error:', event.error);
+      if (window.hugEvent) hugEvent('voice_input_error', { error: event.error || 'unknown' });
+    });
+
+    voiceBtn.addEventListener('click', () => {
+      if (isRecordingVoice) {
+        recognition.stop();
+      } else {
+        try {
+          recognition.start();
+        } catch (e) {
+          console.warn('[hug] voice input start failed:', e);
+        }
+      }
+    });
+  }
 
   /* ---------- scenario library ---------- */
   const SCENARIOS = {
@@ -1146,10 +1239,7 @@
   });
 
   /* ---------- composer ---------- */
-  ta.addEventListener('input', () => {
-    ta.style.height = 'auto';
-    ta.style.height = Math.min(ta.scrollHeight, 140) + 'px';
-  });
+  ta.addEventListener('input', resizeComposerText);
 
   function buildHistory() {
     const turns = [];
@@ -1212,7 +1302,7 @@
     userEl.style.animation = 'rise 0.5s forwards';
     convo.appendChild(userEl);
     ta.value = '';
-    ta.style.height = 'auto';
+    resizeComposerText();
     pendingImage = null;
     showPreview();
 
@@ -1368,12 +1458,14 @@
   /* ---------- import chat (any LLM) ---------- */
   const importText = document.getElementById('importText');
   const loadImport = document.getElementById('loadImport');
+  const sampleData = document.getElementById('sampleData');
   const importHint = document.getElementById('importHint');
   const srcRotator = document.getElementById('srcRotator');
 
   const DEFAULT_HINT = 'Detects role markers (User / Assistant / ChatGPT / Claude / Gemini&hellip;).';
+  const SAMPLE_DATA_URL = 'data/RAG%20Faithfulness%20Measurement%20Methods.json';
 
-  // Fast-flip name rotator above the paste box. Communicates "any LLM works."
+  // Name rotator above the paste box. Communicates "any LLM works."
   const LLM_NAMES = [
     'ChatGPT', 'Claude', 'Gemini', 'Meta AI', 'Grok', 'DeepSeek',
     'Perplexity', 'Copilot', 'Mistral', 'Llama', 'Qwen', 'Kimi',
@@ -1389,8 +1481,8 @@
       setTimeout(() => {
         srcRotator.textContent = LLM_NAMES[_llmIdx];
         srcRotator.classList.remove('flipping');
-      }, 130);
-    }, 380);
+      }, 180);
+    }, 1250);
   }
   function stopLLMRotator() {
     if (_llmTimer) { clearInterval(_llmTimer); _llmTimer = null; }
@@ -1439,6 +1531,71 @@
       importHint.innerHTML = DEFAULT_HINT;
     }
   });
+
+  function exportedMessageText(msg) {
+    if (!msg) return '';
+    if (msg.text && String(msg.text).trim()) return String(msg.text).trim();
+    if (Array.isArray(msg.content)) {
+      return msg.content
+        .filter(block => block && block.type === 'text' && block.text)
+        .map(block => String(block.text).trim())
+        .filter(Boolean)
+        .join('\n\n');
+    }
+    return '';
+  }
+
+  function collectExportMessages(nodes, out) {
+    if (!Array.isArray(nodes)) return;
+    nodes.forEach((msg) => {
+      const text = exportedMessageText(msg);
+      if (text) {
+        const sender = String(msg.sender || '').trim();
+        const isUser = msg.isCreatedByUser === true || /^user$/i.test(sender);
+        const role = isUser ? 'User' : (sender || 'Assistant');
+        out.push(`${role}: ${text}`);
+      }
+      collectExportMessages(msg.children, out);
+    });
+  }
+
+  function transcriptFromExport(data) {
+    const lines = [];
+    collectExportMessages(data && data.messages, lines);
+    return lines.join('\n\n');
+  }
+
+  async function loadSampleData() {
+    if (!sampleData) return;
+    const original = sampleData.textContent;
+    sampleData.disabled = true;
+    sampleData.textContent = 'Loading...';
+    try {
+      const resp = await fetch(SAMPLE_DATA_URL);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      const transcript = transcriptFromExport(data);
+      if (!transcript) throw new Error('No chat turns found in sample export');
+      importText.value = transcript;
+      importText.dispatchEvent(new Event('input', { bubbles: true }));
+      importHint.classList.remove('is-url-nudge');
+      importHint.innerHTML = 'Sample Data loaded &mdash; click <em>Load chat</em> to review it.';
+      importText.focus();
+      if (window.hugEvent) hugEvent('sample_import_loaded', {
+        title: data.title || null,
+        chars: transcript.length,
+      });
+    } catch (e) {
+      importHint.classList.add('is-url-nudge');
+      importHint.innerHTML = `Sample Data unavailable &mdash; <em>${String(e.message || e).replace(/</g, '&lt;')}</em>.`;
+      if (window.hugEvent) hugEvent('sample_import_error', { error: String(e.message || e) });
+    } finally {
+      sampleData.disabled = false;
+      sampleData.textContent = original;
+    }
+  }
+
+  if (sampleData) sampleData.addEventListener('click', loadSampleData);
 
   // ---- Long-import trimming: keep first/last turns; mark the elided middle.
   // Roughly 80K chars ≈ 20K tokens, leaves headroom for the review prompt + reply.

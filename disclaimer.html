@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>hug.claims — disclaimer</title>
+<style>
+  :root {
+    --paper:   #f3ece0;
+    --paper-2: #ebe2d2;
+    --ink:     #1a1612;
+    --ink-2:   #4b4339;
+    --ink-3:   #8a8073;
+    --hug:     #c44a3f;
+    --hug-bg:  #fae9e0;
+    --green:   #6b8e6e;
+    --line:    #d8cdb6;
+    --serif:   -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    --sans:    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100%;
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--paper);
+    background-image:
+      radial-gradient(ellipse 60% 40% at 85% -5%, rgba(196,74,63,.08) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at -5% 105%, rgba(107,142,110,.10) 0%, transparent 55%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.62;
+    font-size: 16.5px;
+  }
+  .app {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 30px 70px;
+  }
+  header.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 20px;
+    padding: 30px 0 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand-link {
+    display: inline-flex;
+    align-items: baseline;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity .15s, transform .15s;
+  }
+  .brand-link:hover { opacity: .84; transform: translateY(-1px); }
+  .brand-text {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .brand-text .em { color: var(--hug); font-weight: 500; }
+  .brand-text .small { font-size: 18px; color: var(--ink-3); margin-left: 1px; }
+  .nav {
+    display: flex;
+    gap: 20px;
+    align-items: baseline;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .nav a, footer a {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color .15s, color .15s;
+  }
+  .nav a:hover, footer a:hover { color: var(--hug); border-bottom-color: var(--hug); }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(42px, 8vw, 74px);
+    letter-spacing: -0.03em;
+    line-height: .98;
+    margin: 54px 0 18px;
+  }
+  h1 em { color: var(--hug); font-style: italic; }
+  .lede {
+    max-width: 720px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink-2);
+    margin-bottom: 42px;
+  }
+  section {
+    border-top: 1px solid var(--line);
+    padding: 30px 0;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+  }
+  p { color: var(--ink-2); margin: 10px 0; }
+  ul {
+    list-style: none;
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  li {
+    position: relative;
+    padding-left: 24px;
+    color: var(--ink-2);
+  }
+  li::before {
+    content: "$";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--green);
+  }
+  strong { color: var(--ink); font-weight: 600; }
+  .note {
+    margin-top: 18px;
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(255,253,248,.58);
+    color: var(--ink-2);
+  }
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    color: var(--ink-3);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .18em;
+  }
+  footer em {
+    font-family: var(--serif);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+  @media (max-width: 680px) {
+    header.top { align-items: flex-start; flex-direction: column; }
+    .nav { justify-content: flex-start; gap: 14px; }
+  }
+</style>
+<script src="hug-config.js"></script>
+<script src="hug-events.js" defer></script>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a class="brand-link" href="index.html" aria-label="Hug Claims home">
+      <span class="brand-text">Hug<span class="em">.</span><span class="small">claims</span></span>
+    </a>
+    <nav class="nav">
+      <a href="forum.html">forum</a>
+      <a href="claim.html">file a claim</a>
+      <a href="chat.html">try the chat</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Disclaimer <em>&amp; terms</em>.</h1>
+    <p class="lede">HugClaims is a prototype for reporting meaningful AI errors and distributing limited cash-back rewards when a correction is verified. These rules are meant to keep the fund useful, fair, and hard to game.</p>
+
+    <section>
+      <h2>Funding and payout pool</h2>
+      <p>Cash-back payments come from a limited HugClaims demo fund, sponsor pool, or research budget. Payouts are not guaranteed until a claim is accepted, verified, and marked payable.</p>
+      <ul>
+        <li><strong>Payout amounts are capped.</strong> The displayed amount is an estimate based on stakes, confidence, available funds, and review status.</li>
+        <li><strong>Funds are distributed first to valid, non-duplicate claims.</strong> If the pool is exhausted, otherwise valid claims may receive a reduced payout, deferred payout, or no payout.</li>
+        <li><strong>High-stakes does not automatically mean payable.</strong> The correction still has to identify a real AI error and provide a substantially right fix.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>One claim per AI error</h2>
+      <p>Each distinct question, AI answer, and alleged error can be submitted once. Rewording the same prompt, resubmitting the same transcript, or splitting one mistake into many small claims may be treated as duplicate activity.</p>
+      <ul>
+        <li><strong>One question, one wrong answer, one correction.</strong> If several people submit the same underlying error, the earliest complete valid claim normally has priority.</li>
+        <li><strong>Follow-up claims need a new error.</strong> A later claim must show a materially different AI answer or a different substantive mistake.</li>
+        <li><strong>Forum examples are not bounty templates.</strong> Copying public examples without adding a new verified error is not payable.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>What counts as a valid claim</h2>
+      <ul>
+        <li>The AI answer made a factual, mathematical, logical, citation, reasoning, or materially misleading error.</li>
+        <li>The submitted correction is substantially right, specific, and supported by the conversation or credible evidence.</li>
+        <li>The error matters enough to affect the answer, not merely style, tone, formatting, harmless ambiguity, or preference.</li>
+        <li>The transcript, screenshots, links, or evidence are authentic and complete enough for review.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Abuse we may reject</h2>
+      <ul>
+        <li><strong>Manufactured errors:</strong> prompts designed only to trick, coerce, jailbreak, or force a known failure without a real user need.</li>
+        <li><strong>Duplicate farming:</strong> submitting the same issue through multiple accounts, brands, paraphrases, or near-identical transcripts.</li>
+        <li><strong>Collusion:</strong> coordinating with reviewers, forum users, or other claimants to inflate votes, agreement, or payout priority.</li>
+        <li><strong>Bad corrections:</strong> replacing an AI error with another incorrect answer, speculative claim, or unsupported assertion.</li>
+        <li><strong>Unsafe or illegal content:</strong> claims involving instructions for harm, evasion, fraud, privacy invasion, or prohibited activity may be refused or redacted.</li>
+        <li><strong>Evidence tampering:</strong> edited screenshots, omitted context, fake transcripts, or altered model outputs disqualify the claim.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Review and appeals</h2>
+      <p>Automated review is only a first pass. HugClaims may use human review, community signals, model-based verification, or source checking before payment. We can reverse, reduce, or pause a payout if later evidence shows the claim was duplicate, invalid, abusive, or unsafe.</p>
+      <p class="note">A verifier saying "valid" is not a final legal or financial commitment. It is a review signal used by the prototype.</p>
+    </section>
+
+    <section>
+      <h2>Privacy and publication</h2>
+      <p>Submitted conversations may contain sensitive information. Do not submit private, confidential, medical, legal, financial, employer, client, or third-party data unless you have the right to share it. Forum posts may be visible to other users and may be summarized for research or product feedback.</p>
+    </section>
+
+    <section>
+      <h2>Not insurance, advice, or a warranty</h2>
+      <p>HugClaims is not an insurance company, regulated financial product, legal service, medical service, or guarantee that an AI system is safe or correct. Cash back is a prototype reward mechanic, not coverage for real-world losses.</p>
+      <p>For medical, legal, financial, safety, or other high-stakes questions, consult a qualified professional and verify independently.</p>
+    </section>
+  </main>
+
+  <footer>
+    <div>hug.claims &middot; <em>cash back with rules</em></div>
+    <div>
+      <a href="forum.html">forum</a>
+      &nbsp;&middot;&nbsp;
+      <a href="claim.html">file a claim</a>
+      &nbsp;&middot;&nbsp;
+      <a href="chat.html">try the chat</a>
+      &nbsp;&middot;&nbsp;
+      <a data-hug-export>Export my session</a>
+    </div>
+  </footer>
+</div>
+</body>
+</html>

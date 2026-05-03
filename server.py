@@ -38,7 +38,10 @@ from pydantic import BaseModel, Field
 # Azure AI Foundry endpoint and deployment.
 ENDPOINT = os.environ.get(
     "FOUNDRY_ENDPOINT",
-    "https://ai-mghassem9468ai243514660583.services.ai.azure.com/anthropic/",
+    os.environ.get(
+        "AZURE_FOUNDRY_ENDPOINT",
+        "https://ai-mghassem9468ai243514660583.services.ai.azure.com/anthropic/",
+    ),
 )
 # Deployment name on Foundry — usually matches the Anthropic model ID.
 # Set HUG_MODEL=claude-opus-4-7 (or whatever your Opus deployment is named) to swap.
@@ -122,10 +125,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-client = AsyncAnthropicFoundry(
-    api_key=os.environ.get("ANTHROPIC_API_KEY"),
-    base_url=ENDPOINT,
-)
+client: Optional[AsyncAnthropicFoundry] = None
+
+
+def foundry_api_key() -> Optional[str]:
+    return (
+        os.environ.get("ANTHROPIC_API_KEY")
+        or os.environ.get("ANTHROPIC_FOUNDRY_API_KEY")
+        or os.environ.get("AZURE_FOUNDRY_API_KEY")
+    )
+
+
+def get_client() -> AsyncAnthropicFoundry:
+    global client
+    if client is None:
+        client = AsyncAnthropicFoundry(
+            api_key=foundry_api_key(),
+            base_url=ENDPOINT,
+        )
+    return client
 
 # ---------- Dataset capture ----------------------------------------------------
 # Every interaction (server-driven and client-driven) lands as one JSON object
@@ -206,7 +224,7 @@ class EventIn(BaseModel):
 async def rate_answer(question: str, answer: str) -> dict:
     """Score an answer 0-10 for factual risk via Haiku 4.5. Best-effort; falls back to mid."""
     try:
-        resp = await client.messages.create(
+        resp = await get_client().messages.create(
             model=RATER_MODEL,
             max_tokens=200,
             system=RATER_SYSTEM,
@@ -251,8 +269,8 @@ def _last_user(messages: list[dict]) -> str:
 
 @app.post("/chat")
 async def chat(req: ChatRequest, request: Request):
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        raise HTTPException(500, "ANTHROPIC_API_KEY not set on server")
+    if not foundry_api_key():
+        raise HTTPException(500, "Foundry API key not set on server")
 
     api_messages = [{"role": t.role, "content": t.content} for t in req.messages]
     question = _last_user(api_messages)
@@ -277,7 +295,7 @@ async def chat(req: ChatRequest, request: Request):
         rating: Optional[dict] = None
         error: Optional[str] = None
         try:
-            async with client.messages.stream(
+            async with get_client().messages.stream(
                 model=MODEL,
                 max_tokens=1024,
                 system=[
@@ -310,7 +328,7 @@ async def chat(req: ChatRequest, request: Request):
             yield f"data: {json.dumps({'done': True, 'usage': usage})}\n\n"
 
         except anthropic.AuthenticationError:
-            error = "invalid ANTHROPIC_API_KEY"
+            error = "invalid Foundry API key"
             yield f"data: {json.dumps({'error': error})}\n\n"
         except anthropic.RateLimitError as e:
             error = f"rate limited: {e}"
@@ -348,8 +366,8 @@ async def chat(req: ChatRequest, request: Request):
 @app.post("/verify_claim")
 async def verify_claim(req: VerifyRequest, request: Request):
     """LLM-as-grader: judges whether the user's claim has merit."""
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        raise HTTPException(500, "ANTHROPIC_API_KEY not set on server")
+    if not foundry_api_key():
+        raise HTTPException(500, "Foundry API key not set on server")
 
     user_content = (
         f"CONVERSATION:\n{req.conversation}\n\n"
@@ -362,7 +380,7 @@ async def verify_claim(req: VerifyRequest, request: Request):
     result: dict = fallback
     error: Optional[str] = None
     try:
-        resp = await client.messages.create(
+        resp = await get_client().messages.create(
             model=VERIFIER_MODEL,
             max_tokens=400,
             system=VERIFIER_SYSTEM,
@@ -382,7 +400,7 @@ async def verify_claim(req: VerifyRequest, request: Request):
             result = {"verdict": verdict, "confidence": confidence, "reasoning": reasoning}
             print(f"[hug] verify {result}", flush=True)
     except anthropic.AuthenticationError:
-        error = "invalid ANTHROPIC_API_KEY"
+        error = "invalid Foundry API key"
     except anthropic.APIStatusError as e:
         error = f"verifier API error {e.status_code}"
     except Exception as e:
@@ -406,7 +424,7 @@ async def verify_claim(req: VerifyRequest, request: Request):
         request=request,
     )
 
-    if error == "invalid ANTHROPIC_API_KEY":
+    if error == "invalid Foundry API key":
         raise HTTPException(401, error)
     if error and error.startswith("verifier API error"):
         raise HTTPException(502, error)
@@ -416,8 +434,8 @@ async def verify_claim(req: VerifyRequest, request: Request):
 @app.post("/suggest_edit")
 async def suggest_edit(req: SuggestRequest, request: Request):
     """Haiku 4.5 suggests a corrected version of one assistant message."""
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        raise HTTPException(500, "ANTHROPIC_API_KEY not set on server")
+    if not foundry_api_key():
+        raise HTTPException(500, "Foundry API key not set on server")
 
     user_content = (
         f"CONVERSATION:\n{req.conversation}\n\n"
@@ -428,7 +446,7 @@ async def suggest_edit(req: SuggestRequest, request: Request):
     suggested = req.target_message
     error: Optional[str] = None
     try:
-        resp = await client.messages.create(
+        resp = await get_client().messages.create(
             model=SUGGEST_MODEL,
             max_tokens=600,
             system=SUGGEST_SYSTEM,
@@ -441,7 +459,7 @@ async def suggest_edit(req: SuggestRequest, request: Request):
         print(f"[hug] suggest produced {len(text)} chars", flush=True)
         suggested = text or req.target_message
     except anthropic.AuthenticationError:
-        error = "invalid ANTHROPIC_API_KEY"
+        error = "invalid Foundry API key"
     except anthropic.APIStatusError as e:
         error = f"suggest API error {e.status_code}"
     except Exception as e:
@@ -462,7 +480,7 @@ async def suggest_edit(req: SuggestRequest, request: Request):
         request=request,
     )
 
-    if error == "invalid ANTHROPIC_API_KEY":
+    if error == "invalid Foundry API key":
         raise HTTPException(401, error)
     if error and error.startswith("suggest API error"):
         raise HTTPException(502, error)

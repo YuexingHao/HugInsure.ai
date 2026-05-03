@@ -1,6 +1,7 @@
 .venv/
 __pycache__/
 data/
+recordings/
 *.pyc
 *.pyo
 .env

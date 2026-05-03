@@ -79,6 +79,42 @@
     transition: border-color .15s, color .15s;
   }
   .back-link:hover { border-color: var(--hug); color: var(--hug); }
+  .header-actions {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .share-links {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .share-icon {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 253, 248, 0.55);
+    color: var(--ink-2);
+    text-decoration: none;
+    transition: border-color .15s, color .15s, transform .15s, background .15s;
+  }
+  .share-icon:hover {
+    border-color: var(--hug);
+    color: var(--hug);
+    background: #fffdf8;
+    transform: translateY(-1px);
+  }
+  .share-icon svg {
+    width: 15px;
+    height: 15px;
+    display: block;
+  }
 
   h1 {
     font-family: var(--serif);
@@ -829,14 +865,28 @@
     <a class="brand-link" href="index.html" aria-label="Hug Claims home">
       <span class="brand-text">Hug<span class="em">.</span><span class="small">claims</span></span>
     </a>
-    <span style="display:flex;gap:18px;align-items:baseline;">
+    <span class="header-actions">
       <a href="forum.html" class="back-link">forum</a>
+      <span class="share-links" aria-label="Share claim">
+        <a class="share-icon" data-share="reddit" target="_blank" rel="noopener" aria-label="Share to Reddit" title="Share to Reddit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 12.3a2.6 2.6 0 0 0-1.7-.7 2.2 2.2 0 0 0-.6 4.3 5.9 5.9 0 0 0 5.8 4.1h4a5.9 5.9 0 0 0 5.8-4.1 2.2 2.2 0 0 0-.6-4.3 2.6 2.6 0 0 0-1.7.7"/><path d="M13 7.2 14.2 3l4.1.9"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/><path d="M9.8 17c1.4.8 3 .8 4.4 0"/></svg>
+        </a>
+        <a class="share-icon" data-share="facebook" target="_blank" rel="noopener" aria-label="Share to Facebook" title="Share to Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 8.4V6.7c0-.8.2-1.2 1.3-1.2H17V2.3c-.8-.1-1.7-.2-2.5-.2-2.5 0-4.2 1.5-4.2 4.3v2H7.5V12h2.8v9.8H14V12h2.8l.4-3.6H14Z"/></svg>
+        </a>
+        <a class="share-icon" data-share="x" target="_blank" rel="noopener" aria-label="Share to X" title="Share to X">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.3 3h3.4l-7.4 8.5L22 21h-6.8l-5.3-6.9L3.8 21H.4l7.9-9L0 3h7l4.8 6.3L17.3 3Zm-1.2 16.3H18L6 4.6H4L16.1 19.3Z"/></svg>
+        </a>
+        <a class="share-icon" data-share="whatsapp" target="_blank" rel="noopener" aria-label="Share to WhatsApp" title="Share to WhatsApp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 19.2 6 15.8a7.8 7.8 0 1 1 2.5 2.4l-3.7 1Z"/><path d="M9.4 8.8c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.5 1.2c.1.3.1.5-.1.7l-.4.5c.6 1.1 1.4 1.9 2.5 2.5l.5-.4c.2-.2.4-.2.7-.1l1.2.5c.3.1.4.3.4.5v.5c0 .3-.1.5-.4.7-.5.3-1.3.4-2.1.2-2.6-.7-4.6-2.7-5.3-5.3-.2-.8-.1-1.6.2-2.1Z"/></svg>
+        </a>
+      </span>
       <a href="chat.html" class="back-link">&larr; back to chat</a>
     </span>
   </header>
 
   <main id="main">
-    <h1>Cash back from <span class="brand-cycle" id="brandCycle">GPT</span>.</h1>
+    <h1>Cash back from <span class="brand-cycle" id="brandCycle">GPT</span> errors.</h1>
 
     <section>
       <h2>conversation</h2>
@@ -852,6 +902,7 @@
     <section>
       <h2>cash back</h2>
       <div class="tier-info" id="tierInfo"></div>
+      <p class="edit-instruction"><a href="payment.html">Set up Stripe payouts</a> to receive approved cash back.</p>
     </section>
 
     <section>
@@ -875,6 +926,8 @@
   </main>
 
   <footer class="page-foot">
+    <a href="disclaimer.html">Disclaimer</a>
+    &nbsp;&middot;&nbsp;
     <a data-hug-export>Export my session</a>
   </footer>
 </div>
@@ -1165,6 +1218,37 @@
       }, 280);
     }, 2200);
   }
+
+  // ---------- Share links ----------
+  function shareText() {
+    const brand = brandCycle ? brandCycle.textContent.trim() : 'AI';
+    return `I filed a HugClaims correction for ${brand} errors.`;
+  }
+  function shareUrl() {
+    return `${location.origin}${location.pathname}`;
+  }
+  function wireShareLinks() {
+    document.querySelectorAll('[data-share]').forEach((link) => {
+      const target = link.dataset.share;
+      const text = shareText();
+      const url = shareUrl();
+      let href = 'forum.html';
+      if (target === 'reddit') {
+        href = `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`;
+      } else if (target === 'facebook') {
+        href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+      } else if (target === 'x') {
+        href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+      } else if (target === 'whatsapp') {
+        href = `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`;
+      }
+      link.href = href;
+      link.addEventListener('click', () => {
+        if (window.hugEvent) hugEvent('claim_share_clicked', { target });
+      });
+    });
+  }
+  wireShareLinks();
 
   // ---------- Conversation-link import ----------
   let importedUrl = null;
