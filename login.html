@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/jpeg" href="assets/hug-logo.jpg" />
+<link rel="apple-touch-icon" href="assets/hug-logo.jpg" />
+<title>hug.claims — login</title>
+<style>
+  :root {
+    --paper:   #f1edf6;
+    --paper-2: #e5ddee;
+    --ink:     #1a1612;
+    --ink-2:   #4b4339;
+    --ink-3:   #8a8073;
+    --hug:     #c44a3f;
+    --hug-2:   #a83a30;
+    --hug-bg:  #fae9e0;
+    --line:    #d3c8da;
+    --violet:  #635bff;
+    --serif:   -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    --sans:    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100%;
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--paper);
+    background-image:
+      radial-gradient(ellipse 60% 40% at 85% -5%, rgba(132,102,178,.15) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at -5% 105%, rgba(196,74,63,.07) 0%, transparent 55%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+    font-size: 16px;
+  }
+  .app { max-width: 920px; margin: 0 auto; padding: 0 30px 70px; }
+  header.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 18px;
+    padding: 30px 0 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand-link {
+    display: inline-flex;
+    align-items: baseline;
+    color: inherit;
+    text-decoration: none;
+    transition: opacity .15s, transform .15s;
+  }
+  .brand-link:hover { opacity: .84; transform: translateY(-1px); }
+  .brand-text {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .brand-text .em { color: var(--hug); font-weight: 500; }
+  .brand-text .small { font-size: 18px; color: var(--ink-3); margin-left: 1px; }
+  .nav {
+    display: flex;
+    gap: 20px;
+    align-items: baseline;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .nav a, footer a {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color .15s, color .15s;
+  }
+  .nav a:hover, footer a:hover { color: var(--hug); border-bottom-color: var(--hug); }
+  .nav a.active { color: var(--ink); border-bottom-color: var(--ink); }
+  main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 38px;
+    align-items: start;
+    padding: 52px 0 30px;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(42px, 7.4vw, 72px);
+    line-height: .98;
+    letter-spacing: -0.035em;
+    margin-bottom: 18px;
+  }
+  h1 em { color: var(--violet); font-style: italic; }
+  .lede {
+    max-width: 58ch;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    color: var(--ink-2);
+  }
+  .account-card {
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 18px 46px -30px rgba(40, 25, 10, 0.26);
+  }
+  .account-card h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 25px;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .account-card .sub {
+    color: var(--ink-3);
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .provider-stack {
+    display: grid;
+    gap: 10px;
+  }
+  .provider-btn {
+    width: 100%;
+    min-height: 46px;
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(255, 253, 248, .72);
+    color: var(--ink);
+    padding: 8px 12px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .16s, transform .16s, background .16s;
+  }
+  .provider-btn:hover {
+    border-color: var(--hug-soft);
+    background: #fffdf8;
+    transform: translateY(-1px);
+  }
+  .mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: white;
+  }
+  .mark.google { background: #4285f4; }
+  .mark.meta { background: #0866ff; }
+  .mark.email { background: var(--ink); }
+  .provider-btn strong { display: block; font-size: 14px; }
+  .provider-btn span.copy { display: block; color: var(--ink-3); font-size: 12px; }
+  .provider-btn span.state {
+    color: var(--hug);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+  }
+  .profile-preview {
+    margin-top: 18px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--paper-2);
+  }
+  .profile-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hug);
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: .04em;
+  }
+  .profile-row strong { display: block; }
+  .profile-row span { display: block; color: var(--ink-3); font-size: 12.5px; }
+  .note {
+    margin-top: 18px;
+    padding: 14px 16px;
+    background: var(--hug-bg);
+    border: 1px solid rgba(196,74,63,.20);
+    border-radius: 12px;
+    color: var(--ink-2);
+    font-size: 14px;
+  }
+  .setup-list {
+    margin-top: 26px;
+    display: grid;
+    gap: 12px;
+    max-width: 620px;
+  }
+  .setup-list div {
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255,253,248,.52);
+  }
+  .setup-list strong { display: block; margin-bottom: 4px; }
+  .setup-list p { color: var(--ink-2); }
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    color: var(--ink-3);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .18em;
+  }
+  footer em {
+    font-family: var(--serif);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+  @media (max-width: 820px) {
+    header.top { align-items: flex-start; flex-direction: column; }
+    .nav { justify-content: flex-start; gap: 14px; }
+    main { grid-template-columns: 1fr; padding-top: 38px; }
+  }
+</style>
+<script src="hug-config.js"></script>
+<script src="hug-events.js" defer></script>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a class="brand-link" href="index.html" aria-label="Hug Claims home">
+      <span class="brand-text">Hug<span class="em">.</span><span class="small">claims</span></span>
+    </a>
+    <nav class="nav">
+      <a href="forum.html">forum</a>
+      <a href="claim.html">file a claim</a>
+      <a href="chat.html">try the chat</a>
+      <a href="login.html" class="active">login</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h1>Set up your <em>Hug account</em>.</h1>
+      <p class="lede">Use one account for saved conversations, forum posts, claim history, and cash-back receiving settings. Google and Meta sign-in are placeholders for the next auth integration.</p>
+      <div class="setup-list">
+        <div>
+          <strong>Claims should belong to the right person.</strong>
+          <p>Future login will replace the current local demo identity so forum posts and payouts are tied to the signed-in user.</p>
+        </div>
+        <div>
+          <strong>OAuth comes next.</strong>
+          <p>This page is ready for Google, Meta, and email providers; backend session storage and provider secrets still need to be wired.</p>
+        </div>
+      </div>
+    </section>
+
+    <aside class="account-card">
+      <h2>Continue with</h2>
+      <p class="sub">Choose a provider to connect later.</p>
+      <div class="provider-stack">
+        <button class="provider-btn" data-provider="google" type="button">
+          <span class="mark google">G</span>
+          <span><strong>Google</strong><span class="copy">Use a Google account for claims and forum identity</span></span>
+          <span class="state">soon</span>
+        </button>
+        <button class="provider-btn" data-provider="meta" type="button">
+          <span class="mark meta">M</span>
+          <span><strong>Meta</strong><span class="copy">Connect Facebook or Instagram identity later</span></span>
+          <span class="state">soon</span>
+        </button>
+        <button class="provider-btn" data-provider="email" type="button">
+          <span class="mark email">@</span>
+          <span><strong>Email</strong><span class="copy">Reserve an email-only account path</span></span>
+          <span class="state">soon</span>
+        </button>
+      </div>
+
+      <div class="profile-preview">
+        <div class="profile-row">
+          <span class="avatar">YU</span>
+          <span>
+            <strong>Demo local profile</strong>
+            <span>Not signed in. Stored only in this browser.</span>
+          </span>
+        </div>
+      </div>
+      <p class="note" id="loginStatus">Provider connection is not active yet. This page is the front-end contract for the upcoming auth flow.</p>
+    </aside>
+  </main>
+
+  <footer>
+    <div>hug.claims &middot; <em>account setup preview</em></div>
+    <div>
+      <a href="forum.html">forum</a>
+      &nbsp;&middot;&nbsp;
+      <a href="claim.html">file a claim</a>
+      &nbsp;&middot;&nbsp;
+      <a href="disclaimer.html">Disclaimer</a>
+      &nbsp;&middot;&nbsp;
+      <a data-hug-export>Export my session</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  document.querySelectorAll('.provider-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const provider = btn.dataset.provider || 'provider';
+      const status = document.getElementById('loginStatus');
+      status.textContent = `${provider[0].toUpperCase()}${provider.slice(1)} login is reserved for the next OAuth setup.`;
+      if (window.hugEvent) hugEvent('login_provider_preview_clicked', { provider });
+    });
+  });
+</script>
+</body>
+</html>
