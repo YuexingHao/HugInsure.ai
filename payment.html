@@ -3,11 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>hug.claims — payout setup</title>
+<link rel="icon" type="image/jpeg" href="assets/hug-logo.jpg" />
+<link rel="apple-touch-icon" href="assets/hug-logo.jpg" />
+<title>hug.claims — cash back receiving setup</title>
 <style>
   :root {
-    --paper:   #f3ece0;
-    --paper-2: #ebe2d2;
+    --paper:   #f1edf6;
+    --paper-2: #e5ddee;
     --ink:     #1a1612;
     --ink-2:   #4b4339;
     --ink-3:   #8a8073;
@@ -15,7 +17,7 @@
     --hug-bg:  #fae9e0;
     --green:   #2f6b40;
     --green-bg: rgba(107, 142, 110, 0.16);
-    --line:    #d8cdb6;
+    --line:    #d3c8da;
     --stripe:  #635bff;
     --serif:   -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
     --sans:    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
@@ -27,8 +29,8 @@
     color: var(--ink);
     background: var(--paper);
     background-image:
-      radial-gradient(ellipse 60% 40% at 85% -5%, rgba(99,91,255,.10) 0%, transparent 60%),
-      radial-gradient(ellipse 70% 50% at -5% 105%, rgba(107,142,110,.10) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 40% at 85% -5%, rgba(132,102,178,.15) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at -5% 105%, rgba(196,74,63,.07) 0%, transparent 55%),
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
@@ -287,21 +289,21 @@
   <main>
     <div class="hero">
       <div>
-        <div class="demo-badge">demo payout setup</div>
-        <h1>Receive cash back through <em>Stripe</em>.</h1>
-        <p class="lede">Connect a payout account so HugClaims can route verified AI-error cash back after review. This page is a prototype and does not create a real Stripe account.</p>
+        <div class="demo-badge">cash back receiving setup</div>
+        <h1>Choose how to receive <em>cash back</em>.</h1>
+        <p class="lede">Add a receiving method so HugClaims can route approved AI-error cash back after review.</p>
       </div>
 
-      <aside class="stripe-card" aria-label="Fake Stripe setup form">
+      <aside class="stripe-card" aria-label="Cash back receiving method form">
         <div class="stripe-logo">
           <div class="mark">S</div>
           <div>
-            <strong>Stripe Connect</strong>
-            <span>test mode only</span>
+            <strong>Cash back account</strong>
+            <span>receiving method</span>
           </div>
         </div>
         <div class="field">
-          <label for="email">Payout email</label>
+          <label for="email">Receiving email</label>
           <input class="fake-input" id="email" type="email" value="you@example.com" />
         </div>
         <div class="field">
@@ -309,19 +311,19 @@
           <input class="fake-input" id="country" type="text" value="United States" />
         </div>
         <div class="field">
-          <label for="method">Payout method</label>
+          <label for="method">Receiving method</label>
           <input class="fake-input" id="method" type="text" value="Bank account ending •••• 4242" />
         </div>
         <div class="stripe-actions">
-          <button class="btn btn-primary" id="connectBtn" type="button">Connect Stripe</button>
+          <button class="btn btn-primary" id="connectBtn" type="button">Save method</button>
           <a class="btn btn-secondary" href="claim.html">Back to claim</a>
         </div>
-        <div class="status" id="status">Demo payout account connected. Verified cash-back claims would route here.</div>
+        <div class="status" id="status">Receiving method saved. Approved cash-back claims would route here.</div>
       </aside>
     </div>
 
     <section>
-      <h2>How payouts would work</h2>
+      <h2>How cash back would work</h2>
       <div class="steps">
         <div class="step">
           <div class="num">1.</div>
@@ -335,16 +337,16 @@
         </div>
         <div class="step">
           <div class="num">3.</div>
-          <h3>Route cash back.</h3>
-          <p>If payable, the approved amount would be sent to the connected Stripe payout account.</p>
+          <h3>Receive cash back.</h3>
+          <p>If payable, the approved amount would be sent to your selected receiving method.</p>
         </div>
       </div>
-      <p class="note">No live payment, bank, tax, identity, or Stripe onboarding is performed on this page. It is interface scaffolding for demo and user-testing purposes.</p>
+      <p class="note">No live payment, bank, tax, or identity onboarding is performed on this page. It is interface scaffolding for demo and user-testing purposes.</p>
     </section>
   </main>
 
   <footer>
-    <div>hug.claims &middot; <em>fake Stripe setup</em></div>
+    <div>hug.claims &middot; <em>cash back receiving setup</em></div>
     <div>
       <a href="forum.html">forum</a>
       &nbsp;&middot;&nbsp;
@@ -362,8 +364,8 @@
   const statusEl = document.getElementById('status');
   connectBtn.addEventListener('click', () => {
     statusEl.classList.add('show');
-    connectBtn.textContent = 'Connected';
-    if (window.hugEvent) hugEvent('stripe_demo_connected', {
+    connectBtn.textContent = 'Saved';
+    if (window.hugEvent) hugEvent('cashback_receiving_method_saved', {
       email_entered: Boolean(document.getElementById('email').value.trim()),
       country: document.getElementById('country').value.trim(),
     });

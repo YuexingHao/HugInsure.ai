@@ -53,6 +53,7 @@ SYSTEM_PROMPT = (HERE / "system_prompt.md").read_text()
 # Always rate with Haiku 4.5 — cheap, fast, sufficient for a 0-10 score.
 RATER_MODEL = os.environ.get("HUG_RATER_MODEL", "claude-haiku-4-5")
 SUGGEST_MODEL = os.environ.get("HUG_SUGGEST_MODEL", "claude-haiku-4-5")
+DETECT_MODEL = os.environ.get("HUG_DETECT_MODEL", "claude-haiku-4-5")
 SUGGEST_SYSTEM = """You are a fact-checker reviewing an AI assistant's reply for potential errors. \
 A user is considering filing a claim that this reply was wrong. Your job: produce a corrected \
 version of the target reply, fixing factual, logical, or significant errors so the user can \
@@ -68,6 +69,14 @@ Guidelines:
 Output ONLY the corrected message text. No quotation marks, no preamble like "Here's the \
 correction:", no commentary, no markdown, no HTML. Just the text the user should see in \
 their corrected version."""
+
+DETECT_SYSTEM = """You identify which AI assistant likely produced a response in a claim transcript.
+Choose the best label from this exact list:
+GPT-5.1, GPT-4o, GPT-4.1, Claude Opus 4.6, Claude Sonnet 4.5, Claude Haiku 4.5, Gemini 2.5 Pro, Gemini 2.5 Flash, Meta AI, Grok, Perplexity, DeepSeek, Qwen, Mistral, Copilot, Other/Unknown.
+
+Use explicit labels in the transcript first. If there is no clear evidence, return Other/Unknown.
+Output ONLY JSON on one line:
+{"llm":"<label>","confidence":0.0-1.0,"reason":"<short reason>"}"""
 
 
 VERIFIER_MODEL = os.environ.get("HUG_VERIFIER_MODEL", "claude-haiku-4-5")
@@ -209,6 +218,11 @@ class VerifyRequest(BaseModel):
 class SuggestRequest(BaseModel):
     conversation: str
     target_message: str
+    session_id: Optional[str] = None
+
+
+class DetectLLMRequest(BaseModel):
+    conversation: str
     session_id: Optional[str] = None
 
 
@@ -485,6 +499,65 @@ async def suggest_edit(req: SuggestRequest, request: Request):
     if error and error.startswith("suggest API error"):
         raise HTTPException(502, error)
     return {"suggested": suggested}
+
+
+@app.post("/detect_llm")
+async def detect_llm(req: DetectLLMRequest, request: Request):
+    """Best-effort guess of which AI produced the response being claimed."""
+    if not foundry_api_key():
+      raise HTTPException(500, "Foundry API key not set on server")
+
+    clipped = req.conversation[:12000]
+    result = {"llm": "Other/Unknown", "confidence": 0.0, "reason": "no clear model label found"}
+    error: Optional[str] = None
+    try:
+        resp = await get_client().messages.create(
+            model=DETECT_MODEL,
+            max_tokens=160,
+            system=DETECT_SYSTEM,
+            messages=[{
+                "role": "user",
+                "content": f"CLAIM TRANSCRIPT:\n{clipped}\n\nIdentify the AI assistant label.",
+            }],
+        )
+        text = next((b.text for b in resp.content if b.type == "text"), "").strip()
+        if text.startswith("```"):
+            text = text.strip("`").replace("json", "", 1).strip()
+        parsed = json.loads(text)
+        label = str(parsed.get("llm") or "Other/Unknown").strip()
+        confidence = float(parsed.get("confidence") or 0)
+        reason = str(parsed.get("reason") or "").strip()[:180]
+        result = {
+            "llm": label or "Other/Unknown",
+            "confidence": max(0.0, min(1.0, confidence)),
+            "reason": reason or "detected from transcript",
+        }
+    except anthropic.AuthenticationError:
+        error = "invalid Foundry API key"
+    except anthropic.APIStatusError as e:
+        error = f"detect API error {e.status_code}"
+    except Exception as e:
+        error = f"{type(e).__name__}: {e}"
+        print(f"[hug] detect llm error: {error}", flush=True)
+
+    await log_event(
+        "llm_detected",
+        page="claim.html",
+        session_id=req.session_id,
+        payload={
+            "conversation_length": len(req.conversation or ""),
+            "result": result,
+            "model": DETECT_MODEL,
+            "error": error,
+        },
+        request=request,
+    )
+
+    if error == "invalid Foundry API key":
+        raise HTTPException(401, error)
+    if error and error.startswith("detect API error"):
+        raise HTTPException(502, error)
+    return result
 
 
 # ---------- Client-emitted events + dataset export ---------------------------

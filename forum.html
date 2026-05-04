@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/jpeg" href="assets/hug-logo.jpg" />
+<link rel="apple-touch-icon" href="assets/hug-logo.jpg" />
 <title>hug. — community claims</title>
 <style>
   :root {
-    --paper:   #f3ece0;
-    --paper-2: #ebe2d2;
-    --paper-3: #e2d6c0;
+    --paper:   #f1edf6;
+    --paper-2: #e5ddee;
+    --paper-3: #d9cfdf;
     --ink:     #1a1612;
     --ink-2:   #4b4339;
     --ink-3:   #8a8073;
@@ -21,7 +23,7 @@
     --green-bg:#e6efe3;
     --gold:    #b48d4a;
     --gold-bg: #f3e8cf;
-    --line:    #d8cdb6;
+    --line:    #d3c8da;
     --serif:   -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
     --sans:    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   }
@@ -32,8 +34,8 @@
     color: var(--ink);
     background: var(--paper);
     background-image:
-      radial-gradient(ellipse 60% 40% at 85% -5%, rgba(196,74,63,.08) 0%, transparent 60%),
-      radial-gradient(ellipse 70% 50% at -5% 105%, rgba(180,141,74,.10) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 40% at 85% -5%, rgba(132,102,178,.14) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at -5% 105%, rgba(196,74,63,.07) 0%, transparent 55%),
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
@@ -460,6 +462,58 @@
     line-height: 1.6;
     color: var(--ink-2);
     margin-bottom: 14px;
+  }
+  .post.local-post {
+    border-color: var(--hug-soft);
+    box-shadow: 0 18px 44px -30px rgba(196, 74, 63, 0.34);
+  }
+  .post .claim-ref {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin: 0 0 12px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: var(--hug-bg);
+    color: var(--hug-2);
+    font: 600 10px var(--sans);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+  .forum-diff {
+    background: rgba(250, 233, 224, 0.35);
+    border: 1px solid var(--hug-soft);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 12px 0 14px;
+    font-size: 14px;
+    color: var(--ink-2);
+    white-space: pre-wrap;
+  }
+  .forum-diff strong {
+    display: block;
+    margin-bottom: 6px;
+    font: 600 10px var(--sans);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-3);
+  }
+  s.struck {
+    color: var(--hug-2);
+    text-decoration: line-through;
+    text-decoration-color: var(--hug);
+    text-decoration-thickness: 2px;
+    background: rgba(196, 74, 63, 0.08);
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+  ins.correction {
+    background: rgba(180, 141, 74, 0.20);
+    color: var(--ink);
+    text-decoration: none;
+    padding: 0 3px;
+    border-radius: 2px;
+    font-weight: 500;
   }
   .pdf-toggle {
     display: inline-flex;
@@ -1407,6 +1461,116 @@
     });
   }
   setInterval(tickLiveStats, 5000);
+
+  const FORUM_POSTS_KEY = 'hug:forum:posts';
+  function escapeHtml(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+  function tokenize(text) {
+    return String(text).split(/(\s+|[^\w\s]+)/).filter(t => t !== '');
+  }
+  function diffWords(a, b) {
+    const aw = tokenize(a), bw = tokenize(b);
+    const m = aw.length, n = bw.length;
+    const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        dp[i][j] = aw[i - 1] === bw[j - 1]
+          ? dp[i - 1][j - 1] + 1
+          : Math.max(dp[i - 1][j], dp[i][j - 1]);
+      }
+    }
+    const parts = [];
+    let i = m, j = n;
+    while (i > 0 && j > 0) {
+      if (aw[i - 1] === bw[j - 1]) { parts.unshift({ type: 'eq', text: aw[i - 1] }); i--; j--; }
+      else if (dp[i - 1][j] >= dp[i][j - 1]) { parts.unshift({ type: 'del', text: aw[i - 1] }); i--; }
+      else { parts.unshift({ type: 'ins', text: bw[j - 1] }); j--; }
+    }
+    while (i > 0) { parts.unshift({ type: 'del', text: aw[i - 1] }); i--; }
+    while (j > 0) { parts.unshift({ type: 'ins', text: bw[j - 1] }); j--; }
+    const out = [];
+    parts.forEach((p) => {
+      const last = out[out.length - 1];
+      if (last && last.type === p.type) last.text += p.text;
+      else out.push({ ...p });
+    });
+    return out;
+  }
+  function renderDiff(parts) {
+    return parts.map(p => {
+      if (p.type === 'eq') return escapeHtml(p.text);
+      if (p.type === 'del') return `<s class="struck">${escapeHtml(p.text)}</s>`;
+      if (p.type === 'ins') return `<ins class="correction">${escapeHtml(p.text)}</ins>`;
+      return '';
+    }).join('');
+  }
+  function readLocalForumPosts() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(FORUM_POSTS_KEY) || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  function localForumPostMarkup(post) {
+    const edits = Array.isArray(post.edits) ? post.edits : [];
+    const first = edits[0] || {};
+    const diff = first.original && first.edited ? renderDiff(diffWords(first.original, first.edited)) : '';
+    const context = post.context || (edits.length > 1
+      ? `Posted from claim ${post.ref || 'HUG'} with ${edits.length} edited AI responses.`
+      : `Posted from claim ${post.ref || 'HUG'} with the submitted correction ready for community review.`);
+    return `
+      <article class="post local-post" data-domain="${escapeHtml(post.domain || 'math')}" data-local-post="true">
+        <div class="post-head">
+          <span class="avatar c1">YOU</span>
+          <span class="author">@you</span>
+          <span class="sep">&middot;</span>
+          <span class="tag brand">${escapeHtml(post.brand || 'AI')}</span>
+          <span class="tag domain">${escapeHtml(post.domain || 'math')}</span>
+          <span class="sep">&middot;</span>
+          <span class="time">just now</span>
+          <span class="status pending">pending <span class="amt">$${escapeHtml(post.payout || 0)}</span></span>
+        </div>
+        <span class="claim-ref">${escapeHtml(post.ref || 'HUG')}</span>
+        <h3>${escapeHtml(post.title || 'Submitted AI correction')}</h3>
+        <div class="excerpt">
+          <em class="q">${escapeHtml(post.brand || 'AI')} said:</em>
+          ${escapeHtml(first.original || 'Original AI response saved in the submitted claim.')}
+        </div>
+        ${diff ? `<div class="forum-diff"><strong>submitted correction</strong>${diff}</div>` : ''}
+        <p class="context">${escapeHtml(context)}</p>
+        <div class="post-foot">
+          <button class="vote-pill" data-votes="0"><span class="arrow">&#9650;</span> <span class="v">0</span></button>
+          <button class="meta-link toggle-comments">0 comments</button>
+          <button class="reply-btn">reply</button>
+        </div>
+        <div class="comments">
+          <div class="add-comment">
+            <span class="avatar c1">YOU</span>
+            <input type="text" placeholder="Add context, source, or reviewer note..." />
+            <button type="button">post</button>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+  function renderLocalForumPosts() {
+    const postsContainer = document.getElementById('posts');
+    if (!postsContainer) return;
+    readLocalForumPosts().slice().reverse().forEach((post) => {
+      postsContainer.insertAdjacentHTML('afterbegin', localForumPostMarkup(post));
+    });
+    if (new URLSearchParams(location.search).get('posted') === '1') {
+      const first = postsContainer.querySelector('.local-post');
+      if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+  renderLocalForumPosts();
 
   // Helper: identify a post by its title for analytics
   function postKey(post) {
