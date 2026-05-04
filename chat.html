@@ -1084,7 +1084,7 @@
     </a>
     <div class="meta">
       <a href="forum.html" style="font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink-2);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s,color .15s;padding-bottom:1px;" onmouseover="this.style.color='var(--hug)';this.style.borderBottomColor='var(--hug)';" onmouseout="this.style.color='var(--ink-2)';this.style.borderBottomColor='transparent';">forum</a>
-      <a href="login.html" style="font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink-2);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s,color .15s;padding-bottom:1px;" onmouseover="this.style.color='var(--hug)';this.style.borderBottomColor='var(--hug)';" onmouseout="this.style.color='var(--ink-2)';this.style.borderBottomColor='transparent';">login</a>
+      <a href="login.html" id="accountLink" style="font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink-2);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s,color .15s;padding-bottom:1px;" onmouseover="this.style.color='var(--hug)';this.style.borderBottomColor='var(--hug)';" onmouseout="this.style.color='var(--ink-2)';this.style.borderBottomColor='transparent';">login</a>
     </div>
   </header>
 
@@ -2501,6 +2501,15 @@
   }
 
   /* ---------- init: open on an empty real chat ---------- */
+  try {
+    const user = JSON.parse(localStorage.getItem('hug:user') || 'null');
+    const accountLink = document.getElementById('accountLink');
+    if (accountLink && user && user.signedIn && user.username) {
+      accountLink.textContent = user.username;
+      accountLink.title = 'Demo local profile';
+    }
+  } catch (e) { /* localStorage blocked — keep login label */ }
+
   appEl.dataset.mode = 'chat';
   initChatPersistence();
   if (!convo.querySelector('.msg')) resetScore('ask a question to size the bounty.');

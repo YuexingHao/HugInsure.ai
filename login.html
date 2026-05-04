@@ -146,19 +146,6 @@
     background: #fffdf8;
     transform: translateY(-1px);
   }
-  .mark {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    color: white;
-  }
-  .mark.google { background: #4285f4; }
-  .mark.meta { background: #0866ff; }
-  .mark.email { background: var(--ink); }
   .provider-btn strong { display: block; font-size: 14px; }
   .provider-btn span.copy { display: block; color: var(--ink-3); font-size: 12px; }
   .provider-btn span.state {
@@ -168,12 +155,82 @@
     text-transform: uppercase;
     letter-spacing: .14em;
   }
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid rgba(26,22,18,.10);
+    box-shadow: inset 0 -8px 16px rgba(26,22,18,.04);
+    font-weight: 800;
+  }
+  .google-logo .g {
+    font-size: 21px;
+    line-height: 1;
+    background: conic-gradient(from -35deg, #4285f4 0 24%, #34a853 24% 43%, #fbbc05 43% 63%, #ea4335 63% 82%, #4285f4 82% 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-family: Arial, sans-serif;
+  }
+  .meta-logo {
+    background: #eef4ff;
+    color: #0866ff;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -.1em;
+  }
+  .email-logo {
+    background: var(--ink);
+    color: #fff;
+    font-size: 18px;
+  }
+  .openai-logo {
+    background: #f4f1e9;
+    color: #171717;
+    font-size: 17px;
+    letter-spacing: -.03em;
+  }
+  .anthropic-logo {
+    background: #f0e8dd;
+    color: #1f1a14;
+    font-family: Georgia, serif;
+    font-size: 21px;
+  }
+  .provider-divider {
+    margin: 4px 0 0;
+    padding-top: 4px;
+    color: var(--ink-3);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
   .profile-preview {
+    width: 100%;
     margin-top: 18px;
     padding: 14px;
     border: 1px solid var(--line);
     border-radius: 14px;
     background: var(--paper-2);
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color .16s, box-shadow .16s, transform .16s, background .16s;
+    font: inherit;
+  }
+  .profile-preview:hover {
+    border-color: rgba(99, 91, 255, .38);
+    background: #eee7f6;
+    box-shadow: 0 14px 34px -26px rgba(40, 25, 10, .36);
+    transform: translateY(-1px);
+  }
+  .profile-preview.signed {
+    border-color: rgba(99, 91, 255, .44);
+    background: #f4effb;
   }
   .profile-row {
     display: flex;
@@ -194,6 +251,29 @@
   }
   .profile-row strong { display: block; }
   .profile-row span { display: block; color: var(--ink-3); font-size: 12.5px; }
+  .profile-action {
+    margin-top: 10px;
+    color: var(--violet);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .demo-signout {
+    margin-top: 10px;
+    border: 0;
+    background: transparent;
+    color: var(--ink-3);
+    cursor: pointer;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+    transition: color .15s, text-decoration-color .15s;
+  }
+  .demo-signout:hover { color: var(--hug); text-decoration-color: var(--hug); }
   .note {
     margin-top: 18px;
     padding: 14px 16px;
@@ -271,8 +351,8 @@
           <p>Future login will replace the current local demo identity so forum posts and payouts are tied to the signed-in user.</p>
         </div>
         <div>
-          <strong>OAuth comes next.</strong>
-          <p>This page is ready for Google, Meta, and email providers; backend session storage and provider secrets still need to be wired.</p>
+          <strong>OAuth and imports come next.</strong>
+          <p>This page is ready for Google, Meta, and email sign-in. OpenAI and Anthropic are shown as future chat-history import paths for failure-mode collection.</p>
         </div>
       </div>
     </section>
@@ -282,31 +362,44 @@
       <p class="sub">Choose a provider to connect later.</p>
       <div class="provider-stack">
         <button class="provider-btn" data-provider="google" type="button">
-          <span class="mark google">G</span>
+          <span class="brand-logo google-logo" aria-hidden="true"><span class="g">G</span></span>
           <span><strong>Google</strong><span class="copy">Use a Google account for claims and forum identity</span></span>
           <span class="state">soon</span>
         </button>
         <button class="provider-btn" data-provider="meta" type="button">
-          <span class="mark meta">M</span>
+          <span class="brand-logo meta-logo" aria-hidden="true">∞</span>
           <span><strong>Meta</strong><span class="copy">Connect Facebook or Instagram identity later</span></span>
           <span class="state">soon</span>
         </button>
         <button class="provider-btn" data-provider="email" type="button">
-          <span class="mark email">@</span>
+          <span class="brand-logo email-logo" aria-hidden="true">@</span>
           <span><strong>Email</strong><span class="copy">Reserve an email-only account path</span></span>
           <span class="state">soon</span>
         </button>
+        <div class="provider-divider">future chat imports</div>
+        <button class="provider-btn" data-provider="openai" type="button">
+          <span class="brand-logo openai-logo" aria-hidden="true">AI</span>
+          <span><strong>OpenAI</strong><span class="copy">Plan for exported ChatGPT histories and shared conversations</span></span>
+          <span class="state">import</span>
+        </button>
+        <button class="provider-btn" data-provider="anthropic" type="button">
+          <span class="brand-logo anthropic-logo" aria-hidden="true">A</span>
+          <span><strong>Anthropic</strong><span class="copy">Plan for exported Claude chats and shared transcripts</span></span>
+          <span class="state">import</span>
+        </button>
       </div>
 
-      <div class="profile-preview">
+      <button class="profile-preview" id="demoProfile" type="button" aria-pressed="false">
         <div class="profile-row">
-          <span class="avatar">YU</span>
+          <span class="avatar" id="profileAvatar">YU</span>
           <span>
-            <strong>Demo local profile</strong>
-            <span>Not signed in. Stored only in this browser.</span>
+            <strong id="profileTitle">Demo local profile</strong>
+            <span id="profileSubtitle">Not signed in. Stored only in this browser.</span>
           </span>
         </div>
-      </div>
+        <div class="profile-action" id="profileAction">Click to continue as yuexing</div>
+      </button>
+      <button class="demo-signout" id="demoSignOut" type="button" hidden>Sign out demo profile</button>
       <p class="note" id="loginStatus">Provider connection is not active yet. This page is the front-end contract for the upcoming auth flow.</p>
     </aside>
   </main>
@@ -326,14 +419,80 @@
 </div>
 
 <script>
+  const HUG_USER_KEY = 'hug:user';
+  const demoUser = {
+    id: 'yuexing',
+    username: 'yuexing',
+    displayName: 'Yuexing',
+    avatar: 'YU',
+    provider: 'demo-local',
+    signedIn: true
+  };
+
+  function readHugUser() {
+    try { return JSON.parse(localStorage.getItem(HUG_USER_KEY) || 'null'); }
+    catch (err) { return null; }
+  }
+
+  function writeHugUser(user) {
+    try { localStorage.setItem(HUG_USER_KEY, JSON.stringify({ ...user, signedInAt: new Date().toISOString() })); }
+    catch (err) { console.warn('Could not save demo user:', err); }
+  }
+
+  function clearHugUser() {
+    try { localStorage.removeItem(HUG_USER_KEY); }
+    catch (err) { console.warn('Could not clear demo user:', err); }
+  }
+
+  function renderProfile() {
+    const user = readHugUser();
+    const signedIn = Boolean(user && user.signedIn);
+    const card = document.getElementById('demoProfile');
+    const avatar = document.getElementById('profileAvatar');
+    const title = document.getElementById('profileTitle');
+    const subtitle = document.getElementById('profileSubtitle');
+    const action = document.getElementById('profileAction');
+    const signOut = document.getElementById('demoSignOut');
+    const status = document.getElementById('loginStatus');
+
+    card.classList.toggle('signed', signedIn);
+    card.setAttribute('aria-pressed', signedIn ? 'true' : 'false');
+    avatar.textContent = signedIn ? (user.avatar || 'YU') : 'YU';
+    title.textContent = signedIn ? `Signed in as ${user.username || 'yuexing'}` : 'Demo local profile';
+    subtitle.textContent = signedIn
+      ? 'Demo account active. Claims and forum drafts can use this local identity.'
+      : 'Not signed in. Stored only in this browser.';
+    action.textContent = signedIn ? 'Demo login active' : 'Click to continue as yuexing';
+    signOut.hidden = !signedIn;
+    if (signedIn) status.textContent = 'You are using the local yuexing demo profile. This is not OAuth; it is browser-only fake login for demos.';
+  }
+
+  document.getElementById('demoProfile').addEventListener('click', () => {
+    writeHugUser(demoUser);
+    renderProfile();
+    if (window.hugEvent) hugEvent('demo_login_clicked', { user: demoUser.username });
+  });
+
+  document.getElementById('demoSignOut').addEventListener('click', () => {
+    clearHugUser();
+    renderProfile();
+    document.getElementById('loginStatus').textContent = 'Demo profile signed out. Click the profile card to continue as yuexing again.';
+    if (window.hugEvent) hugEvent('demo_login_signed_out', { user: 'yuexing' });
+  });
+
   document.querySelectorAll('.provider-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const provider = btn.dataset.provider || 'provider';
       const status = document.getElementById('loginStatus');
-      status.textContent = `${provider[0].toUpperCase()}${provider.slice(1)} login is reserved for the next OAuth setup.`;
+      const label = `${provider[0].toUpperCase()}${provider.slice(1)}`;
+      status.textContent = ['openai', 'anthropic'].includes(provider)
+        ? `${label} is reserved as a future chat-history import path for AI failure-mode collection.`
+        : `${label} login is reserved for the next OAuth setup.`;
       if (window.hugEvent) hugEvent('login_provider_preview_clicked', { provider });
     });
   });
+
+  renderProfile();
 </script>
 </body>
 </html>
